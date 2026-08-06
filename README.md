@@ -75,7 +75,19 @@ Creative Director → brand-designer (concepts/tokens) + web-designer (this app)
 |---------|------|
 | Design brief | `docs/orgs/superpatch/.../15-media/design/VIDEO-BRIEF.md` |
 | HyperFrames deck | `.../15-media/hyperframes/income-stack-deck/` |
+| Remotion film | `src/remotion/` (this app) |
 | OpenMontage finals | `.../15-media/openmontage/` |
+
+HyperFrames remains the approved HTML film. Remotion is the motion-first surface
+(transitions, layered diagrams, kinetic type) on branch `feature/income-stack-remotion`.
+
+```bash
+# Remotion Studio (1920×1080, fade transitions)
+npm run remotion
+
+# Optional CLI render → openmontage/
+npm run remotion:render
+```
 
 Regenerate the HyperFrames HTML from `slides.ts`:
 
@@ -83,7 +95,7 @@ Regenerate the HyperFrames HTML from `slides.ts`:
 npm run hyperframes:generate
 ```
 
-Preview / render (Node ≥ 22, FFmpeg):
+Preview / render HyperFrames (Node ≥ 22, FFmpeg):
 
 ```bash
 cd ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/hyperframes/income-stack-deck
@@ -92,4 +104,4 @@ npx hyperframes preview
 npx hyperframes render --quality high --output ../../openmontage/income-stack-deck-final.mp4
 ```
 
-Optional hero loops from OpenMontage → drop into `public/loops/` and set `heroVideoSrc` on slides.
+Optional hero loops → `public/concepts/animated/` and set `heroVideoSrc` on slides.

@@ -10,12 +10,20 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "hyperframes:generate": "node scripts/generate-hyperframes.mjs"
+    "hyperframes:generate": "node scripts/generate-hyperframes.mjs",
+    "remotion": "remotion studio src/remotion/index.ts",
+    "remotion:compositions": "remotion compositions src/remotion/index.ts",
+    "remotion:render": "remotion render src/remotion/index.ts IncomeStackFilm ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/openmontage/income-stack-deck-remotion.mp4"
   },
   "dependencies": {
+    "@remotion/cli": "^4.0.506",
+    "@remotion/google-fonts": "^4.0.506",
+    "@remotion/media": "^4.0.506",
+    "@remotion/transitions": "^4.0.506",
     "gsap": "^3.15.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.506"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
