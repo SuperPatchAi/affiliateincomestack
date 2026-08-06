@@ -1,6 +1,6 @@
 # Super Patch Income Stack™ — Animated Deck
 
-Mobile-first scroll presentation for new affiliates. Concept plates from the v1 art direction deck; on-slide copy from the Income Stack / Full Stack outline; hybrid GSAP motion.
+Mobile-first **fluid document** presentation for new affiliates. High-quality concept plates sit in aspect-aware frames (`object-fit: contain` — full composition, no aggressive crop). Live type and per-slide GSAP entrances sit beside/below the imagery.
 
 ## Portfolio
 

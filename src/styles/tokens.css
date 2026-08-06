@@ -27,7 +27,9 @@ body,
 
 body {
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+
 
 .accent-blue {
   --slide-accent: var(--sp-blue);
