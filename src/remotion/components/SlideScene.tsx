@@ -7,7 +7,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import type { Slide } from "../../data/slides";
+import { heroSrc, type Slide } from "../../data/slides";
 import { pickCopyAnchor } from "../layout";
 import { publicAssetPath } from "../timeline";
 import { COLORS } from "../theme";
@@ -40,15 +40,15 @@ function KenBurnsPlate({ src }: { src: string }) {
 
 export function SlideScene({ slide }: Props) {
   const { anchor, showAnnotations } = pickCopyAnchor(slide);
-  const useSlabs =
-    !slide.heroVideoSrc && slide.motionPreset === "parallax-slabs";
+  const videoSrc = heroSrc(slide);
+  const useSlabs = !videoSrc && slide.motionPreset === "parallax-slabs";
 
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.bg }}>
       <AbsoluteFill>
-        {slide.heroVideoSrc ? (
+        {videoSrc ? (
           <OffthreadVideo
-            src={staticFile(publicAssetPath(slide.heroVideoSrc))}
+            src={staticFile(publicAssetPath(videoSrc))}
             style={{
               width: "100%",
               height: "100%",

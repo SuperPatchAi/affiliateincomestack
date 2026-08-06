@@ -1,4 +1,5 @@
 import { annotationSpanPct, type Slide } from "../data/slides";
+import { shouldShowLiveAnnotations } from "./labels";
 
 export type CopyAnchor = "bl" | "br" | "tl" | "tr";
 
@@ -11,7 +12,8 @@ export function pickCopyAnchor(slide: Slide): {
   showAnnotations: boolean;
 } {
   const annotations = slide.annotations ?? [];
-  if (!annotations.length || slide.heroVideoSrc) {
+  const showAnnotations = shouldShowLiveAnnotations(slide);
+  if (!showAnnotations) {
     return { anchor: "bl", showAnnotations: false };
   }
 

@@ -1,5 +1,11 @@
 import type { Slide as SlideData } from "../data/slides";
-import { fittedSizePct, TITLE_SLAB_BASE, TITLE_SLAB_SRCS } from "../data/slides";
+import {
+  fittedSizePct,
+  heroSrc,
+  TITLE_SLAB_BASE,
+  TITLE_SLAB_SRCS,
+} from "../data/slides";
+import { shouldShowLiveAnnotations } from "../remotion/labels";
 import { Flywheel } from "./Flywheel";
 
 type Props = {
@@ -11,6 +17,8 @@ export function Slide({ slide, index }: Props) {
   const mediaSide = index % 2 === 0 ? "media-first" : "copy-first";
   const showCornerFlywheel =
     Boolean(slide.flywheelArc) && slide.motionPreset !== "flywheel-scrub";
+  const videoSrc = heroSrc(slide);
+  const showAnnotations = shouldShowLiveAnnotations(slide);
 
   return (
     <section
@@ -23,10 +31,10 @@ export function Slide({ slide, index }: Props) {
       <div className="slide-inner">
         <div className="slide-media-col" data-slide-media>
           <figure className="slide-media-frame">
-            {slide.heroVideoSrc ? (
+            {videoSrc ? (
               <video
                 className="slide-plate"
-                src={slide.heroVideoSrc}
+                src={videoSrc}
                 poster={slide.conceptSrc}
                 autoPlay
                 muted
@@ -77,8 +85,7 @@ export function Slide({ slide, index }: Props) {
             )}
             <div className="slide-media-glow" aria-hidden />
 
-            {/* Hero loops often re-introduce plate type; don't stack a second label layer. */}
-            {!slide.heroVideoSrc && slide.annotations?.length ? (
+            {showAnnotations && slide.annotations?.length ? (
               <div className="plate-annotations" data-annotation-layer aria-hidden>
                 {slide.annotations.map((annotation, i) => (
                   <span

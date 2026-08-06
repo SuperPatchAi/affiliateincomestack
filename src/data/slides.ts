@@ -82,10 +82,21 @@ export function annotationSpanPct(a: PlateAnnotation): {
   };
 }
 
+export type HeroMedia = {
+  src: string;
+  /** Native pixel size of the source file. New assets must be 1920×1080. */
+  width: number;
+  height: number;
+  /** True when the loop already contains diagram labels that would duplicate live overlays. */
+  annotationsBaked: boolean;
+};
+
 export type Slide = {
   id: string;
   conceptSrc: string;
+  /** @deprecated Prefer `hero`. Kept during migration if any scripts still read it. */
   heroVideoSrc?: string;
+  hero?: HeroMedia;
   accent: SlideAccent;
   eyebrow: string;
   headline: string;
@@ -101,8 +112,12 @@ export type Slide = {
 export const STILL_CLIP_SEC = 5;
 export const HERO_CLIP_SEC = 10;
 
+export function heroSrc(slide: Slide): string | undefined {
+  return slide.hero?.src ?? slide.heroVideoSrc;
+}
+
 export function clipDurationSec(slide: Slide): number {
-  return slide.heroVideoSrc ? HERO_CLIP_SEC : STILL_CLIP_SEC;
+  return heroSrc(slide) ? HERO_CLIP_SEC : STILL_CLIP_SEC;
 }
 
 export const INCOME_DISCLOSURE =
@@ -163,6 +178,12 @@ export const SLIDES: Slide[] = [
   {
     id: "01-title",
     conceptSrc: "/concepts/clean/sp-stack-01-title.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-01-title_animated.mp4",
+      width: 1280,
+      height: 720,
+      annotationsBaked: false,
+    },
     heroVideoSrc: "/concepts/animated/sp-stack-01-title_animated.mp4",
     accent: "blue",
     eyebrow: "The Super Patch Income Stack™",
@@ -185,6 +206,12 @@ export const SLIDES: Slide[] = [
   {
     id: "03-four-stacks",
     conceptSrc: "/concepts/clean/sp-stack-03-four-stacks.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
+      width: 1280,
+      height: 720,
+      annotationsBaked: true,
+    },
     heroVideoSrc: "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
     accent: "multi",
     eyebrow: "The Super Patch Full Stack",

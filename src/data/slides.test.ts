@@ -165,4 +165,19 @@ describe("plate annotations", () => {
     );
   });
 
+  it("declares hero media metadata with explicit baked-label policy", () => {
+    expect(byId("01-title").hero).toMatchObject({
+      src: "/concepts/animated/sp-stack-01-title_animated.mp4",
+      width: 1280,
+      height: 720,
+      annotationsBaked: false,
+    });
+    expect(byId("03-four-stacks").hero).toMatchObject({
+      src: "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
+      width: 1280,
+      height: 720,
+      annotationsBaked: true,
+    });
+  });
+
 });
