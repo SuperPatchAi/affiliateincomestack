@@ -100,6 +100,13 @@ export type Slide = {
 export const INCOME_DISCLOSURE =
   "Income is not guaranteed. Results vary. See the Super Patch Income Disclosure.";
 
+/** Title plate stack: 10 coloured slabs drop in one-by-one. Paths under public/. */
+export const TITLE_SLAB_BASE = "/concepts/slabs/title-base.png";
+export const TITLE_SLAB_SRCS = Array.from(
+  { length: 10 },
+  (_, i) => `/concepts/slabs/title-slab-${String(i).padStart(2, "0")}.png`,
+);
+
 export function wordCount(text: string): number {
   return text
     .trim()

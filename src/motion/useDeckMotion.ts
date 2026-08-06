@@ -20,12 +20,39 @@ function buildEntrance(
   const preset = slide.dataset.motion ?? "ken-burns-glow";
   const tl = gsap.timeline({ paused: true });
 
-  if (plate) {
+  const slabs = gsap.utils.toArray<HTMLElement>(
+    slide.querySelectorAll("[data-slab]"),
+  );
+
+  if (preset === "parallax-slabs" && slabs.length) {
+    // Coloured stack sections drop onto the scene one by one from the top.
+    // Brand easing is ease-out; duration is longer than the 300ms micro-interaction
+    // budget because this is a storytelling beat, not a UI feedback cue.
+    if (plate) {
+      tl.fromTo(
+        plate,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4, ease: "power2.out" },
+        0,
+      );
+    }
+    tl.fromTo(
+      slabs,
+      { y: -220, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.45,
+        stagger: 0.1,
+        ease: "power3.out",
+      },
+      0.15,
+    );
+  } else if (plate) {
     const fromVars: gsap.TweenVars = { opacity: 0, duration: 0.9, ease: "power3.out" };
     const toVars: gsap.TweenVars = { opacity: 1, y: 0, scale: 1, rotateX: 0, filter: "brightness(1)" };
 
     switch (preset) {
-      case "parallax-slabs":
       case "exploded-layers":
         Object.assign(fromVars, { y: 48, scale: 0.94, rotateX: 8 });
         break;
@@ -55,6 +82,19 @@ function buildEntrance(
     gsap.to(plate, {
       yPercent: preset.includes("leap") || preset.includes("rise") ? -3 : 2.5,
       scale: 1.015,
+      ease: "none",
+      scrollTrigger: {
+        trigger: slide,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+      },
+    });
+  }
+
+  if (preset === "parallax-slabs" && slabs.length && plate) {
+    gsap.to([plate, ...slabs], {
+      yPercent: 2.5,
       ease: "none",
       scrollTrigger: {
         trigger: slide,
@@ -103,7 +143,9 @@ export function useDeckMotion(enabled: boolean) {
   useEffect(() => {
     if (!enabled) {
       // Ensure content visible when motion is off
-      gsap.set("[data-slide-plate], [data-anim], .flywheel-arc", { clearProps: "all" });
+      gsap.set("[data-slide-plate], [data-slab], [data-anim], .flywheel-arc", {
+        clearProps: "all",
+      });
       return;
     }
     ensurePlugin();

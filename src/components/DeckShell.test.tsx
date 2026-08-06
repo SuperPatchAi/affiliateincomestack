@@ -16,8 +16,16 @@ describe("DeckShell", () => {
     const slides = container.querySelectorAll("[data-layout='fluid']");
     expect(slides).toHaveLength(15);
     const plate = container.querySelector<HTMLImageElement>("[data-slide-plate]");
-    expect(plate?.getAttribute("src")).toMatch(/\/concepts\/clean\/sp-stack-/);
+    // Title slide composites a clear base + ten coloured slabs for the drop-in beat.
+    expect(plate?.getAttribute("src")).toMatch(/\/concepts\/slabs\/title-base\.png$/);
     expect(plate?.getAttribute("width")).toBe("1920");
+    expect(
+      container.querySelectorAll("[data-slide='01-title'] [data-slab]"),
+    ).toHaveLength(10);
+    const later = container.querySelector<HTMLImageElement>(
+      "[data-slide='02-question'] [data-slide-plate]",
+    );
+    expect(later?.getAttribute("src")).toMatch(/\/concepts\/clean\/sp-stack-/);
   });
 
   it("renders plate annotations as positioned overlay type", () => {

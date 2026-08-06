@@ -3,16 +3,23 @@
 :root {
   --sp-bg: #05070f;
   --sp-bg-elevated: #0a0e1a;
-  --sp-text: #f4f6fb;
-  --sp-muted: #9aa3b5;
+  /* Brand website greys, inverted for the dark stage. The guide pairs a Grey 900 headline
+     with Grey 700 body so body copy always carries less contrast; on dark that becomes
+     white over Grey 300, with Grey 500 for fine print. */
+  --sp-text: #ffffff;
+  --sp-muted: #c8c8c8;
+  --sp-fine: #888888;
   --sp-red: #dd0604;
   --sp-blue: #2f6bff;
   --sp-green: #22d36b;
   --sp-orange: #ff7a1a;
   --sp-violet: #8b5cff;
   --sp-cool: #c8d0e0;
-  --font-display: "Montserrat", system-ui, sans-serif;
-  --font-body: "Avenir Next", "Montserrat", system-ui, sans-serif;
+  /* Avenir Next is the brand font for design work, but the guide specifies Montserrat for
+     HTML applications, falling back to Helvetica then Arial. Preferring Avenir Next here
+     would render this deck differently for macOS viewers than for everyone else. */
+  --font-display: "Montserrat", Helvetica, Arial, sans-serif;
+  --font-body: "Montserrat", Helvetica, Arial, sans-serif;
 }
 
 html,
@@ -46,8 +53,11 @@ body {
 .accent-cool {
   --slide-accent: var(--sp-cool);
 }
+/* Brand red is too dark for small type on the near-black stage, so accent text gets a
+   lighter tint of it while fills and glows keep the true brand red. */
 .accent-red {
   --slide-accent: var(--sp-red);
+  --slide-accent-text: #ef8989;
 }
 .accent-multi {
   --slide-accent: var(--sp-blue);

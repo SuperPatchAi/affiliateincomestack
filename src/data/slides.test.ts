@@ -5,6 +5,8 @@ import {
   assertSlidesValid,
   fittedSizePct,
   annotationSpanPct,
+  TITLE_SLAB_SRCS,
+  TITLE_SLAB_BASE,
 } from "./slides";
 
 describe("SLIDES", () => {
@@ -146,4 +148,12 @@ describe("plate annotations", () => {
     );
     expect(() => assertSlidesValid(broken)).toThrow(/annotation/i);
   });
+
+  it("title plate owns ten drop-in slab layers", () => {
+    const title = SLIDES.find((s) => s.id === "01-title")!;
+    expect(title.motionPreset).toBe("parallax-slabs");
+    expect(TITLE_SLAB_SRCS).toHaveLength(10);
+    expect(TITLE_SLAB_BASE).toContain("title-base");
+  });
+
 });

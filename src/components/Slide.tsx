@@ -1,5 +1,5 @@
 import type { Slide as SlideData } from "../data/slides";
-import { fittedSizePct } from "../data/slides";
+import { fittedSizePct, TITLE_SLAB_BASE, TITLE_SLAB_SRCS } from "../data/slides";
 import { Flywheel } from "./Flywheel";
 
 type Props = {
@@ -34,6 +34,35 @@ export function Slide({ slide, index }: Props) {
                 playsInline
                 data-slide-plate
               />
+            ) : slide.motionPreset === "parallax-slabs" ? (
+              <>
+                <img
+                  className="slide-plate"
+                  src={TITLE_SLAB_BASE}
+                  alt=""
+                  width={1920}
+                  height={1080}
+                  decoding="async"
+                  loading="eager"
+                  data-slide-plate
+                />
+                <div className="slab-stack" aria-hidden>
+                  {TITLE_SLAB_SRCS.map((src, i) => (
+                    <img
+                      key={src}
+                      className="slide-plate slab"
+                      src={src}
+                      alt=""
+                      width={1920}
+                      height={1080}
+                      decoding="async"
+                      loading="eager"
+                      data-slab
+                      data-slab-index={i}
+                    />
+                  ))}
+                </div>
+              </>
             ) : (
               <img
                 className="slide-plate"

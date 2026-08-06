@@ -1,0 +1,67 @@
+{
+  "plate": "sp-stack-01-title.png",
+  "base": "title-base.png",
+  "count": 10,
+  "sourceSize": [
+    1536,
+    1024
+  ],
+  "stackBounds": {
+    "x0": 449,
+    "x1": 1075,
+    "y0": 267,
+    "y1": 911
+  },
+  "slabs": [
+    {
+      "file": "title-slab-00.png",
+      "y0": 267,
+      "y1": 321
+    },
+    {
+      "file": "title-slab-01.png",
+      "y0": 321,
+      "y1": 387
+    },
+    {
+      "file": "title-slab-02.png",
+      "y0": 387,
+      "y1": 447
+    },
+    {
+      "file": "title-slab-03.png",
+      "y0": 447,
+      "y1": 508
+    },
+    {
+      "file": "title-slab-04.png",
+      "y0": 508,
+      "y1": 569
+    },
+    {
+      "file": "title-slab-05.png",
+      "y0": 569,
+      "y1": 631
+    },
+    {
+      "file": "title-slab-06.png",
+      "y0": 631,
+      "y1": 691
+    },
+    {
+      "file": "title-slab-07.png",
+      "y0": 691,
+      "y1": 749
+    },
+    {
+      "file": "title-slab-08.png",
+      "y0": 749,
+      "y1": 811
+    },
+    {
+      "file": "title-slab-09.png",
+      "y0": 811,
+      "y1": 911
+    }
+  ]
+}

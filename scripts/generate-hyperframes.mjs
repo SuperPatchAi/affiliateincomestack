@@ -10,9 +10,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "../../..");
 
 // Dynamic import of TS via Node type stripping
-const { SLIDES, fittedSizePct, annotationSpanPct } = await import(
-  "../src/data/slides.ts"
-);
+const {
+  SLIDES,
+  fittedSizePct,
+  annotationSpanPct,
+  TITLE_SLAB_BASE,
+  TITLE_SLAB_SRCS,
+} = await import("../src/data/slides.ts");
 
 const CLIP_DUR = 5;
 const total = SLIDES.length * CLIP_DUR;
@@ -26,7 +30,7 @@ mkdirSync(assetsDir, { recursive: true });
 // Small accent type needs a lighter tint than the fill accent to clear WCAG AA on the
 // near-black stage; only the brand red is dark enough to need one.
 const accentTextHex = {
-  red: "#ee8080",
+  red: "#ef8989",
 };
 
 const accentHex = {
@@ -51,6 +55,43 @@ for (const s of SLIDES) {
   const file = s.conceptSrc.split("/").pop();
   cpSync(join(__dirname, "../public", s.conceptSrc), join(assetsDir, file));
 }
+// Title stack layers (base + 10 coloured slabs) for the drop-in beat.
+for (const src of [TITLE_SLAB_BASE, ...TITLE_SLAB_SRCS]) {
+  const file = src.split("/").pop();
+  cpSync(join(__dirname, "../public", src), join(assetsDir, file));
+}
+
+function plateMarkup(slide) {
+  if (slide.motionPreset === "parallax-slabs") {
+    const base = TITLE_SLAB_BASE.split("/").pop();
+    const slabs = TITLE_SLAB_SRCS.map((src, i) => {
+      const file = src.split("/").pop();
+      return `<img id="slab-${slide.id}-${i}" class="plate slab" src="assets/${file}" alt="" width="1920" height="1080" />`;
+    }).join("\n          ");
+    return `
+        <img
+          id="img-${slide.id}"
+          class="plate"
+          src="assets/${base}"
+          alt=""
+          width="1920"
+          height="1080"
+        />
+        <div class="slab-stack" id="slabs-${slide.id}" aria-hidden="true">
+          ${slabs}
+        </div>`;
+  }
+  const file = slide.conceptSrc.split("/").pop();
+  return `
+        <img
+          id="img-${slide.id}"
+          class="plate"
+          src="assets/${file}"
+          alt=""
+          width="1920"
+          height="1080"
+        />`;
+}
 
 // Plates are 3:2 and contain-fitted into the 1920x1080 stage, so the annotation layer
 // covers the 1620x1080 letterboxed image rather than the full frame.
@@ -58,20 +99,65 @@ const PLATE_W = 1620;
 const PLATE_H = 1080;
 const PLATE_X = (1920 - PLATE_W) / 2;
 
-// The copy block is a fixed-size panel; it moves to whichever corner leaves the plate's
-// annotations unobstructed. Sized generously so long bodies still clear.
-const COPY_W = 1100;
-const COPY_H = 430;
+// The copy block moves to whichever corner leaves the plate's annotations unobstructed.
+// Its footprint is estimated per slide from the wrapped headline and body: a fixed box
+// would be wrong in both directions now that headlines are uppercase — too short for a
+// three-line headline, and too wide for every slide, which forces annotations off plates
+// that in fact have room for them.
+const COPY_MAX_W = 1100;
 const MARGIN_X = 96;
 const MARGIN_Y = 88;
 const CLEARANCE = 28;
+const EYEBROW_BLOCK = 36;
+const HEADLINE_PX = 64;
+const HEADLINE_EM = 0.63; // uppercase Montserrat 900 at -1.6% tracking
+const HEADLINE_GAP = 18;
+const BODY_PX = 28;
+const BODY_CH = 38; // .body max-width
+const BODY_EM = 0.6;
+const DISCLOSURE_BLOCK = 66;
 
-const COPY_ANCHORS = [
-  ["bl", MARGIN_X, 1080 - MARGIN_Y - COPY_H],
-  ["br", 1920 - MARGIN_X - COPY_W, 1080 - MARGIN_Y - COPY_H],
-  ["tl", MARGIN_X, MARGIN_Y],
-  ["tr", 1920 - MARGIN_X - COPY_W, MARGIN_Y],
-];
+function wrapHeadline(headline) {
+  const lines = [];
+  let cur = "";
+  for (const word of headline.toUpperCase().split(/\s+/)) {
+    const candidate = cur ? `${cur} ${word}` : word;
+    if (cur && candidate.length * HEADLINE_PX * HEADLINE_EM > COPY_MAX_W) {
+      lines.push(cur);
+      cur = word;
+    } else {
+      cur = candidate;
+    }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function estimateCopyBox(slide) {
+  const lines = wrapHeadline(slide.headline);
+  const headlineW = Math.max(
+    ...lines.map((l) => l.length * HEADLINE_PX * HEADLINE_EM),
+  );
+  const bodyLines = Math.ceil(slide.body.length / BODY_CH);
+  return {
+    w: Math.min(COPY_MAX_W, Math.max(headlineW, BODY_CH * BODY_PX * BODY_EM)),
+    h:
+      EYEBROW_BLOCK +
+      lines.length * HEADLINE_PX +
+      HEADLINE_GAP +
+      bodyLines * BODY_PX * 1.5 +
+      (slide.disclosure ? DISCLOSURE_BLOCK : 0),
+  };
+}
+
+function copyAnchors(box) {
+  return [
+    ["bl", MARGIN_X, 1080 - MARGIN_Y - box.h],
+    ["br", 1920 - MARGIN_X - box.w, 1080 - MARGIN_Y - box.h],
+    ["tl", MARGIN_X, MARGIN_Y],
+    ["tr", 1920 - MARGIN_X - box.w, MARGIN_Y],
+  ];
+}
 
 /** Rendered box of an annotation in stage pixels, from the shared plate-relative span. */
 function annotationRect(a) {
@@ -84,8 +170,8 @@ function annotationRect(a) {
   };
 }
 
-function overlaps(rect, x, y) {
-  return rect.x0 < x + COPY_W && rect.x1 > x && rect.y0 < y + COPY_H && rect.y1 > y;
+function overlaps(rect, x, y, box) {
+  return rect.x0 < x + box.w && rect.x1 > x && rect.y0 < y + box.h && rect.y1 > y;
 }
 
 /**
@@ -95,12 +181,13 @@ function overlaps(rect, x, y) {
  */
 function planLayout(slide) {
   const rects = (slide.annotations ?? []).map(annotationRect);
-  for (const [anchor, x, y] of COPY_ANCHORS) {
-    if (!rects.some((r) => overlaps(r, x, y))) {
-      return { anchor, showAnnotations: rects.length > 0 };
+  const box = estimateCopyBox(slide);
+  for (const [anchor, x, y] of copyAnchors(box)) {
+    if (!rects.some((r) => overlaps(r, x, y, box))) {
+      return { anchor, showAnnotations: rects.length > 0, box };
     }
   }
-  return { anchor: "bl", showAnnotations: false };
+  return { anchor: "bl", showAnnotations: false, box };
 }
 
 function annotationMarkup(slide, plan) {
@@ -123,7 +210,6 @@ const layouts = new Map(SLIDES.map((s) => [s.id, planLayout(s)]));
 
 const clips = SLIDES.map((s, i) => {
   const start = i * CLIP_DUR;
-  const file = s.conceptSrc.split("/").pop();
   const accent = accentHex[s.accent] || "#2f6bff";
   const accentText = accentTextHex[s.accent] || accent;
   const plan = layouts.get(s.id);
@@ -141,17 +227,10 @@ const clips = SLIDES.map((s, i) => {
         style="--accent: ${accent}; --accent-text: ${accentText}"
       >
         <div class="fill" aria-hidden="true"></div>
-        <img
-          id="img-${s.id}"
-          class="plate"
-          src="assets/${file}"
-          alt=""
-          width="1920"
-          height="1080"
-        />
+${plateMarkup(s)}
 ${annotationMarkup(s, plan)}
         <div class="scrim"></div>
-        <div class="copy" id="copy-${s.id}">
+        <div class="copy" id="copy-${s.id}" style="width: ${Math.ceil(plan.box.w)}px">
           <p class="eyebrow" id="ey-${s.id}">${escapeHtml(s.eyebrow)}</p>
           <h2 class="headline" id="hl-${s.id}">${escapeHtml(s.headline)}</h2>
           <p class="body" id="bd-${s.id}">${escapeHtml(s.body)}</p>
@@ -162,8 +241,14 @@ ${annotationMarkup(s, plan)}
 
 const tweenLines = SLIDES.map((s, i) => {
   const t = i * CLIP_DUR;
-  return `
-      tl.fromTo("#img-${s.id}", { scale: 1.08, y: -20 }, { scale: 1, y: 12, duration: ${CLIP_DUR}, ease: "none" }, ${t});
+  const plateTween =
+    s.motionPreset === "parallax-slabs"
+      ? `
+      tl.from("#img-${s.id}", { opacity: 0, duration: 0.4, ease: "power2.out" }, ${t});
+      tl.from("#slabs-${s.id} .slab", { y: -520, opacity: 0, duration: 0.45, stagger: 0.1, ease: "power3.out" }, ${t + 0.15});`
+      : `
+      tl.fromTo("#img-${s.id}", { scale: 1.08, y: -20 }, { scale: 1, y: 12, duration: ${CLIP_DUR}, ease: "none" }, ${t});`;
+  return `${plateTween}
       tl.from("#ey-${s.id}", { y: 24, opacity: 0, duration: 0.55, ease: "power3.out" }, ${t + 0.25});
       tl.from("#hl-${s.id}", { y: 32, opacity: 0, duration: 0.65, ease: "power3.out" }, ${t + 0.35});
       tl.from("#bd-${s.id}", { y: 28, opacity: 0, duration: 0.6, ease: "power2.out" }, ${t + 0.5});
@@ -194,13 +279,15 @@ const html = `<!doctype html>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap" rel="stylesheet" />
     <style>
-      body { margin: 0; background: #05070f; color: #f4f6fb; font-family: "Montserrat", system-ui, sans-serif; }
+      body { margin: 0; background: #05070f; color: #ffffff; font-family: "Montserrat", Helvetica, Arial, sans-serif; }
       #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #05070f; }
       .clip { position: absolute; inset: 0; overflow: hidden; }
       .fill { position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%); }
-      .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #05070f; }
+      .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: transparent; }
+      .slab-stack { position: absolute; inset: 0; z-index: 0; }
+      .slab-stack .slab { background: transparent; }
       /* Sits above the scrim so recovered plate type stays bright artwork instead of reading
          as leftover baked type; the copy block is anchored clear of it per slide. */
       .annotations { position: absolute; inset: 0; z-index: 2; }
@@ -210,15 +297,18 @@ const html = `<!doctype html>
       .scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(5,7,15,0.15) 0%, rgba(5,7,15,0.25) 40%, rgba(5,7,15,0.92) 78%, #05070f 100%); }
       /* Top-anchored copy needs the dense end of the scrim flipped up to keep contrast. */
       .anchor-tl .scrim, .anchor-tr .scrim { background: linear-gradient(180deg, #05070f 0%, rgba(5,7,15,0.92) 24%, rgba(5,7,15,0.25) 62%, rgba(5,7,15,0.15) 100%); }
-      .copy { position: absolute; width: ${COPY_W}px; z-index: 3; }
+      .copy { position: absolute; max-width: ${COPY_MAX_W}px; z-index: 3; }
       .anchor-bl .copy { left: ${MARGIN_X}px; bottom: ${MARGIN_Y}px; }
       .anchor-br .copy { right: ${MARGIN_X}px; bottom: ${MARGIN_Y}px; }
       .anchor-tl .copy { left: ${MARGIN_X}px; top: ${MARGIN_Y}px; }
       .anchor-tr .copy { right: ${MARGIN_X}px; top: ${MARGIN_Y}px; }
-      .eyebrow { margin: 0 0 14px; color: var(--accent-text, var(--accent)); font-size: 22px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
-      .headline { margin: 0 0 18px; font-size: 64px; font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; }
-      .body { margin: 0; max-width: 38ch; color: #9aa3b5; font-size: 28px; font-weight: 600; line-height: 1.4; }
-      .disclosure { margin: 18px 0 0; max-width: 52ch; color: rgba(244,246,251,0.5); font-size: 16px; line-height: 1.35; }
+      /* Brand type rules: sub-headline bold sentence case at 150%; headline always
+         uppercase Black at 100% leading and -1.6% tracking; body medium at 150% and a
+         step lighter than the headline (white over Grey 300, Grey 500 for fine print). */
+      .eyebrow { margin: 0 0 14px; color: var(--accent-text, var(--accent)); font-size: 24px; font-weight: 700; line-height: 1.5; }
+      .headline { margin: 0 0 18px; font-size: 64px; font-weight: 900; line-height: 1; letter-spacing: -0.016em; text-transform: uppercase; }
+      .body { margin: 0; max-width: 38ch; color: #c8c8c8; font-size: 28px; font-weight: 500; line-height: 1.5; }
+      .disclosure { margin: 18px 0 0; max-width: 52ch; color: #888888; font-size: 16px; font-weight: 500; line-height: 1.5; }
       .brand { position: absolute; top: 40px; left: 96px; z-index: 3; font-size: 18px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
     </style>
   </head>
