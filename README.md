@@ -32,4 +32,29 @@ Open on a phone-width viewport (~390px) and scroll.
 
 ## Creative seats
 
-Creative Director → brand-designer (concepts/tokens) + web-designer (this app). Spec: `docs/superpowers/specs/2026-08-06-superpatch-income-stack-deck-design.md`
+Creative Director → brand-designer (concepts/tokens) + web-designer (this app) + video-producer (OpenMontage / HyperFrames). Spec: `docs/superpowers/specs/2026-08-06-superpatch-income-stack-deck-design.md`
+
+## OpenMontage + HyperFrames
+
+| Surface | Path |
+|---------|------|
+| Design brief | `docs/orgs/superpatch/.../15-media/design/VIDEO-BRIEF.md` |
+| HyperFrames deck | `.../15-media/hyperframes/income-stack-deck/` |
+| OpenMontage finals | `.../15-media/openmontage/` |
+
+Regenerate the HyperFrames HTML from `slides.ts`:
+
+```bash
+npm run hyperframes:generate
+```
+
+Preview / render (Node ≥ 22, FFmpeg):
+
+```bash
+cd ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/hyperframes/income-stack-deck
+npx hyperframes preview
+# after approve:
+npx hyperframes render --quality high --output ../../openmontage/income-stack-deck-final.mp4
+```
+
+Optional hero loops from OpenMontage → drop into `public/loops/` and set `heroVideoSrc` on slides.
