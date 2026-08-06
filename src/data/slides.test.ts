@@ -15,8 +15,9 @@ describe("SLIDES", () => {
     for (const s of SLIDES) {
       expect(s.eyebrow.length).toBeGreaterThan(0);
       expect(s.headline.length).toBeGreaterThan(0);
-      expect(wordCount(s.body)).toBeGreaterThanOrEqual(30);
-      expect(wordCount(s.body)).toBeLessThanOrEqual(50);
+      const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
+      expect(wordCount(filmCopy)).toBeGreaterThanOrEqual(30);
+      expect(wordCount(filmCopy)).toBeLessThanOrEqual(50);
     }
   });
 
@@ -26,6 +27,41 @@ describe("SLIDES", () => {
     for (const s of money) {
       expect(s.disclosure && s.disclosure.length).toBeGreaterThan(10);
     }
+  });
+
+  it("requires disclosure on closing when income outcomes are mentioned", () => {
+    const close = SLIDES.find((s) => s.id === "15-closing")!;
+    expect(close.requiresDisclosure).toBe(true);
+    expect(close.disclosure?.length).toBeGreaterThan(10);
+  });
+
+  it("avoids unqualified guaranteed-earnings language on retail", () => {
+    const retail = SLIDES.find((s) => s.id === "07-retail")!;
+    expect(retail.body.toLowerCase()).not.toMatch(/\bguaranteed\b/);
+  });
+
+  it("closing exposes primary and secondary CTAs", () => {
+    const close = SLIDES.find((s) => s.id === "15-closing")!;
+    expect(close.ctaPrimary).toBe("Get your affiliate link");
+    expect(close.ctaSecondary).toBe("Read the Income Disclosure");
+  });
+
+  it("assertSlidesValid word-counts onScreenBody for film when set", () => {
+    const base = SLIDES[0]!;
+    const withOverlay: typeof SLIDES = SLIDES.map((s, i) =>
+      i === 0
+        ? {
+            ...base,
+            body: "Speaker script that can run longer than fifty words for the presenter while the film overlay uses a shorter on-screen body string instead. Keep expanding this line with enough words so the speaker version clearly exceeds the fifty-word film limit and proves the relaxed body rule. Add still more spoken detail about pacing, sponsor guidance, and how affiliates choose their starting path without forcing that verbosity onto the film overlay.",
+            onScreenBody:
+              "Most affiliate programs pay one commission. Super Patch rewards every stage of building — from retail customers to leadership pools. Choose your starting pace, then take the next step with your sponsor.",
+          }
+        : s,
+    );
+    expect(wordCount(withOverlay[0]!.body)).toBeGreaterThan(50);
+    expect(wordCount(withOverlay[0]!.onScreenBody!)).toBeGreaterThanOrEqual(30);
+    expect(wordCount(withOverlay[0]!.onScreenBody!)).toBeLessThanOrEqual(50);
+    expect(() => assertSlidesValid(withOverlay)).not.toThrow();
   });
 
   it("assertSlidesValid passes for SLIDES", () => {

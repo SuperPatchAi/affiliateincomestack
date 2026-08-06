@@ -101,7 +101,13 @@ export type Slide = {
   eyebrow: string;
   headline: string;
   body: string;
+  /** If set, Remotion/web film overlay prefers this over `body`. */
+  onScreenBody?: string;
   disclosure?: string;
+  ctaPrimary?: string;
+  ctaSecondary?: string;
+  voiceover?: string;
+  presenterNotes?: string;
   annotations?: PlateAnnotation[];
   flywheelArc?: FlywheelArc;
   motionPreset: string;
@@ -145,9 +151,13 @@ export function assertSlidesValid(slides: Slide[]): void {
     if (!s.eyebrow?.trim() || !s.headline?.trim() || !s.body?.trim()) {
       throw new Error(`Slide ${s.id} missing copy fields`);
     }
-    const n = wordCount(s.body);
+    // Film overlay word budget: prefer onScreenBody; otherwise body is the on-screen script.
+    const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
+    const n = wordCount(filmCopy);
     if (n < 30 || n > 50) {
-      throw new Error(`Slide ${s.id} body word count ${n} not in 30–50`);
+      throw new Error(
+        `Slide ${s.id} ${s.onScreenBody?.trim() ? "onScreenBody" : "body"} word count ${n} not in 30–50`,
+      );
     }
     if (s.requiresDisclosure) {
       if (!s.disclosure || s.disclosure.length < 10) {
@@ -272,7 +282,7 @@ export const SLIDES: Slide[] = [
     accent: "green",
     eyebrow: "Stack 1",
     headline: "25% Retail Affiliate Commissions",
-    body: "This is where everyone begins. Every time someone purchases through your personal affiliate link, you earn a guaranteed 25% commission — paid weekly. One product or several, if they buy through your link, you earn 25% of what they pay.",
+    body: "This is where everyone begins. When someone buys through your personal affiliate link, you earn 25% commission on qualifying purchases — paid weekly. One product or several, if they buy through your link, you earn 25% of what they pay.",
     annotations: [
       { text: "25%", xPct: 22.62, yPct: 45.61, sizePct: 30.65, role: "metric" },
     ],
@@ -384,9 +394,12 @@ export const SLIDES: Slide[] = [
     accent: "red",
     eyebrow: "One Opportunity. Ten Income Streams.",
     headline: "Build Customers. Build Leaders. Build Leverage.",
-    body: "Most affiliate programs pay one commission. Super Patch rewards every stage of building a business — from retail customers to global profit pools. Whether you want a few hundred a month or generational wealth, the Income Stack gives you multiple ways to get there.",
+    body: "Most affiliate programs pay one commission. Super Patch rewards every stage of building — from retail customers to leadership pools. Choose your starting pace, then take the next step with your sponsor.",
+    disclosure: INCOME_DISCLOSURE,
+    ctaPrimary: "Get your affiliate link",
+    ctaSecondary: "Read the Income Disclosure",
     flywheelArc: "all",
     motionPreset: "horizon-settle",
-    requiresDisclosure: false,
+    requiresDisclosure: true,
   },
 ];

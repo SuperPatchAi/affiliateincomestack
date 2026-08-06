@@ -73,4 +73,19 @@ describe("DeckShell", () => {
     const layer = container.querySelector("[data-annotation-layer]");
     expect(layer?.getAttribute("aria-hidden")).toBe("true");
   });
+
+  it("shows disclosure and CTAs on the closing slide", () => {
+    const { container } = render(<DeckShell />);
+    const closing = container.querySelector("[data-slide='15-closing']");
+    expect(closing).toBeTruthy();
+    expect(
+      closing?.querySelector("[data-cta='primary']")?.textContent,
+    ).toBe("Get your affiliate link");
+    expect(
+      closing?.querySelector("[data-cta='secondary']")?.textContent,
+    ).toBe("Read the Income Disclosure");
+    expect(closing?.querySelector(".slide-disclosure")?.textContent).toMatch(
+      /not guaranteed/i,
+    );
+  });
 });

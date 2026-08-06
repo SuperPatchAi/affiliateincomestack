@@ -15,6 +15,7 @@ import { publicAssetPath } from "../timeline";
 import { COLORS } from "../theme";
 import { AnnotationLayers, SlabDropLayers } from "./DiagramLayers";
 import { CopyBlock } from "./CopyBlock";
+import { EndCard } from "./EndCard";
 import { FlywheelRemotion } from "./FlywheelRemotion";
 import { PlateMotion } from "./PlateMotion";
 import { copyEyebrowDelay, flywheelPlacement } from "./flywheelPlacement";
@@ -28,7 +29,13 @@ export function SlideScene({ slide }: Props) {
   const { durationInFrames } = useVideoConfig();
   const beat = getMotionBeat(slide.motionPreset);
   const liveAnnotations = shouldShowLiveAnnotations(slide);
-  const { anchor, showAnnotations } = pickCopyAnchor(slide);
+  const picked = pickCopyAnchor(slide);
+  // Closing CTAs sit in the lower third — park copy top-left so they don't collide.
+  const hasEndCard = Boolean(
+    slide.ctaPrimary && slide.ctaSecondary && slide.disclosure,
+  );
+  const anchor = hasEndCard ? "tl" : picked.anchor;
+  const showAnnotations = picked.showAnnotations;
   const videoSrc = heroSrc(slide);
   const useSlabs = !videoSrc && slide.motionPreset === "parallax-slabs";
   const placement = flywheelPlacement(slide);
@@ -120,6 +127,16 @@ export function SlideScene({ slide }: Props) {
         bodyStart={bodyStart}
         disclosureStart={disclosureStart}
       />
+
+      {/* Layer D — closing end card (CTAs + disclosure ≥16px) */}
+      {slide.ctaPrimary && slide.ctaSecondary && slide.disclosure ? (
+        <EndCard
+          ctaPrimary={slide.ctaPrimary}
+          ctaSecondary={slide.ctaSecondary}
+          disclosure={slide.disclosure}
+          startFrame={disclosureStart}
+        />
+      ) : null}
     </AbsoluteFill>
   );
 }

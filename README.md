@@ -61,7 +61,10 @@ Originals stay in `public/concepts/` untouched. Recovered strings live on as
 ## Rules
 
 - Do not invent compensation numbers — edit `src/data/slides.ts` only from the source outline
-- Bodies stay 30–50 words; money slides keep `requiresDisclosure: true`
+- Film overlay copy stays 30–50 words (`onScreenBody` if set, otherwise `body`); speaker `body` may exceed that when `onScreenBody` is present
+- Money slides 07–14 and closing (`15-closing`) keep `requiresDisclosure: true` with `INCOME_DISCLOSURE`
+- Closing exposes `ctaPrimary` / `ctaSecondary`; Remotion renders them via `EndCard` (≥16px disclosure)
+- Avoid unqualified “guaranteed” earnings language on retail
 - Optional hero loops: set `heroVideoSrc` on a slide; falls back to the PNG plate
 - `prefers-reduced-motion: reduce` disables scrub animations
 

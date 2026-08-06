@@ -107,9 +107,10 @@ export function CopyBlock({
           transform: `translateY(${interpolate(bodyIn, [0, 1], [16, 0])}px)`,
         }}
       >
-        {slide.body}
+        {slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body}
       </p>
-      {slide.disclosure ? (
+      {/* EndCard owns disclosure + CTAs when ctaPrimary is present. */}
+      {slide.disclosure && !slide.ctaPrimary ? (
         <p
           style={{
             margin: "14px 0 0",

@@ -126,8 +126,22 @@ export function Slide({ slide, index }: Props) {
             {slide.headline}
           </h2>
           <p className="slide-body" data-anim="body">
-            {slide.body}
+            {slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body}
           </p>
+          {slide.ctaPrimary || slide.ctaSecondary ? (
+            <div className="slide-cta-group" data-anim="cta">
+              {slide.ctaPrimary ? (
+                <span className="slide-cta-primary" data-cta="primary">
+                  {slide.ctaPrimary}
+                </span>
+              ) : null}
+              {slide.ctaSecondary ? (
+                <span className="slide-cta-secondary" data-cta="secondary">
+                  {slide.ctaSecondary}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
           {slide.disclosure ? (
             <p className="slide-disclosure" data-anim="disclosure">
               {slide.disclosure}
