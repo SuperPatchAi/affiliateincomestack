@@ -25,7 +25,7 @@ const baseFrom = (): PlateFrom => ({
   brightness: 1,
 });
 
-export const MOTION_PRESETS: Record<string, MotionBeat> = {
+export const MOTION_PRESETS = {
   "parallax-slabs": {
     id: "parallax-slabs",
     secondaryPolicy: "copy-first",
@@ -188,8 +188,10 @@ export const MOTION_PRESETS: Record<string, MotionBeat> = {
     ambientScale: [1, 1.02],
     ambientYPercent: 1.5,
   },
-};
+} as const satisfies Record<string, MotionBeat>;
+
+export type MotionPresetId = keyof typeof MOTION_PRESETS;
 
 export function getMotionBeat(preset: string): MotionBeat {
-  return MOTION_PRESETS[preset] ?? MOTION_PRESETS["ken-burns-glow"];
+  return MOTION_PRESETS[preset as MotionPresetId] ?? MOTION_PRESETS["ken-burns-glow"];
 }

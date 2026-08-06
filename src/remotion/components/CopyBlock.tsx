@@ -10,6 +10,9 @@ type Anchor = "bl" | "br" | "tl" | "tr";
 type Props = {
   slide: Slide;
   anchor?: Anchor;
+  eyebrowStart?: number;
+  bodyStart?: number;
+  disclosureStart?: number;
 };
 
 const ANCHOR_STYLE: Record<Anchor, CSSProperties> = {
@@ -19,25 +22,36 @@ const ANCHOR_STYLE: Record<Anchor, CSSProperties> = {
   tr: { right: 72, top: 64, left: "auto", bottom: "auto" },
 };
 
-export function CopyBlock({ slide, anchor = "bl" }: Props) {
+export function CopyBlock({
+  slide,
+  anchor = "bl",
+  eyebrowStart = 4,
+  bodyStart = 22,
+  disclosureStart = 40,
+}: Props) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const eyebrowColor = accentTextColor(slide.accent);
 
   const eyebrowIn = spring({
-    frame: Math.max(0, frame - 4),
+    frame: Math.max(0, frame - eyebrowStart),
     fps,
     config: { damping: 20, stiffness: 160, mass: 0.5 },
   });
   const bodyIn = spring({
-    frame: Math.max(0, frame - 22),
+    frame: Math.max(0, frame - bodyStart),
     fps,
     config: { damping: 22, stiffness: 120, mass: 0.7 },
   });
-  const disclosureIn = interpolate(frame, [40, 55], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const disclosureIn = interpolate(
+    frame,
+    [disclosureStart, disclosureStart + 15],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
 
   const topHeavy = anchor === "tl" || anchor === "tr";
 
@@ -76,7 +90,11 @@ export function CopyBlock({ slide, anchor = "bl" }: Props) {
       >
         {slide.eyebrow}
       </div>
-      <KineticHeadline text={slide.headline} fontSize={48} delayFrames={8} />
+      <KineticHeadline
+        text={slide.headline}
+        fontSize={48}
+        delayFrames={eyebrowStart + 4}
+      />
       <p
         style={{
           margin: "18px 0 0",

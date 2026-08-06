@@ -61,9 +61,12 @@ export function SlabDropLayers() {
 export function AnnotationLayers({
   annotations,
   accent,
+  startFrame = 10,
 }: {
   annotations: PlateAnnotation[];
   accent: Slide["accent"];
+  /** Frame when the first annotation begins its entrance spring. */
+  startFrame?: number;
 }) {
   const frame = useCurrentFrame();
   const { fps, height } = useVideoConfig();
@@ -73,7 +76,7 @@ export function AnnotationLayers({
     <AbsoluteFill>
       {annotations.map((a, i) => {
         const sizePct = fittedSizePct(a);
-        const local = Math.max(0, frame - 10 - i * 4);
+        const local = Math.max(0, frame - startFrame - i * 4);
         const enter = spring({
           frame: local,
           fps,

@@ -2,8 +2,8 @@ import type { FlywheelArc } from "../data/slides";
 
 const ARCS: { id: FlywheelArc; label: string; color: string }[] = [
   { id: "product", label: "Product", color: "var(--sp-blue)" },
-  { id: "brand", label: "Brand", color: "var(--sp-orange)" },
-  { id: "income", label: "Income", color: "var(--sp-green)" },
+  { id: "brand", label: "Brand", color: "var(--sp-green)" },
+  { id: "income", label: "Income", color: "var(--sp-orange)" },
   { id: "development", label: "Development", color: "var(--sp-violet)" },
 ];
 
