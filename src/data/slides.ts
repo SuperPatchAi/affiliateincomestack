@@ -254,6 +254,13 @@ export const SLIDES: Slide[] = [
   {
     id: "02-question",
     conceptSrc: "/concepts/clean/sp-stack-02-the-question.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-02-the-question_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-02-the-question_animated.mp4",
     accent: "cool",
     eyebrow: "The Old Model",
     headline: "One Commission Is Not a Business",
@@ -314,6 +321,13 @@ export const SLIDES: Slide[] = [
   {
     id: "05-ecosystem",
     conceptSrc: "/concepts/clean/sp-stack-05-ecosystem.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-05-ecosystem_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-05-ecosystem_animated.mp4",
     accent: "violet",
     eyebrow: "Why It Compounds",
     headline: "Exponential Value Across the Ecosystem",
@@ -329,6 +343,13 @@ export const SLIDES: Slide[] = [
   {
     id: "06-ten-layers",
     conceptSrc: "/concepts/clean/sp-stack-06-ten-layers.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-06-ten-layers_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-06-ten-layers_animated.mp4",
     accent: "orange",
     eyebrow: "Income Stack™ — Ten Streams",
     headline: "Ten Ways. One Path Forward.",
@@ -343,6 +364,13 @@ export const SLIDES: Slide[] = [
   {
     id: "07-retail",
     conceptSrc: "/concepts/clean/sp-stack-07-retail.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-07-retail_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-07-retail_animated.mp4",
     accent: "green",
     eyebrow: "Stack 1",
     headline: "25% Retail Affiliate Commissions",
@@ -358,6 +386,13 @@ export const SLIDES: Slide[] = [
   {
     id: "08-fast-start",
     conceptSrc: "/concepts/clean/sp-stack-08-fast-start.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-08-fast-start_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-08-fast-start_animated.mp4",
     accent: "orange",
     eyebrow: "Stack 2",
     headline: "Fast Start & Rank Advancement Bonuses",
@@ -373,6 +408,13 @@ export const SLIDES: Slide[] = [
   {
     id: "09-team-overrides",
     conceptSrc: "/concepts/clean/sp-stack-09-team-overrides.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-09-team-overrides_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-09-team-overrides_animated.mp4",
     accent: "blue",
     eyebrow: "Stack 3",
     headline: "Team Override Commissions",
@@ -392,6 +434,13 @@ export const SLIDES: Slide[] = [
   {
     id: "10-md-depth",
     conceptSrc: "/concepts/clean/sp-stack-10-unlimited-depth.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-10-unlimited-depth_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-10-unlimited-depth_animated.mp4",
     accent: "violet",
     eyebrow: "Stack 4",
     headline: "Managing Director Leaders Unlimited Depth Bonus",
@@ -407,6 +456,13 @@ export const SLIDES: Slide[] = [
   {
     id: "11-vp-override",
     conceptSrc: "/concepts/clean/sp-stack-11-vp-override.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-11-vp-override_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-11-vp-override_animated.mp4",
     accent: "blue",
     eyebrow: "Stack 5",
     headline: "Vice President Leadership Override",
@@ -419,6 +475,13 @@ export const SLIDES: Slide[] = [
   {
     id: "12-generations",
     conceptSrc: "/concepts/clean/sp-stack-12-generations.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-12-generations_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-12-generations_animated.mp4",
     accent: "green",
     eyebrow: "Stack 6",
     headline: "Generation Bonuses",
@@ -431,6 +494,13 @@ export const SLIDES: Slide[] = [
   {
     id: "13-executive",
     conceptSrc: "/concepts/clean/sp-stack-13-executive.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-13-executive_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-13-executive_animated.mp4",
     accent: "orange",
     eyebrow: "Stacks 7 & 8",
     headline: "Executive Leadership & CEO Leadership Bonus",
@@ -443,6 +513,13 @@ export const SLIDES: Slide[] = [
   {
     id: "14-global",
     conceptSrc: "/concepts/clean/sp-stack-14-global-pool.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-14-global-pool_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-14-global-pool_animated.mp4",
     accent: "violet",
     eyebrow: "Stacks 9 & 10",
     headline: "Global President Override & Global Leadership Pool",
@@ -455,6 +532,13 @@ export const SLIDES: Slide[] = [
   {
     id: "15-closing",
     conceptSrc: "/concepts/clean/sp-stack-15-closing.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-15-closing_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-15-closing_animated.mp4",
     accent: "red",
     eyebrow: "One Opportunity. Ten Income Streams.",
     headline: "Build Customers. Build Leaders. Build Leverage.",

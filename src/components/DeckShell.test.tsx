@@ -16,7 +16,7 @@ describe("DeckShell", () => {
     const { container } = render(<DeckShell />);
     const slides = container.querySelectorAll("[data-layout='fluid']");
     expect(slides).toHaveLength(15);
-    // Slides 01 and 03 ship operator-animated hero loops instead of the still plate.
+    // Every slide ships an animated hero loop; clean PNG is the poster.
     const title = container.querySelector<HTMLVideoElement>(
       "[data-slide='01-title'] [data-slide-plate]",
     );
@@ -25,18 +25,15 @@ describe("DeckShell", () => {
       /\/concepts\/animated\/sp-stack-01-title_animated\.mp4$/,
     );
     expect(title?.getAttribute("poster")).toMatch(/\/concepts\/clean\/sp-stack-01-title\.png$/);
-    const pillars = container.querySelector<HTMLVideoElement>(
-      "[data-slide='03-four-stacks'] [data-slide-plate]",
-    );
-    expect(pillars?.tagName).toBe("VIDEO");
-    expect(pillars?.getAttribute("src")).toMatch(
-      /\/concepts\/animated\/sp-stack-03-four-stacks_animated\.mp4$/,
-    );
-    const later = container.querySelector<HTMLImageElement>(
+    const question = container.querySelector<HTMLVideoElement>(
       "[data-slide='02-question'] [data-slide-plate]",
     );
-    expect(later?.tagName).toBe("IMG");
-    expect(later?.getAttribute("src")).toMatch(/\/concepts\/clean\/sp-stack-/);
+    expect(question?.tagName).toBe("VIDEO");
+    expect(question?.getAttribute("src")).toMatch(
+      /\/concepts\/animated\/sp-stack-02-the-question_animated\.mp4$/,
+    );
+    const videos = container.querySelectorAll("[data-slide] video[data-slide-plate]");
+    expect(videos).toHaveLength(15);
   });
 
   it("renders plate annotations as positioned overlay type", () => {

@@ -239,16 +239,11 @@ describe("plate annotations", () => {
     expect(TITLE_SLAB_BASE).toContain("title-base");
   });
 
-  it("uses operator-animated hero loops on slides 01, 03, and 04", () => {
-    expect(byId("01-title").heroVideoSrc).toBe(
-      "/concepts/animated/sp-stack-01-title_animated.mp4",
-    );
-    expect(byId("03-four-stacks").heroVideoSrc).toBe(
-      "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
-    );
-    expect(byId("04-flywheel").heroVideoSrc).toBe(
-      "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
-    );
+  it("uses animated hero loops on every slide", () => {
+    for (const s of SLIDES) {
+      expect(s.heroVideoSrc, s.id).toMatch(/^\/concepts\/animated\/.+\.mp4$/);
+      expect(s.hero?.src, s.id).toBe(s.heroVideoSrc);
+    }
   });
 
   it("declares hero media metadata with explicit baked-label policy", () => {
@@ -266,6 +261,11 @@ describe("plate annotations", () => {
     });
     expect(byId("04-flywheel").hero).toMatchObject({
       src: "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    });
+    expect(byId("07-retail").hero).toMatchObject({
       width: 1920,
       height: 1080,
       annotationsBaked: false,

@@ -22,7 +22,11 @@ describe("remotion timeline", () => {
   });
 
   it("maps still vs hero clip lengths to frames", () => {
-    const still = SLIDES.find((s) => !s.heroVideoSrc)!;
+    const still = {
+      ...SLIDES[0],
+      hero: undefined,
+      heroVideoSrc: undefined,
+    };
     const hero = SLIDES.find((s) => s.heroVideoSrc)!;
     expect(clipFrames(still)).toBe(STILL_CLIP_SEC * FPS);
     expect(clipFrames(hero)).toBe(HERO_CLIP_SEC * FPS);
@@ -33,8 +37,8 @@ describe("remotion timeline", () => {
     const raw = SLIDES.reduce((sum, s) => sum + clipFrames(s), 0);
     const expected = raw - (SLIDES.length - 1) * TRANSITION_FRAMES;
     expect(filmDurationInFrames(SLIDES)).toBe(expected);
-    // 12×5s + 3×10s = 90s raw; 14 fades × 18f = 8.4s overlap → 2448f (~81.6s)
-    expect(filmDurationInFrames(SLIDES)).toBe(2448);
+    // 15×10s = 150s raw; 14 fades × 18f = 8.4s overlap → 4248f (~141.6s)
+    expect(filmDurationInFrames(SLIDES)).toBe(4248);
   });
 
   it("strips leading slash for Remotion staticFile paths", () => {
