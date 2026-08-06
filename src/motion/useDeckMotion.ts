@@ -11,81 +11,47 @@ function ensurePlugin() {
   }
 }
 
-function animatePreset(
+function buildEntrance(
   slide: HTMLElement,
   plate: HTMLElement | null,
   copyBits: HTMLElement[],
   arcs: NodeListOf<SVGPathElement>,
 ) {
   const preset = slide.dataset.motion ?? "ken-burns-glow";
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: slide,
-      start: "top 78%",
-      end: "top 35%",
-      toggleActions: "play none none reverse",
-    },
-  });
+  const tl = gsap.timeline({ paused: true });
 
   if (plate) {
+    const fromVars: gsap.TweenVars = { opacity: 0, duration: 0.9, ease: "power3.out" };
+    const toVars: gsap.TweenVars = { opacity: 1, y: 0, scale: 1, rotateX: 0, filter: "brightness(1)" };
+
     switch (preset) {
       case "parallax-slabs":
       case "exploded-layers":
-        tl.fromTo(
-          plate,
-          { opacity: 0, y: 48, scale: 0.94, rotateX: 8 },
-          { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 0.9, ease: "power3.out" },
-          0,
-        );
+        Object.assign(fromVars, { y: 48, scale: 0.94, rotateX: 8 });
         break;
       case "coin-rise":
       case "platform-leap":
       case "summit-reveal":
-        tl.fromTo(
-          plate,
-          { opacity: 0, y: 64, scale: 0.96 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power2.out" },
-          0,
-        );
+        Object.assign(fromVars, { y: 64, scale: 0.96 });
         break;
       case "root-tiers":
       case "depth-rings":
       case "generation-rings":
       case "legs-descend":
-        tl.fromTo(
-          plate,
-          { opacity: 0, scale: 1.06, filter: "brightness(0.7)" },
-          {
-            opacity: 1,
-            scale: 1,
-            filter: "brightness(1)",
-            duration: 0.95,
-            ease: "power2.out",
-          },
-          0,
-        );
+        Object.assign(fromVars, { scale: 1.06, filter: "brightness(0.7)" });
         break;
       case "flywheel-scrub":
       case "pillars-sequence":
       case "node-mesh":
       case "earth-arcs":
-        tl.fromTo(
-          plate,
-          { opacity: 0, scale: 0.92 },
-          { opacity: 1, scale: 1, duration: 1, ease: "power3.out" },
-          0,
-        );
+        Object.assign(fromVars, { scale: 0.92 });
         break;
       default:
-        tl.fromTo(
-          plate,
-          { opacity: 0, y: 28, scale: 1.04 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power2.out" },
-          0,
-        );
+        Object.assign(fromVars, { y: 28, scale: 1.04 });
     }
 
-    // Ongoing subtle drift while in view (high-end keynote feel)
+    tl.fromTo(plate, fromVars, toVars, 0);
+
     gsap.to(plate, {
       yPercent: preset.includes("leap") || preset.includes("rise") ? -3 : 2.5,
       scale: 1.015,
@@ -102,49 +68,55 @@ function animatePreset(
   if (copyBits.length) {
     tl.fromTo(
       copyBits,
-      { opacity: 0, y: 28 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.55,
-        stagger: 0.08,
-        ease: "power2.out",
-      },
-      0.12,
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: 0.55, stagger: 0.08, ease: "power2.out" },
+      0.1,
     );
   }
 
   if (arcs.length) {
     tl.fromTo(
       arcs,
-      { opacity: 0.12, strokeDashoffset: 40 },
-      {
-        opacity: 1,
-        strokeDashoffset: 0,
-        stagger: 0.1,
-        duration: 0.7,
-        ease: "power1.out",
-      },
-      0.2,
+      { opacity: 0.12 },
+      { opacity: 1, stagger: 0.1, duration: 0.65, ease: "power1.out" },
+      0.15,
     );
   }
+
+  const st = ScrollTrigger.create({
+    trigger: slide,
+    start: "top 85%",
+    onEnter: () => tl.play(),
+    onEnterBack: () => tl.play(),
+    onLeaveBack: () => tl.pause(0),
+  });
+
+  // First paint: if already in view, show final state (no stuck opacity:0)
+  requestAnimationFrame(() => {
+    if (st.isActive || slide.getBoundingClientRect().top < window.innerHeight * 0.9) {
+      tl.progress(1);
+    }
+  });
 }
 
 export function useDeckMotion(enabled: boolean) {
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      // Ensure content visible when motion is off
+      gsap.set("[data-slide-plate], [data-anim], .flywheel-arc", { clearProps: "all" });
+      return;
+    }
     ensurePlugin();
 
     const ctx = gsap.context(() => {
       const slides = gsap.utils.toArray<HTMLElement>("[data-slide]");
-
       slides.forEach((slide) => {
         const plate = slide.querySelector<HTMLElement>("[data-slide-plate]");
         const copyBits = gsap.utils.toArray<HTMLElement>(
           slide.querySelectorAll("[data-anim]"),
         );
         const arcs = slide.querySelectorAll<SVGPathElement>(".flywheel-arc");
-        animatePreset(slide, plate, copyBits, arcs);
+        buildEntrance(slide, plate, copyBits, arcs);
       });
 
       const progress = document.querySelector<HTMLElement>("[data-deck-progress]");
@@ -164,6 +136,8 @@ export function useDeckMotion(enabled: boolean) {
           },
         );
       }
+
+      ScrollTrigger.refresh();
     });
 
     return () => ctx.revert();

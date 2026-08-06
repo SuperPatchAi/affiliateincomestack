@@ -181,12 +181,13 @@
 /* Desktop: two-column fluid document */
 @media (min-width: 860px) {
   .slide-inner {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
     gap: clamp(1.75rem, 3vw, 3rem);
+    width: 100%;
   }
 
   .layout-copy-first .slide-inner {
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(280px, 0.75fr) minmax(0, 1.25fr);
   }
 
   .layout-copy-first .slide-media-col {
@@ -197,6 +198,10 @@
     order: 1;
   }
 
+  .slide-copy-col {
+    padding-block: 0.5rem;
+  }
+
   .slide-flywheel-hero {
     transform: scale(0.72);
   }
@@ -205,10 +210,6 @@
     min-height: min(88svh, 820px);
     display: flex;
     align-items: center;
-  }
-
-  .slide-inner {
-    width: 100%;
   }
 }
 
