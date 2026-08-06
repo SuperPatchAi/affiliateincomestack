@@ -30,6 +30,58 @@ export type PlateAnnotation = {
   role: PlateAnnotationRole;
 };
 
+/** Plates are 3:2, and annotation type is sized in plate-height units. */
+const PLATE_ASPECT = 1.5;
+/** Keep type off the letterboxed image edge, in percent of plate width. */
+const EDGE_MARGIN_PCT = 1.5;
+/**
+ * Approximate advance width per character, in em. Montserrat is wider than the condensed
+ * face the plates were originally set in, so a metric reproduced at its original cap
+ * height can overrun the plate; these values drive the fit-to-plate clamp below.
+ */
+const EM_PER_CHAR: Record<PlateAnnotationRole, number> = {
+  label: 0.95, // includes 0.16em tracking
+  metric: 0.72,
+};
+
+/**
+ * Font size to actually render, in percent of plate height. Annotations are centred on
+ * the original type, so a wide string can extend past the plate edge; this shrinks such
+ * a string until it fits. Both the web deck and the HyperFrames film call this so the two
+ * surfaces stay identical.
+ */
+export function fittedSizePct(a: PlateAnnotation): number {
+  const halfRoomPct = Math.min(
+    a.xPct - EDGE_MARGIN_PCT,
+    100 - EDGE_MARGIN_PCT - a.xPct,
+  );
+  if (halfRoomPct <= 0) return a.sizePct;
+  // Widths live in plate-width units, type in plate-height units, hence the aspect factor.
+  const maxSizePct =
+    (halfRoomPct * 2 * PLATE_ASPECT) / (a.text.length * EM_PER_CHAR[a.role]);
+  return Math.min(a.sizePct, Number(maxSizePct.toFixed(2)));
+}
+
+/**
+ * Estimated box the annotation occupies once fitted: x in percent of plate width, y in
+ * percent of plate height. The film uses this to park its copy block clear of the type.
+ */
+export function annotationSpanPct(a: PlateAnnotation): {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+} {
+  const size = fittedSizePct(a);
+  const halfW = (a.text.length * size * EM_PER_CHAR[a.role]) / PLATE_ASPECT / 2;
+  return {
+    x0: a.xPct - halfW,
+    x1: a.xPct + halfW,
+    y0: a.yPct - size / 2,
+    y1: a.yPct + size / 2,
+  };
+}
+
 export type Slide = {
   id: string;
   conceptSrc: string;

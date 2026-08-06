@@ -1,4 +1,5 @@
 import type { Slide as SlideData } from "../data/slides";
+import { fittedSizePct } from "../data/slides";
 import { Flywheel } from "./Flywheel";
 
 type Props = {
@@ -56,7 +57,7 @@ export function Slide({ slide, index }: Props) {
                     style={{
                       left: `${annotation.xPct}%`,
                       top: `${annotation.yPct}%`,
-                      fontSize: `${annotation.sizePct}cqh`,
+                      fontSize: `${fittedSizePct(annotation)}cqh`,
                     }}
                     data-plate-annotation
                     data-anim="annotation"

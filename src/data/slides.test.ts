@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { SLIDES, wordCount, assertSlidesValid } from "./slides";
+import {
+  SLIDES,
+  wordCount,
+  assertSlidesValid,
+  fittedSizePct,
+  annotationSpanPct,
+} from "./slides";
 
 describe("SLIDES", () => {
   it("has 15 slides with copy fields", () => {
@@ -101,6 +107,30 @@ describe("plate annotations", () => {
     const pillarLabel = byId("03-four-stacks").annotations![0].sizePct;
     expect(bigMetric).toBeGreaterThan(tierMetric * 4);
     expect(tierMetric).toBeGreaterThan(pillarLabel);
+  });
+
+  it("keeps every fitted annotation inside the plate", () => {
+    for (const s of SLIDES) {
+      for (const a of s.annotations ?? []) {
+        const span = annotationSpanPct(a);
+        expect(span.x0, `${s.id} "${a.text}" overruns the left edge`).toBeGreaterThanOrEqual(0);
+        expect(span.x1, `${s.id} "${a.text}" overruns the right edge`).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
+  it("shrinks a wide metric that would overrun the plate edge", () => {
+    const wide = byId("08-fast-start").annotations!.find((a) => a.text === "$2,000")!;
+    expect(fittedSizePct(wide)).toBeLessThan(wide.sizePct);
+  });
+
+  it("leaves annotations that already fit at their original size", () => {
+    for (const a of byId("09-team-overrides").annotations!) {
+      expect(fittedSizePct(a)).toBe(a.sizePct);
+    }
+    for (const a of byId("03-four-stacks").annotations!) {
+      expect(fittedSizePct(a)).toBe(a.sizePct);
+    }
   });
 
   it("rejects annotations positioned off the plate", () => {
