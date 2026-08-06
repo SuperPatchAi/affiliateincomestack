@@ -143,6 +143,34 @@ export function wordCount(text: string): number {
     .filter(Boolean).length;
 }
 
+/**
+ * Known 720p hero debt. Remove an id once its loop lands at native 1920×1080
+ * (update `hero.width` / `hero.height`, then drop it from this set).
+ */
+export const LEGACY_720P_HERO_IDS = new Set(["01-title", "03-four-stacks"]);
+
+/**
+ * Enforce the native-1080p hero delivery contract. Legacy allowlisted slides may
+ * remain below 1080 until operator re-export; all other heroes must be ≥1920×1080.
+ */
+export function assertHeroMedia(slide: Slide): void {
+  const hero = slide.hero;
+  if (!hero) return;
+  if (LEGACY_720P_HERO_IDS.has(slide.id)) {
+    if (hero.height >= 1080) {
+      throw new Error(
+        `Slide ${slide.id} is on the 720p allowlist but declares ${hero.width}×${hero.height}; remove it from LEGACY_720P_HERO_IDS`,
+      );
+    }
+    return;
+  }
+  if (hero.width < 1920 || hero.height < 1080) {
+    throw new Error(
+      `Slide ${slide.id} hero is ${hero.width}×${hero.height}; new delivery must be ≥1920×1080 (no 720p upscale)`,
+    );
+  }
+}
+
 export function assertSlidesValid(slides: Slide[]): void {
   if (slides.length !== 15) {
     throw new Error(`Expected 15 slides, got ${slides.length}`);
@@ -164,6 +192,7 @@ export function assertSlidesValid(slides: Slide[]): void {
         throw new Error(`Slide ${s.id} requires disclosure`);
       }
     }
+    assertHeroMedia(s);
     for (const a of s.annotations ?? []) {
       if (!a.text.trim()) {
         throw new Error(`Slide ${s.id} has an empty annotation`);

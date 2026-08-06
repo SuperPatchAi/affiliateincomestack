@@ -65,7 +65,9 @@ Originals stay in `public/concepts/` untouched. Recovered strings live on as
 - Money slides 07–14 and closing (`15-closing`) keep `requiresDisclosure: true` with `INCOME_DISCLOSURE`
 - Closing exposes `ctaPrimary` / `ctaSecondary`; Remotion renders them via `EndCard` (≥16px disclosure)
 - Avoid unqualified “guaranteed” earnings language on retail
-- Optional hero loops: set `heroVideoSrc` on a slide; falls back to the PNG plate
+- Optional hero loops: set `hero` (preferred) or `heroVideoSrc` on a slide; falls back to the PNG plate
+- New hero delivery must be native **1920×1080** @ 30 fps (see VIDEO-BRIEF “Hero / I2V delivery”); no 720p upscale for new assets
+- Legacy 720p debt: `01-title` and `03-four-stacks` only — tracked in `LEGACY_720P_HERO_IDS` until operator re-export
 - `prefers-reduced-motion: reduce` disables scrub animations
 
 ## Creative seats
@@ -107,4 +109,6 @@ npx hyperframes preview
 npx hyperframes render --quality high --output ../../openmontage/income-stack-deck-final.mp4
 ```
 
-Optional hero loops → `public/concepts/animated/` and set `heroVideoSrc` on slides.
+Optional hero loops → `public/concepts/animated/` and set `hero` on slides
+(`src`, `width`, `height`, `annotationsBaked`). Contract tests enforce ≥1920×1080
+except the documented 720p allowlist; checklist in VIDEO-BRIEF.

@@ -3,10 +3,12 @@ import {
   SLIDES,
   wordCount,
   assertSlidesValid,
+  assertHeroMedia,
   fittedSizePct,
   annotationSpanPct,
   TITLE_SLAB_SRCS,
   TITLE_SLAB_BASE,
+  type Slide,
 } from "./slides";
 
 describe("SLIDES", () => {
@@ -214,6 +216,51 @@ describe("plate annotations", () => {
       height: 720,
       annotationsBaked: true,
     });
+  });
+
+  it("flags hero media that is below 1920×1080 for new delivery", () => {
+    for (const s of SLIDES) {
+      if (!s.hero) continue;
+      // Transitional: allow known 720p debt with explicit allowlist
+      const legacyOk = new Set(["01-title", "03-four-stacks"]);
+      if (legacyOk.has(s.id)) {
+        expect(s.hero.height).toBeLessThan(1080); // current debt
+        continue;
+      }
+      expect(s.hero.width).toBeGreaterThanOrEqual(1920);
+      expect(s.hero.height).toBeGreaterThanOrEqual(1080);
+    }
+  });
+
+  it("assertHeroMedia rejects non-allowlisted sub-1080p heroes", () => {
+    const debt = byId("01-title");
+    expect(() => assertHeroMedia(debt)).not.toThrow();
+
+    const fake720: Slide = {
+      ...debt,
+      id: "99-new-hero",
+      hero: {
+        src: "/concepts/animated/fake_720.mp4",
+        width: 1280,
+        height: 720,
+        annotationsBaked: false,
+      },
+    };
+    expect(() => assertHeroMedia(fake720)).toThrow(/1920×1080|1080/);
+  });
+
+  it("assertHeroMedia accepts native 1080p delivery", () => {
+    const ok: Slide = {
+      ...byId("01-title"),
+      id: "99-native-1080",
+      hero: {
+        src: "/concepts/animated/native_1080.mp4",
+        width: 1920,
+        height: 1080,
+        annotationsBaked: false,
+      },
+    };
+    expect(() => assertHeroMedia(ok)).not.toThrow();
   });
 
 });
