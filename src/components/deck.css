@@ -122,6 +122,47 @@
   opacity: 0.55;
 }
 
+/* Plates are 3:2 inside a 16:9 frame under object-fit: contain, so the annotation layer
+   mirrors that contained box. Percent positions then land on the artwork, not the frame. */
+.plate-annotations {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  aspect-ratio: 1536 / 1024;
+  max-width: 100%;
+  max-height: 100%;
+  container-type: size;
+  pointer-events: none;
+}
+
+.plate-annotation {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  line-height: 1;
+  will-change: transform, opacity;
+}
+
+.plate-annotation.role-label {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--slide-accent) 55%, transparent),
+    0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+.plate-annotation.role-metric {
+  color: var(--slide-accent, var(--sp-blue));
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-shadow:
+    0 0 26px color-mix(in srgb, var(--slide-accent) 45%, transparent),
+    0 2px 10px rgba(0, 0, 0, 0.55);
+}
+
 .slide-copy-col {
   position: relative;
   min-width: 0;

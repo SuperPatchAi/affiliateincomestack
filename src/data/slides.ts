@@ -14,6 +14,22 @@ export type FlywheelArc =
   | "development"
   | "all";
 
+export type PlateAnnotationRole = "label" | "metric";
+
+/**
+ * Type that used to be baked into the concept plate. The plates are now text-free, so
+ * these strings ride in the overlay layer where they can animate and re-typeset.
+ * Positions are the centre of the original burned-in type, as a percent of plate size.
+ */
+export type PlateAnnotation = {
+  text: string;
+  xPct: number;
+  yPct: number;
+  /** Font size as a percent of plate height, matched to the original burned-in type. */
+  sizePct: number;
+  role: PlateAnnotationRole;
+};
+
 export type Slide = {
   id: string;
   conceptSrc: string;
@@ -23,6 +39,7 @@ export type Slide = {
   headline: string;
   body: string;
   disclosure?: string;
+  annotations?: PlateAnnotation[];
   flywheelArc?: FlywheelArc;
   motionPreset: string;
   requiresDisclosure: boolean;
@@ -55,13 +72,30 @@ export function assertSlidesValid(slides: Slide[]): void {
         throw new Error(`Slide ${s.id} requires disclosure`);
       }
     }
+    for (const a of s.annotations ?? []) {
+      if (!a.text.trim()) {
+        throw new Error(`Slide ${s.id} has an empty annotation`);
+      }
+      const inside =
+        a.xPct >= 0 && a.xPct <= 100 && a.yPct >= 0 && a.yPct <= 100;
+      if (!inside) {
+        throw new Error(
+          `Slide ${s.id} annotation "${a.text}" sits off the plate (${a.xPct}, ${a.yPct})`,
+        );
+      }
+      if (!(a.sizePct > 0 && a.sizePct <= 60)) {
+        throw new Error(
+          `Slide ${s.id} annotation "${a.text}" has unusable size ${a.sizePct}`,
+        );
+      }
+    }
   }
 }
 
 export const SLIDES: Slide[] = [
   {
     id: "01-title",
-    conceptSrc: "/concepts/sp-stack-01-title.png",
+    conceptSrc: "/concepts/clean/sp-stack-01-title.png",
     accent: "blue",
     eyebrow: "The Super Patch Income Stack™",
     headline: "10 Ways to Build Life-Changing Income",
@@ -72,7 +106,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "02-question",
-    conceptSrc: "/concepts/sp-stack-02-the-question.png",
+    conceptSrc: "/concepts/clean/sp-stack-02-the-question.png",
     accent: "cool",
     eyebrow: "The Old Model",
     headline: "One Commission Is Not a Business",
@@ -82,29 +116,41 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "03-four-stacks",
-    conceptSrc: "/concepts/sp-stack-03-four-stacks.png",
+    conceptSrc: "/concepts/clean/sp-stack-03-four-stacks.png",
     accent: "multi",
     eyebrow: "The Super Patch Full Stack",
     headline: "One Company. Four Stacks. Infinite Potential.",
     body: "We are building a full-stack human performance ecosystem: Product delivers outcomes, Brand & Marketing creates demand, Income opens opportunity, and Personal Development builds leaders. Each layer strengthens the others — not a catalog, a system.",
+    annotations: [
+      { text: "PRODUCT", xPct: 17.12, yPct: 81.15, sizePct: 4.07, role: "label" },
+      { text: "BRAND", xPct: 38.44, yPct: 81.15, sizePct: 4.07, role: "label" },
+      { text: "INCOME", xPct: 60.97, yPct: 81.15, sizePct: 4.07, role: "label" },
+      { text: "PEOPLE", xPct: 82.85, yPct: 81.15, sizePct: 4.07, role: "label" },
+    ],
     flywheelArc: "all",
     motionPreset: "pillars-sequence",
     requiresDisclosure: false,
   },
   {
     id: "04-flywheel",
-    conceptSrc: "/concepts/sp-stack-04-flywheel.png",
+    conceptSrc: "/concepts/clean/sp-stack-04-flywheel.png",
     accent: "multi",
     eyebrow: "The Flywheel Effect",
     headline: "Each Stack Reinforces the Others",
     body: "Better products strengthen the brand. A stronger brand accelerates customers. Greater awareness expands income. Greater income attracts leaders. Better leaders build community. Stronger communities fund innovation. The result is a self-reinforcing ecosystem built to last.",
+    annotations: [
+      { text: "PRODUCT", xPct: 20.21, yPct: 34.77, sizePct: 5.97, role: "label" },
+      { text: "BRAND", xPct: 80.63, yPct: 34.72, sizePct: 5.83, role: "label" },
+      { text: "PEOPLE", xPct: 19.73, yPct: 71.09, sizePct: 5.97, role: "label" },
+      { text: "INCOME", xPct: 80.76, yPct: 71.14, sizePct: 5.83, role: "label" },
+    ],
     flywheelArc: "all",
     motionPreset: "flywheel-scrub",
     requiresDisclosure: false,
   },
   {
     id: "05-ecosystem",
-    conceptSrc: "/concepts/sp-stack-05-ecosystem.png",
+    conceptSrc: "/concepts/clean/sp-stack-05-ecosystem.png",
     accent: "violet",
     eyebrow: "Why It Compounds",
     headline: "Exponential Value Across the Ecosystem",
@@ -115,7 +161,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "06-ten-layers",
-    conceptSrc: "/concepts/sp-stack-06-ten-layers.png",
+    conceptSrc: "/concepts/clean/sp-stack-06-ten-layers.png",
     accent: "orange",
     eyebrow: "Income Stack™",
     headline: "The More Value You Create, the More Stacks Work for You",
@@ -126,11 +172,14 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "07-retail",
-    conceptSrc: "/concepts/sp-stack-07-retail.png",
+    conceptSrc: "/concepts/clean/sp-stack-07-retail.png",
     accent: "green",
     eyebrow: "Stack 1",
     headline: "25% Retail Affiliate Commissions",
     body: "This is where everyone begins. Every time someone purchases through your personal affiliate link, you earn a guaranteed 25% commission — paid weekly. One product or several, if they buy through your link, you earn 25% of what they pay.",
+    annotations: [
+      { text: "25%", xPct: 22.62, yPct: 45.61, sizePct: 30.65, role: "metric" },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "coin-rise",
@@ -138,11 +187,14 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "08-fast-start",
-    conceptSrc: "/concepts/sp-stack-08-fast-start.png",
+    conceptSrc: "/concepts/clean/sp-stack-08-fast-start.png",
     accent: "orange",
     eyebrow: "Stack 2",
     headline: "Fast Start & Rank Advancement Bonuses",
     body: "Personally enroll three or more new affiliates in a month with qualifying kits and unlock Fast Start Bonuses from an additional $200 up to $2,000. As your organization hits sales milestones, Rank Advancement Bonuses can reach up to $100,000.",
+    annotations: [
+      { text: "$2,000", xPct: 81.9, yPct: 32.47, sizePct: 28.35, role: "metric" },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "platform-leap",
@@ -150,11 +202,18 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "09-team-overrides",
-    conceptSrc: "/concepts/sp-stack-09-team-overrides.png",
+    conceptSrc: "/concepts/clean/sp-stack-09-team-overrides.png",
     accent: "blue",
     eyebrow: "Stack 3",
     headline: "Team Override Commissions",
     body: "True residual income begins as you help others build. Earn up to 15% of Bonus Volume on Level 1, up to 10% on Level 2, and up to 4% on Levels 3, 4, and 5. There is no ceiling on organization size.",
+    annotations: [
+      { text: "15%", xPct: 10.03, yPct: 25.29, sizePct: 5.15, role: "metric" },
+      { text: "10%", xPct: 9.96, yPct: 41.5, sizePct: 5.15, role: "metric" },
+      { text: "4%", xPct: 9.57, yPct: 56.05, sizePct: 4.61, role: "metric" },
+      { text: "4%", xPct: 9.51, yPct: 68.36, sizePct: 4.88, role: "metric" },
+      { text: "4%", xPct: 9.51, yPct: 78.61, sizePct: 4.88, role: "metric" },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "root-tiers",
@@ -162,11 +221,14 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "10-md-depth",
-    conceptSrc: "/concepts/sp-stack-10-unlimited-depth.png",
+    conceptSrc: "/concepts/clean/sp-stack-10-unlimited-depth.png",
     accent: "violet",
     eyebrow: "Stack 4",
     headline: "Managing Director Leaders Unlimited Depth Bonus",
     body: "Once you achieve Managing Director, you begin earning an additional unlimited 2% on qualifying Bonus Volume past level 5, up to the next qualified Managing Director. Leadership unlocks another layer of recurring income that grows with your organization.",
+    annotations: [
+      { text: "2%", xPct: 37.11, yPct: 13.23, sizePct: 6.1, role: "metric" },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "depth-rings",
@@ -174,7 +236,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "11-vp-override",
-    conceptSrc: "/concepts/sp-stack-11-vp-override.png",
+    conceptSrc: "/concepts/clean/sp-stack-11-vp-override.png",
     accent: "blue",
     eyebrow: "Stack 5",
     headline: "Vice President Leadership Override",
@@ -186,7 +248,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "12-generations",
-    conceptSrc: "/concepts/sp-stack-12-generations.png",
+    conceptSrc: "/concepts/clean/sp-stack-12-generations.png",
     accent: "green",
     eyebrow: "Stack 6",
     headline: "Generation Bonuses",
@@ -198,7 +260,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "13-executive",
-    conceptSrc: "/concepts/sp-stack-13-executive.png",
+    conceptSrc: "/concepts/clean/sp-stack-13-executive.png",
     accent: "orange",
     eyebrow: "Stacks 7 & 8",
     headline: "Executive Leadership & CEO Leadership Bonus",
@@ -210,7 +272,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "14-global",
-    conceptSrc: "/concepts/sp-stack-14-global-pool.png",
+    conceptSrc: "/concepts/clean/sp-stack-14-global-pool.png",
     accent: "violet",
     eyebrow: "Stacks 9 & 10",
     headline: "Global President Override & Global Leadership Pool",
@@ -222,7 +284,7 @@ export const SLIDES: Slide[] = [
   },
   {
     id: "15-closing",
-    conceptSrc: "/concepts/sp-stack-15-closing.png",
+    conceptSrc: "/concepts/clean/sp-stack-15-closing.png",
     accent: "red",
     eyebrow: "One Opportunity. Ten Income Streams.",
     headline: "Build Customers. Build Leaders. Build Leverage.",

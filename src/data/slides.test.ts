@@ -24,3 +24,96 @@ describe("SLIDES", () => {
     expect(() => assertSlidesValid(SLIDES)).not.toThrow();
   });
 });
+
+describe("text-free plates", () => {
+  it("points every slide at a de-texted plate", () => {
+    for (const s of SLIDES) {
+      expect(s.conceptSrc).toMatch(/^\/concepts\/clean\/sp-stack-/);
+    }
+  });
+});
+
+describe("plate annotations", () => {
+  const byId = (id: string) => {
+    const slide = SLIDES.find((s) => s.id === id);
+    if (!slide) throw new Error(`no slide ${id}`);
+    return slide;
+  };
+
+  it("re-declares the four-stack pillar labels as overlay graphics", () => {
+    expect(byId("03-four-stacks").annotations?.map((a) => a.text)).toEqual([
+      "PRODUCT",
+      "BRAND",
+      "INCOME",
+      "PEOPLE",
+    ]);
+  });
+
+  it("re-declares the flywheel quadrant labels", () => {
+    expect(byId("04-flywheel").annotations?.map((a) => a.text)).toEqual([
+      "PRODUCT",
+      "BRAND",
+      "PEOPLE",
+      "INCOME",
+    ]);
+  });
+
+  it("keeps the team override tier percentages exactly as provided", () => {
+    expect(byId("09-team-overrides").annotations?.map((a) => a.text)).toEqual([
+      "15%",
+      "10%",
+      "4%",
+      "4%",
+      "4%",
+    ]);
+  });
+
+  it("keeps display metrics for the plates that carried one", () => {
+    expect(byId("07-retail").annotations?.[0]).toMatchObject({
+      text: "25%",
+      role: "metric",
+    });
+    expect(byId("08-fast-start").annotations?.[0]).toMatchObject({
+      text: "$2,000",
+      role: "metric",
+    });
+    expect(byId("10-md-depth").annotations?.[0]).toMatchObject({
+      text: "2%",
+      role: "metric",
+    });
+  });
+
+  it("positions every annotation inside the plate", () => {
+    for (const s of SLIDES) {
+      for (const a of s.annotations ?? []) {
+        expect(a.text.trim().length).toBeGreaterThan(0);
+        expect(a.xPct).toBeGreaterThanOrEqual(0);
+        expect(a.xPct).toBeLessThanOrEqual(100);
+        expect(a.yPct).toBeGreaterThanOrEqual(0);
+        expect(a.yPct).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
+  it("keeps display metrics far larger than diagram labels, as the plates had them", () => {
+    const bigMetric = byId("07-retail").annotations![0].sizePct;
+    const tierMetric = byId("09-team-overrides").annotations![0].sizePct;
+    const pillarLabel = byId("03-four-stacks").annotations![0].sizePct;
+    expect(bigMetric).toBeGreaterThan(tierMetric * 4);
+    expect(tierMetric).toBeGreaterThan(pillarLabel);
+  });
+
+  it("rejects annotations positioned off the plate", () => {
+    const broken = SLIDES.map((s) =>
+      s.id === "09-team-overrides"
+        ? {
+            ...s,
+            annotations: [
+              { text: "15%", xPct: 140, yPct: 20, sizePct: 5, role: "metric" as const },
+            ],
+          }
+        : s,
+    );
+    expect(() => assertSlidesValid(broken)).toThrow(/annotation/i);
+  });
+});

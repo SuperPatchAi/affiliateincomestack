@@ -41,7 +41,29 @@ function escapeHtml(str) {
 
 for (const s of SLIDES) {
   const file = s.conceptSrc.split("/").pop();
-  cpSync(join(__dirname, "../public/concepts", file), join(assetsDir, file));
+  cpSync(join(__dirname, "../public", s.conceptSrc), join(assetsDir, file));
+}
+
+// Plates are 3:2 and contain-fitted into the 1920x1080 stage, so the annotation layer
+// covers the 1620x1080 letterboxed image rather than the full frame.
+const PLATE_W = 1620;
+const PLATE_H = 1080;
+const PLATE_X = (1920 - PLATE_W) / 2;
+
+function annotationMarkup(slide) {
+  if (!slide.annotations?.length) return "";
+  const spans = slide.annotations
+    .map((a, i) => {
+      const x = Math.round(PLATE_X + (a.xPct / 100) * PLATE_W);
+      const y = Math.round((a.yPct / 100) * PLATE_H);
+      const size = Math.round((a.sizePct / 100) * PLATE_H);
+      return `<span class="annotation ${a.role}" id="an-${slide.id}-${i}" style="left: ${x}px; top: ${y}px; font-size: ${size}px">${escapeHtml(a.text)}</span>`;
+    })
+    .join("\n          ");
+  return `
+        <div class="annotations" id="an-${slide.id}" aria-hidden="true">
+          ${spans}
+        </div>`;
 }
 
 const clips = SLIDES.map((s, i) => {
@@ -70,6 +92,7 @@ const clips = SLIDES.map((s, i) => {
           width="1920"
           height="1080"
         />
+${annotationMarkup(s)}
         <div class="scrim"></div>
         <div class="copy" id="copy-${s.id}">
           <p class="eyebrow" id="ey-${s.id}">${escapeHtml(s.eyebrow)}</p>
@@ -87,6 +110,7 @@ const tweenLines = SLIDES.map((s, i) => {
       tl.from("#ey-${s.id}", { y: 24, opacity: 0, duration: 0.55, ease: "power3.out" }, ${t + 0.25});
       tl.from("#hl-${s.id}", { y: 32, opacity: 0, duration: 0.65, ease: "power3.out" }, ${t + 0.35});
       tl.from("#bd-${s.id}", { y: 28, opacity: 0, duration: 0.6, ease: "power2.out" }, ${t + 0.5});
+      ${s.annotations?.length ? `tl.from("#an-${s.id} > *", { scale: 0.82, opacity: 0, duration: 0.5, stagger: 0.12, ease: "back.out(1.8)" }, ${t + 0.45});` : ""}
       ${s.disclosure ? `tl.from("#d-${s.id}", { opacity: 0, duration: 0.4 }, ${t + 0.7});` : ""}`;
 }).join("\n");
 
@@ -120,7 +144,12 @@ const html = `<!doctype html>
       .clip { position: absolute; inset: 0; overflow: hidden; }
       .fill { position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%); }
       .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #05070f; }
-      .scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,7,15,0.15) 0%, rgba(5,7,15,0.25) 40%, rgba(5,7,15,0.92) 78%, #05070f 100%); }
+      /* Sits between plate and scrim so recovered plate type reads as artwork and never fights the copy block. */
+      .annotations { position: absolute; inset: 0; z-index: 1; }
+      .annotation { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; line-height: 1; }
+      .annotation.label { color: rgba(255,255,255,0.92); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent), 0 2px 8px rgba(0,0,0,0.7); }
+      .annotation.metric { color: var(--accent); font-weight: 900; letter-spacing: -0.02em; text-shadow: 0 0 34px color-mix(in srgb, var(--accent) 45%, transparent), 0 2px 12px rgba(0,0,0,0.55); }
+      .scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(5,7,15,0.15) 0%, rgba(5,7,15,0.25) 40%, rgba(5,7,15,0.92) 78%, #05070f 100%); }
       .copy { position: absolute; left: 96px; right: 96px; bottom: 88px; max-width: 1100px; z-index: 2; }
       .eyebrow { margin: 0 0 14px; color: var(--accent); font-size: 22px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
       .headline { margin: 0 0 18px; font-size: 64px; font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; }

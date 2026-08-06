@@ -1,0 +1,507 @@
+[
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 50,
+        "text" : "THE SUPER PATCH INCOME STACK",
+        "w" : 1344,
+        "x" : 100,
+        "y" : 109
+      },
+      {
+        "confidence" : 1,
+        "h" : 39,
+        "text" : "10 Ways to Build Life-Changing Income",
+        "w" : 730,
+        "x" : 403,
+        "y" : 185
+      }
+    ],
+    "file" : "sp-stack-01-title.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 91,
+        "text" : "What is the #1",
+        "w" : 492,
+        "x" : 84,
+        "y" : 334
+      },
+      {
+        "confidence" : 1,
+        "h" : 77,
+        "text" : "thing you want",
+        "w" : 512,
+        "x" : 80,
+        "y" : 432
+      },
+      {
+        "confidence" : 1,
+        "h" : 77,
+        "text" : "for your life",
+        "w" : 387,
+        "x" : 82,
+        "y" : 513
+      },
+      {
+        "confidence" : 1,
+        "h" : 86,
+        "text" : "right now?",
+        "w" : 360,
+        "x" : 83,
+        "y" : 593
+      }
+    ],
+    "file" : "sp-stack-02-the-question.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 63,
+        "text" : "ONE COMPANY. FOUR STACKS.",
+        "w" : 978,
+        "x" : 281,
+        "y" : 80
+      },
+      {
+        "confidence" : 1,
+        "h" : 30,
+        "text" : "PRODUCT",
+        "w" : 170,
+        "x" : 178,
+        "y" : 816
+      },
+      {
+        "confidence" : 1,
+        "h" : 30,
+        "text" : "BRAND",
+        "w" : 123,
+        "x" : 529,
+        "y" : 816
+      },
+      {
+        "confidence" : 1,
+        "h" : 30,
+        "text" : "INCOME",
+        "w" : 137,
+        "x" : 868,
+        "y" : 816
+      },
+      {
+        "confidence" : 1,
+        "h" : 30,
+        "text" : "PEOPLE",
+        "w" : 139,
+        "x" : 1203,
+        "y" : 816
+      }
+    ],
+    "file" : "sp-stack-03-four-stacks.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 71,
+        "text" : "THE FULL STACK FLYWHEEL",
+        "w" : 615,
+        "x" : 25,
+        "y" : 31
+      },
+      {
+        "confidence" : 1,
+        "h" : 44,
+        "text" : "PRODUCT",
+        "w" : 157,
+        "x" : 232,
+        "y" : 334
+      },
+      {
+        "confidence" : 1,
+        "h" : 43,
+        "text" : "BRAND",
+        "w" : 117,
+        "x" : 1180,
+        "y" : 334
+      },
+      {
+        "confidence" : 1,
+        "h" : 44,
+        "text" : "PEOPLE",
+        "w" : 130,
+        "x" : 238,
+        "y" : 706
+      },
+      {
+        "confidence" : 1,
+        "h" : 43,
+        "text" : "INCOME",
+        "w" : 137,
+        "x" : 1172,
+        "y" : 707
+      }
+    ],
+    "file" : "sp-stack-04-flywheel.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 52,
+        "text" : "EVERY LAYER",
+        "w" : 434,
+        "x" : 55,
+        "y" : 95
+      },
+      {
+        "confidence" : 1,
+        "h" : 57,
+        "text" : "MAKES THE NEXT",
+        "w" : 552,
+        "x" : 58,
+        "y" : 166
+      },
+      {
+        "confidence" : 1,
+        "h" : 54,
+        "text" : "ONE STRONGER",
+        "w" : 510,
+        "x" : 58,
+        "y" : 240
+      }
+    ],
+    "file" : "sp-stack-05-ecosystem.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 79,
+        "text" : "TEN STREAMS.",
+        "w" : 601,
+        "x" : 49,
+        "y" : 77
+      },
+      {
+        "confidence" : 1,
+        "h" : 90,
+        "text" : "ONE STACK.",
+        "w" : 512,
+        "x" : 51,
+        "y" : 153
+      }
+    ],
+    "file" : "sp-stack-06-ten-layers.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 226,
+        "text" : "25%",
+        "w" : 539,
+        "x" : 78,
+        "y" : 354
+      },
+      {
+        "confidence" : 1,
+        "h" : 57,
+        "text" : "RETAIL COMMISSIONS",
+        "w" : 617,
+        "x" : 89,
+        "y" : 611
+      },
+      {
+        "confidence" : 1,
+        "h" : 30,
+        "text" : "PAID EVERY WEEK",
+        "w" : 353,
+        "x" : 91,
+        "y" : 691
+      }
+    ],
+    "file" : "sp-stack-07-retail.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 120,
+        "text" : "FAST START",
+        "w" : 577,
+        "x" : 62,
+        "y" : 72
+      },
+      {
+        "confidence" : 1,
+        "h" : 70,
+        "text" : "MOMENTUM PAYS",
+        "w" : 547,
+        "x" : 69,
+        "y" : 209
+      },
+      {
+        "confidence" : 1,
+        "h" : 209,
+        "text" : "$2,000",
+        "w" : 460,
+        "x" : 1028,
+        "y" : 228
+      }
+    ],
+    "file" : "sp-stack-08-fast-start.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 61,
+        "text" : "TEAM OVERRIDES",
+        "w" : 467,
+        "x" : 29,
+        "y" : 53
+      },
+      {
+        "confidence" : 1,
+        "h" : 32,
+        "text" : "WHERE RESIDUAL BEGINS",
+        "w" : 460,
+        "x" : 37,
+        "y" : 131
+      },
+      {
+        "confidence" : 1,
+        "h" : 38,
+        "text" : "15%",
+        "w" : 72,
+        "x" : 118,
+        "y" : 240
+      },
+      {
+        "confidence" : 1,
+        "h" : 38,
+        "text" : "10%",
+        "w" : 70,
+        "x" : 118,
+        "y" : 406
+      },
+      {
+        "confidence" : 1,
+        "h" : 34,
+        "text" : "4%",
+        "w" : 54,
+        "x" : 120,
+        "y" : 557
+      },
+      {
+        "confidence" : 1,
+        "h" : 36,
+        "text" : "4%",
+        "w" : 56,
+        "x" : 118,
+        "y" : 682
+      },
+      {
+        "confidence" : 1,
+        "h" : 36,
+        "text" : "4%",
+        "w" : 56,
+        "x" : 118,
+        "y" : 787
+      }
+    ],
+    "file" : "sp-stack-09-team-overrides.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 63,
+        "text" : "UNLIMITED DEPTH",
+        "w" : 467,
+        "x" : 40,
+        "y" : 44
+      },
+      {
+        "confidence" : 1,
+        "h" : 36,
+        "text" : "LEADERSHIP HAS NO FLOOR",
+        "w" : 463,
+        "x" : 42,
+        "y" : 127
+      },
+      {
+        "confidence" : 1,
+        "h" : 45,
+        "text" : "2%",
+        "w" : 56,
+        "x" : 542,
+        "y" : 113
+      }
+    ],
+    "file" : "sp-stack-10-unlimited-depth.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 79,
+        "text" : "2% ON EVERY LEG",
+        "w" : 626,
+        "x" : 73,
+        "y" : 137
+      },
+      {
+        "confidence" : 1,
+        "h" : 39,
+        "text" : "VICE PRESIDENT OVERRIDE",
+        "w" : 480,
+        "x" : 76,
+        "y" : 229
+      }
+    ],
+    "file" : "sp-stack-11-vp-override.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 75,
+        "text" : "3% THROUGH THREE GENERATIONS",
+        "w" : 1012,
+        "x" : 49,
+        "y" : 95
+      },
+      {
+        "confidence" : 1,
+        "h" : 45,
+        "text" : "LEADERS WHO BUILD LEADERS",
+        "w" : 539,
+        "x" : 53,
+        "y" : 200
+      }
+    ],
+    "file" : "sp-stack-12-generations.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 104,
+        "text" : "THE VIEW",
+        "w" : 577,
+        "x" : 35,
+        "y" : 240
+      },
+      {
+        "confidence" : 1,
+        "h" : 108,
+        "text" : "FROM THE TOP",
+        "w" : 864,
+        "x" : 40,
+        "y" : 356
+      },
+      {
+        "confidence" : 1,
+        "h" : 65,
+        "text" : "$10,000 TO $20,000 A MONTH",
+        "w" : 851,
+        "x" : 44,
+        "y" : 488
+      },
+      {
+        "confidence" : 1,
+        "h" : 27,
+        "text" : "EXECUTIVE AND CEO LEADERSHIP",
+        "w" : 585,
+        "x" : 46,
+        "y" : 571
+      }
+    ],
+    "file" : "sp-stack-13-executive.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 72,
+        "text" : "1% OF THE WORLD",
+        "w" : 585,
+        "x" : 40,
+        "y" : 398
+      },
+      {
+        "confidence" : 1,
+        "h" : 59,
+        "text" : "WE BUILD TOGETHER",
+        "w" : 603,
+        "x" : 40,
+        "y" : 488
+      },
+      {
+        "confidence" : 1,
+        "h" : 25,
+        "text" : "GLOBAL LEADERSHIP POOL",
+        "w" : 556,
+        "x" : 46,
+        "y" : 570
+      }
+    ],
+    "file" : "sp-stack-14-global-pool.png",
+    "height" : 1024,
+    "width" : 1536
+  },
+  {
+    "boxes" : [
+      {
+        "confidence" : 1,
+        "h" : 135,
+        "text" : "LET'S BUILD IT TOGETHER",
+        "w" : 1164,
+        "x" : 223,
+        "y" : 166
+      },
+      {
+        "confidence" : 1,
+        "h" : 36,
+        "text" : "BUILD CUSTOMERS. BUILD LEADERS. BUILD LEVERAGE.",
+        "w" : 847,
+        "x" : 401,
+        "y" : 329
+      }
+    ],
+    "file" : "sp-stack-15-closing.png",
+    "height" : 1024,
+    "width" : 1536
+  }
+]

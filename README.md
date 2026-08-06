@@ -2,6 +2,8 @@
 
 Mobile-first **fluid document** presentation for new affiliates. High-quality concept plates sit in aspect-aware frames (`object-fit: contain` — full composition, no aggressive crop). Live type and per-slide GSAP entrances sit beside/below the imagery.
 
+Every plate is **text-free**. All type — headlines, body, diagram labels, display metrics — is live DOM so it can re-typeset, re-colour with the slide accent, and animate.
+
 ## Portfolio
 
 | Layer | Slug |
@@ -22,6 +24,39 @@ npm test
 ```
 
 Open on a phone-width viewport (~390px) and scroll.
+
+## Text-free plates
+
+The concept plates shipped with headlines and diagram labels baked into the pixels, which
+duplicated the live copy. `scripts/` removes them and hands the strings to the overlay layer:
+
+```bash
+# one-time: numpy + pillow for the fill pass (macOS Swift/Vision needs no install)
+python3 -m venv ../../.venv-plates && ../../.venv-plates/bin/pip install numpy pillow
+
+# 1. detect baked type (macOS Vision OCR) -> scripts/plate-text.json
+swift scripts/plate-ocr.swift public/concepts/*.png > scripts/plate-text.json
+
+# 2. paint it out -> public/concepts/clean/*.png
+../../.venv-plates/bin/python scripts/clean-plates.py --out public/concepts/clean
+
+# 3. verify nothing survived (expect zero detections)
+swift scripts/plate-ocr.swift public/concepts/clean/*.png
+```
+
+Inspect a pass before overwriting with `--out /tmp/qa --debug-masks /tmp/qa/masks --only <file>`.
+
+`clean-plates.py` masks glyph pixels and refills them by inverse-distance interpolation from
+the nearest untouched pixel in four directions, so gradients, horizons and reflections
+reconstruct instead of smearing. Two knobs matter:
+
+- `PLATE_HORIZONTAL_BIAS` — plates whose type crosses horizontally banded scenery (13, 14, 15)
+  favour same-row samples, which prevents vertical streaks through city lights and cloud decks
+- `--box-fill-min-height` — display numerals (`25%`, `$2,000`) are too large to rebuild
+  stroke-by-stroke, so their whole rectangle is cleared and refilled from outside the glow
+
+Originals stay in `public/concepts/` untouched. Recovered strings live on as
+`annotations` in `slides.ts`, positioned and sized from the original burned-in type.
 
 ## Rules
 

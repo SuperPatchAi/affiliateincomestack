@@ -46,6 +46,26 @@ export function Slide({ slide, index }: Props) {
               />
             )}
             <div className="slide-media-glow" aria-hidden />
+
+            {slide.annotations?.length ? (
+              <div className="plate-annotations" data-annotation-layer aria-hidden>
+                {slide.annotations.map((annotation, i) => (
+                  <span
+                    key={`${annotation.text}-${i}`}
+                    className={`plate-annotation role-${annotation.role}`}
+                    style={{
+                      left: `${annotation.xPct}%`,
+                      top: `${annotation.yPct}%`,
+                      fontSize: `${annotation.sizePct}cqh`,
+                    }}
+                    data-plate-annotation
+                    data-anim="annotation"
+                  >
+                    {annotation.text}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </figure>
 
           {slide.motionPreset === "flywheel-scrub" ? (
