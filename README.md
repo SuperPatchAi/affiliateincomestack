@@ -58,6 +58,58 @@ reconstruct instead of smearing. Two knobs matter:
 Originals stay in `public/concepts/` untouched. Recovered strings live on as
 `annotations` in `slides.ts`, positioned and sized from the original burned-in type.
 
+## Remotion motion system (MotionDirector)
+
+Plate motion is not hard-coded in `SlideScene`. A **MotionDirector** registry maps each
+`slide.motionPreset` to a beat and phase schedule:
+
+| Module | Role |
+|--------|------|
+| `src/remotion/motion/presets.ts` | `MOTION_PRESETS` / `MotionBeat` / `getMotionBeat(preset)` — plate `from`, settle frames, ambient scale, `secondaryPolicy` |
+| `src/remotion/motion/gating.ts` | `getMotionPhases(...)` — annotation / eyebrow / body / disclosure start frames + ambient interpolate |
+| `src/remotion/labels.ts` | `shouldShowLiveAnnotations(slide)` — hide live overlays when `hero.annotationsBaked` |
+| `src/remotion/components/SlideScene.tsx` | Consumes beat + phases; wires plate / diagrams / `CopyBlock` / `EndCard` |
+
+`secondaryPolicy`: `copy-first` | `diagram-first` | `copy-only`. Unknown presets fall back to `ken-burns-glow`.
+
+### Hero media meta (`HeroMedia`)
+
+Preferred over deprecated `heroVideoSrc`:
+
+```ts
+hero?: { src: string; width: number; height: number; annotationsBaked: boolean }
+```
+
+- `heroSrc(slide)` → `hero?.src ?? heroVideoSrc`
+- New loops: native **1920×1080** @ 30 fps (`assertHeroMedia`); no 720p upscale
+- Legacy allowlist only: `01-title`, `03-four-stacks` → `LEGACY_720P_HERO_IDS`
+- `annotationsBaked: true` → live plate annotations stay off (baked labels win)
+
+### Narrative fields + CTA
+
+| Field | Use |
+|-------|-----|
+| `body` | Speaker / long-form copy |
+| `onScreenBody` | Optional film overlay (30–50 words); preferred over `body` when set |
+| `disclosure` / `requiresDisclosure` | Money slides 07–14 + closing use `INCOME_DISCLOSURE` |
+| `ctaPrimary` / `ctaSecondary` | Closing only — Remotion `EndCard` (≥16px disclosure); web mirrors CTAs |
+| `presenterNotes` | Proof / objection handling (not on-film) |
+| `INCOME_STREAMS` | Ten-stream index SSOT (`src/data/streamIndex.ts`); spine on 07–14; recap last 1.5s of 14 |
+
+## Studio seek QA checklist
+
+`npm run remotion` → open `IncomeStackFilm` (1920×1080, 30 fps, **2298** frames). Seek these absolute frames (clip start; transition overlap = 18f):
+
+| Slide | Frame | What to verify |
+|-------|------:|----------------|
+| 03 four-stacks | **414** | Hero loop + `pillars-sequence`; live annotations **off** if `annotationsBaked` |
+| 04 flywheel | **696** | `flywheel-scrub` plate entrance; hero Flywheel overlay visible |
+| 07 retail | **1092** | `coin-rise` / diagram-first; disclosure present; no “guaranteed” earnings |
+| 09 team-overrides | **1356** | `root-tiers`; annotations settle before dense copy |
+| 15 closing | **2148** | `horizon-settle`; `EndCard` CTAs + disclosure (≥16px) |
+
+Also useful: mid-clip at start+75 for stills (150f) or start+150 for heroes (300f).
+
 ## Rules
 
 - Do not invent compensation numbers — edit `src/data/slides.ts` only from the source outline
