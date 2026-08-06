@@ -149,11 +149,20 @@ describe("plate annotations", () => {
     expect(() => assertSlidesValid(broken)).toThrow(/annotation/i);
   });
 
-  it("title plate owns ten drop-in slab layers", () => {
+  it("title plate owns ten drop-in slab layers as a still fallback", () => {
     const title = SLIDES.find((s) => s.id === "01-title")!;
     expect(title.motionPreset).toBe("parallax-slabs");
     expect(TITLE_SLAB_SRCS).toHaveLength(10);
     expect(TITLE_SLAB_BASE).toContain("title-base");
+  });
+
+  it("uses operator-animated hero loops on slides 01 and 03", () => {
+    expect(byId("01-title").heroVideoSrc).toBe(
+      "/concepts/animated/sp-stack-01-title_animated.mp4",
+    );
+    expect(byId("03-four-stacks").heroVideoSrc).toBe(
+      "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
+    );
   });
 
 });

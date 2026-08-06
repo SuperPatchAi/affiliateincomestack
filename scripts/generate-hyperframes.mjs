@@ -16,16 +16,28 @@ const {
   annotationSpanPct,
   TITLE_SLAB_BASE,
   TITLE_SLAB_SRCS,
+  clipDurationSec,
 } = await import("../src/data/slides.ts");
 
-const CLIP_DUR = 5;
-const total = SLIDES.length * CLIP_DUR;
 const outDir = join(
   root,
   "docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/hyperframes/income-stack-deck",
 );
 const assetsDir = join(outDir, "assets");
 mkdirSync(assetsDir, { recursive: true });
+
+/** Cumulative timeline: stills are 5s, hero video plates take their full 10s. */
+const timeline = [];
+{
+  let t = 0;
+  for (const s of SLIDES) {
+    const duration = clipDurationSec(s);
+    timeline.push({ id: s.id, start: t, duration });
+    t += duration;
+  }
+}
+const total = timeline[timeline.length - 1].start + timeline[timeline.length - 1].duration;
+const timingById = new Map(timeline.map((row) => [row.id, row]));
 
 // Small accent type needs a lighter tint than the fill accent to clear WCAG AA on the
 // near-black stage; only the brand red is dark enough to need one.
@@ -54,14 +66,23 @@ function escapeHtml(str) {
 for (const s of SLIDES) {
   const file = s.conceptSrc.split("/").pop();
   cpSync(join(__dirname, "../public", s.conceptSrc), join(assetsDir, file));
+  if (s.heroVideoSrc) {
+    const vfile = s.heroVideoSrc.split("/").pop();
+    cpSync(join(__dirname, "../public", s.heroVideoSrc), join(assetsDir, vfile));
+  }
 }
-// Title stack layers (base + 10 coloured slabs) for the drop-in beat.
+// Title stack layers kept as fallback when a hero video is absent.
 for (const src of [TITLE_SLAB_BASE, ...TITLE_SLAB_SRCS]) {
   const file = src.split("/").pop();
   cpSync(join(__dirname, "../public", src), join(assetsDir, file));
 }
 
+/**
+ * Still/slab plates may live inside the timed section. Hero <video> MUST be a direct
+ * child of #root (HyperFrames never seeks media nested in a wrapper) — see hostVideos.
+ */
 function plateMarkup(slide) {
+  if (slide.heroVideoSrc) return ""; // video is hoisted to the host root
   if (slide.motionPreset === "parallax-slabs") {
     const base = TITLE_SLAB_BASE.split("/").pop();
     const slabs = TITLE_SLAB_SRCS.map((src, i) => {
@@ -91,6 +112,24 @@ function plateMarkup(slide) {
           width="1920"
           height="1080"
         />`;
+}
+
+function hostVideoMarkup(slide) {
+  if (!slide.heroVideoSrc) return "";
+  const { start, duration } = timingById.get(slide.id);
+  const file = slide.heroVideoSrc.split("/").pop();
+  // Direct child of #root. Framework owns playback — no play()/seek in composition JS.
+  return `
+      <video
+        id="vid-${slide.id}"
+        class="clip plate-video"
+        src="assets/${file}"
+        data-start="${start}"
+        data-duration="${duration}"
+        data-track-index="0"
+        muted
+        playsinline
+      ></video>`;
 }
 
 // Plates are 3:2 and contain-fitted into the 1920x1080 stage, so the annotation layer
@@ -191,7 +230,8 @@ function planLayout(slide) {
 }
 
 function annotationMarkup(slide, plan) {
-  if (!plan.showAnnotations) return "";
+  // Operator hero loops often bake diagram labels back into the pixels.
+  if (slide.heroVideoSrc || !plan.showAnnotations) return "";
   const spans = slide.annotations
     .map((a, i) => {
       const x = Math.round(PLATE_X + (a.xPct / 100) * PLATE_W);
@@ -208,8 +248,10 @@ function annotationMarkup(slide, plan) {
 
 const layouts = new Map(SLIDES.map((s) => [s.id, planLayout(s)]));
 
+const hostVideos = SLIDES.map(hostVideoMarkup).filter(Boolean).join("\n");
+
 const clips = SLIDES.map((s, i) => {
-  const start = i * CLIP_DUR;
+  const { start, duration } = timingById.get(s.id);
   const accent = accentHex[s.accent] || "#2f6bff";
   const accentText = accentTextHex[s.accent] || accent;
   const plan = layouts.get(s.id);
@@ -221,7 +263,7 @@ const clips = SLIDES.map((s, i) => {
         id="clip-${s.id}"
         class="clip slide anchor-${plan.anchor}"
         data-start="${start}"
-        data-duration="${CLIP_DUR}"
+        data-duration="${duration}"
         data-track-index="1"
         data-slide-index="${i}"
         style="--accent: ${accent}; --accent-text: ${accentText}"
@@ -239,20 +281,25 @@ ${annotationMarkup(s, plan)}
       </section>`;
 }).join("\n");
 
-const tweenLines = SLIDES.map((s, i) => {
-  const t = i * CLIP_DUR;
-  const plateTween =
-    s.motionPreset === "parallax-slabs"
-      ? `
+const tweenLines = SLIDES.map((s) => {
+  const { start: t, duration } = timingById.get(s.id);
+  let plateTween = "";
+  if (s.heroVideoSrc) {
+    // HyperFrames drives the video clock; only fade the companion overlay in.
+    plateTween = "";
+  } else if (s.motionPreset === "parallax-slabs") {
+    plateTween = `
       tl.from("#img-${s.id}", { opacity: 0, duration: 0.4, ease: "power2.out" }, ${t});
-      tl.from("#slabs-${s.id} .slab", { y: -520, opacity: 0, duration: 0.45, stagger: 0.1, ease: "power3.out" }, ${t + 0.15});`
-      : `
-      tl.fromTo("#img-${s.id}", { scale: 1.08, y: -20 }, { scale: 1, y: 12, duration: ${CLIP_DUR}, ease: "none" }, ${t});`;
+      tl.from("#slabs-${s.id} .slab", { y: -520, opacity: 0, duration: 0.45, stagger: 0.1, ease: "power3.out" }, ${t + 0.15});`;
+  } else {
+    plateTween = `
+      tl.fromTo("#img-${s.id}", { scale: 1.08, y: -20 }, { scale: 1, y: 12, duration: ${duration}, ease: "none" }, ${t});`;
+  }
   return `${plateTween}
       tl.from("#ey-${s.id}", { y: 24, opacity: 0, duration: 0.55, ease: "power3.out" }, ${t + 0.25});
       tl.from("#hl-${s.id}", { y: 32, opacity: 0, duration: 0.65, ease: "power3.out" }, ${t + 0.35});
       tl.from("#bd-${s.id}", { y: 28, opacity: 0, duration: 0.6, ease: "power2.out" }, ${t + 0.5});
-      ${layouts.get(s.id).showAnnotations ? `tl.from("#an-${s.id} > *", { scale: 0.82, opacity: 0, duration: 0.5, stagger: 0.12, ease: "back.out(1.8)" }, ${t + 0.45});` : ""}
+      ${!s.heroVideoSrc && layouts.get(s.id).showAnnotations ? `tl.from("#an-${s.id} > *", { scale: 0.82, opacity: 0, duration: 0.5, stagger: 0.12, ease: "back.out(1.8)" }, ${t + 0.45});` : ""}
       ${s.disclosure ? `tl.from("#d-${s.id}", { opacity: 0, duration: 0.4 }, ${t + 0.7});` : ""}`;
 }).join("\n");
 
@@ -260,14 +307,18 @@ const slideshowIsland = {
   version: 1,
   compositionId: "income-stack-main",
   mode: "deck",
-  slides: SLIDES.map((s, i) => ({
-    id: s.id,
-    index: i,
-    label: s.headline,
-    start: i * CLIP_DUR,
-    duration: CLIP_DUR,
-    notes: s.body,
-  })),
+  slides: SLIDES.map((s, i) => {
+    const { start, duration } = timingById.get(s.id);
+    return {
+      id: s.id,
+      index: i,
+      label: s.headline,
+      start,
+      duration,
+      notes: s.body,
+      heroVideo: Boolean(s.heroVideoSrc),
+    };
+  }),
 };
 
 const html = `<!doctype html>
@@ -286,6 +337,8 @@ const html = `<!doctype html>
       .clip { position: absolute; inset: 0; overflow: hidden; }
       .fill { position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 65%); }
       .plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: transparent; }
+      /* Host-root hero videos sit under the timed copy sections (track 1). */
+      .plate-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: #05070f; z-index: 0; }
       .slab-stack { position: absolute; inset: 0; z-index: 0; }
       .slab-stack .slab { background: transparent; }
       /* Sits above the scrim so recovered plate type stays bright artwork instead of reading
@@ -315,6 +368,7 @@ const html = `<!doctype html>
   <body>
     <div id="root" data-composition-id="income-stack-main" data-start="0" data-width="1920" data-height="1080" data-duration="${total}">
       <div class="brand">Super Patch · Income Stack™</div>
+${hostVideos}
 ${clips}
     </div>
     <script id="slideshow-deck" type="application/json">
@@ -335,8 +389,10 @@ writeFileSync(join(outDir, "index.html"), html);
 console.log(`Wrote ${join(outDir, "index.html")} (${total}s, ${SLIDES.length} slides)`);
 for (const s of SLIDES) {
   const plan = layouts.get(s.id);
-  if (plan.anchor !== "bl" || (s.annotations?.length && !plan.showAnnotations)) {
-    const dropped = s.annotations?.length && !plan.showAnnotations ? " · annotations dropped (no free corner)" : "";
-    console.log(`  ${s.id}: copy ${plan.anchor}${dropped}`);
-  }
+  const { start, duration } = timingById.get(s.id);
+  const bits = [];
+  if (s.heroVideoSrc) bits.push(`hero video ${duration}s @${start}s`);
+  if (plan.anchor !== "bl") bits.push(`copy ${plan.anchor}`);
+  if (s.annotations?.length && !plan.showAnnotations) bits.push("annotations dropped");
+  if (bits.length) console.log(`  ${s.id}: ${bits.join(" · ")}`);
 }

@@ -15,27 +15,44 @@ describe("DeckShell", () => {
     const { container } = render(<DeckShell />);
     const slides = container.querySelectorAll("[data-layout='fluid']");
     expect(slides).toHaveLength(15);
-    const plate = container.querySelector<HTMLImageElement>("[data-slide-plate]");
-    // Title slide composites a clear base + ten coloured slabs for the drop-in beat.
-    expect(plate?.getAttribute("src")).toMatch(/\/concepts\/slabs\/title-base\.png$/);
-    expect(plate?.getAttribute("width")).toBe("1920");
-    expect(
-      container.querySelectorAll("[data-slide='01-title'] [data-slab]"),
-    ).toHaveLength(10);
+    // Slides 01 and 03 ship operator-animated hero loops instead of the still plate.
+    const title = container.querySelector<HTMLVideoElement>(
+      "[data-slide='01-title'] [data-slide-plate]",
+    );
+    expect(title?.tagName).toBe("VIDEO");
+    expect(title?.getAttribute("src")).toMatch(
+      /\/concepts\/animated\/sp-stack-01-title_animated\.mp4$/,
+    );
+    expect(title?.getAttribute("poster")).toMatch(/\/concepts\/clean\/sp-stack-01-title\.png$/);
+    const pillars = container.querySelector<HTMLVideoElement>(
+      "[data-slide='03-four-stacks'] [data-slide-plate]",
+    );
+    expect(pillars?.tagName).toBe("VIDEO");
+    expect(pillars?.getAttribute("src")).toMatch(
+      /\/concepts\/animated\/sp-stack-03-four-stacks_animated\.mp4$/,
+    );
     const later = container.querySelector<HTMLImageElement>(
       "[data-slide='02-question'] [data-slide-plate]",
     );
+    expect(later?.tagName).toBe("IMG");
     expect(later?.getAttribute("src")).toMatch(/\/concepts\/clean\/sp-stack-/);
   });
 
   it("renders plate annotations as positioned overlay type", () => {
     const { container } = render(<DeckShell />);
+    // Hero-video slides skip the overlay — the loop already carries that type.
     const expected = SLIDES.reduce(
-      (total, s) => total + (s.annotations?.length ?? 0),
+      (total, s) =>
+        total + (s.heroVideoSrc ? 0 : (s.annotations?.length ?? 0)),
       0,
     );
     const rendered = container.querySelectorAll<HTMLElement>("[data-plate-annotation]");
     expect(rendered).toHaveLength(expected);
+    expect(
+      container.querySelectorAll(
+        "[data-slide='03-four-stacks'] [data-plate-annotation]",
+      ),
+    ).toHaveLength(0);
 
     const tiers = container.querySelectorAll<HTMLElement>(
       "[data-slide='09-team-overrides'] [data-plate-annotation]",

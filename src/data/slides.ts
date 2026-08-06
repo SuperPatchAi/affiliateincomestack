@@ -97,6 +97,14 @@ export type Slide = {
   requiresDisclosure: boolean;
 };
 
+/** Still plates hold 5s; operator-supplied hero loops are 10s and need the full clip. */
+export const STILL_CLIP_SEC = 5;
+export const HERO_CLIP_SEC = 10;
+
+export function clipDurationSec(slide: Slide): number {
+  return slide.heroVideoSrc ? HERO_CLIP_SEC : STILL_CLIP_SEC;
+}
+
 export const INCOME_DISCLOSURE =
   "Income is not guaranteed. Results vary. See the Super Patch Income Disclosure.";
 
@@ -155,6 +163,7 @@ export const SLIDES: Slide[] = [
   {
     id: "01-title",
     conceptSrc: "/concepts/clean/sp-stack-01-title.png",
+    heroVideoSrc: "/concepts/animated/sp-stack-01-title_animated.mp4",
     accent: "blue",
     eyebrow: "The Super Patch Income Stack™",
     headline: "10 Ways to Build Life-Changing Income",
@@ -176,6 +185,7 @@ export const SLIDES: Slide[] = [
   {
     id: "03-four-stacks",
     conceptSrc: "/concepts/clean/sp-stack-03-four-stacks.png",
+    heroVideoSrc: "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
     accent: "multi",
     eyebrow: "The Super Patch Full Stack",
     headline: "One Company. Four Stacks. Infinite Potential.",

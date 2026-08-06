@@ -77,7 +77,8 @@ export function Slide({ slide, index }: Props) {
             )}
             <div className="slide-media-glow" aria-hidden />
 
-            {slide.annotations?.length ? (
+            {/* Hero loops often re-introduce plate type; don't stack a second label layer. */}
+            {!slide.heroVideoSrc && slide.annotations?.length ? (
               <div className="plate-annotations" data-annotation-layer aria-hidden>
                 {slide.annotations.map((annotation, i) => (
                   <span
