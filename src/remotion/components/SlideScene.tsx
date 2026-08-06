@@ -7,6 +7,13 @@ import {
   useVideoConfig,
 } from "remotion";
 import { heroSrc, type Slide } from "../../data/slides";
+import {
+  RECAP_WINDOW_SEC,
+  activeStacksForSlide,
+  isIncomeStreamSlide,
+  isRecapSlide,
+  isStreamIndexSlide,
+} from "../../data/streamIndex";
 import { pickCopyAnchor } from "../layout";
 import { shouldShowLiveAnnotations } from "../labels";
 import { getMotionPhases } from "../motion/gating";
@@ -18,6 +25,8 @@ import { CopyBlock } from "./CopyBlock";
 import { EndCard } from "./EndCard";
 import { FlywheelRemotion } from "./FlywheelRemotion";
 import { PlateMotion } from "./PlateMotion";
+import { ProgressSpine } from "./ProgressSpine";
+import { StreamIndexOverlay } from "./StreamIndexOverlay";
 import { copyEyebrowDelay, flywheelPlacement } from "./flywheelPlacement";
 
 type Props = {
@@ -26,7 +35,7 @@ type Props = {
 
 export function SlideScene({ slide }: Props) {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
+  const { durationInFrames, fps } = useVideoConfig();
   const beat = getMotionBeat(slide.motionPreset);
   const liveAnnotations = shouldShowLiveAnnotations(slide);
   const picked = pickCopyAnchor(slide);
@@ -39,6 +48,14 @@ export function SlideScene({ slide }: Props) {
   const videoSrc = heroSrc(slide);
   const useSlabs = !videoSrc && slide.motionPreset === "parallax-slabs";
   const placement = flywheelPlacement(slide);
+  const showSpine = isIncomeStreamSlide(slide.id);
+  const showIndex = isStreamIndexSlide(slide.id);
+  const recapStart = durationInFrames - Math.round(RECAP_WINDOW_SEC * fps);
+  const showRecap = isRecapSlide(slide.id) && frame >= recapStart;
+  const spineComplete = showRecap;
+  const activeStacks = spineComplete
+    ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    : activeStacksForSlide(slide.id);
 
   const phases = getMotionPhases({
     frame,
@@ -128,7 +145,22 @@ export function SlideScene({ slide }: Props) {
         disclosureStart={disclosureStart}
       />
 
-      {/* Layer D — closing end card (CTAs + disclosure ≥16px) */}
+      {/* Layer D — progress spine (income slides) + stream index / recap */}
+      {showSpine ? (
+        <ProgressSpine
+          activeStacks={activeStacks}
+          accent={slide.accent}
+          complete={spineComplete}
+        />
+      ) : null}
+      {showIndex ? (
+        <StreamIndexOverlay mode="index" startFrame={bodyStart} />
+      ) : null}
+      {showRecap ? (
+        <StreamIndexOverlay mode="recap" startFrame={recapStart} />
+      ) : null}
+
+      {/* Layer E — closing end card (CTAs + disclosure ≥16px) */}
       {slide.ctaPrimary && slide.ctaSecondary && slide.disclosure ? (
         <EndCard
           ctaPrimary={slide.ctaPrimary}

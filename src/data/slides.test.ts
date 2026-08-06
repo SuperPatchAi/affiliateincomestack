@@ -48,6 +48,27 @@ describe("SLIDES", () => {
     expect(close.ctaSecondary).toBe("Read the Income Disclosure");
   });
 
+  it("rewrites slide 06 as the ten-stream index bridge", () => {
+    const bridge = SLIDES.find((s) => s.id === "06-ten-layers")!;
+    expect(bridge.eyebrow).toBe("Income Stack™ — Ten Streams");
+    expect(bridge.headline).toBe("Ten Ways. One Path Forward.");
+    expect(bridge.onScreenBody).toMatch(/Start with retail/i);
+    expect(bridge.voiceover).toMatch(/one by one/i);
+    expect(bridge.body.toLowerCase()).toMatch(/retail/);
+    expect(bridge.body.toLowerCase()).toMatch(/global leadership pool/);
+  });
+
+  it("adds proof/objection presenter notes without inventing dollar claims", () => {
+    const eco = SLIDES.find((s) => s.id === "05-ecosystem")!;
+    expect(eco.onScreenBody).toMatch(/Health outcomes/i);
+    expect(eco.presenterNotes).toMatch(/Do I have to recruit/i);
+    expect(eco.presenterNotes).toMatch(/Income Disclosure/i);
+    expect(eco.presenterNotes).not.toMatch(/\$\d/);
+    const four = SLIDES.find((s) => s.id === "03-four-stacks")!;
+    expect(four.presenterNotes).toMatch(/official Super Patch materials/i);
+    expect(four.presenterNotes).not.toMatch(/\b\d+%\b/);
+  });
+
   it("assertSlidesValid word-counts onScreenBody for film when set", () => {
     const base = SLIDES[0]!;
     const withOverlay: typeof SLIDES = SLIDES.map((s, i) =>

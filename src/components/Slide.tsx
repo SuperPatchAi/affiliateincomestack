@@ -5,6 +5,12 @@ import {
   TITLE_SLAB_BASE,
   TITLE_SLAB_SRCS,
 } from "../data/slides";
+import {
+  INCOME_STREAMS,
+  activeStacksForSlide,
+  isIncomeStreamSlide,
+  isStreamIndexSlide,
+} from "../data/streamIndex";
 import { shouldShowLiveAnnotations } from "../remotion/labels";
 import { Flywheel } from "./Flywheel";
 
@@ -19,6 +25,9 @@ export function Slide({ slide, index }: Props) {
     Boolean(slide.flywheelArc) && slide.motionPreset !== "flywheel-scrub";
   const videoSrc = heroSrc(slide);
   const showAnnotations = shouldShowLiveAnnotations(slide);
+  const showStreamIndex = isStreamIndexSlide(slide.id);
+  const showSpine = isIncomeStreamSlide(slide.id);
+  const activeStacks = new Set(activeStacksForSlide(slide.id));
 
   return (
     <section
@@ -128,6 +137,41 @@ export function Slide({ slide, index }: Props) {
           <p className="slide-body" data-anim="body">
             {slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body}
           </p>
+          {showStreamIndex ? (
+            <ol className="stream-index" data-stream-index data-anim="body">
+              {INCOME_STREAMS.map((stream) => (
+                <li key={stream.id} data-stream-item>
+                  <span className="stream-index-num">
+                    {String(stream.stackNumber).padStart(2, "0")}
+                  </span>
+                  <span className="stream-index-label">{stream.shortLabel}</span>
+                </li>
+              ))}
+            </ol>
+          ) : null}
+          {showSpine ? (
+            <div
+              className="progress-spine"
+              data-progress-spine
+              aria-label={`Income stacks ${[...activeStacks].join(" and ")} of ten`}
+            >
+              {INCOME_STREAMS.map((stream) => (
+                <span
+                  key={stream.id}
+                  className={
+                    activeStacks.has(stream.stackNumber)
+                      ? "spine-dot active"
+                      : "spine-dot"
+                  }
+                  data-spine-dot
+                  data-active={
+                    activeStacks.has(stream.stackNumber) ? "true" : "false"
+                  }
+                  data-stack={stream.stackNumber}
+                />
+              ))}
+            </div>
+          ) : null}
           {slide.ctaPrimary || slide.ctaSecondary ? (
             <div className="slide-cta-group" data-anim="cta">
               {slide.ctaPrimary ? (

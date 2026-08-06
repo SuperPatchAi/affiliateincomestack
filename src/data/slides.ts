@@ -265,6 +265,8 @@ export const SLIDES: Slide[] = [
     flywheelArc: "all",
     motionPreset: "pillars-sequence",
     requiresDisclosure: false,
+    presenterNotes:
+      "Product trust: point to official Super Patch materials for outcomes — do not invent clinical claims on this slide.",
   },
   {
     id: "04-flywheel",
@@ -290,6 +292,10 @@ export const SLIDES: Slide[] = [
     eyebrow: "Why It Compounds",
     headline: "Exponential Value Across the Ecosystem",
     body: "Rather than competing with single-product wellness companies, Super Patch connects health outcomes, economic opportunity, leadership, and community. Every major initiative should strengthen one or more stacks — the more stacks touched, the greater the long-term value.",
+    onScreenBody:
+      "Health outcomes, opportunity, and leadership in one company. Super Patch connects wellness results with economic opportunity and leadership development so initiatives can strengthen more than one stack for the long term.",
+    presenterNotes:
+      "Objection: Do I have to recruit? Answer: Everyone starts at Stack 1 retail. Leadership stacks unlock as you help others. Cost/kits: point to official materials. Always: Income Disclosure.",
     flywheelArc: "all",
     motionPreset: "node-mesh",
     requiresDisclosure: false,
@@ -298,9 +304,12 @@ export const SLIDES: Slide[] = [
     id: "06-ten-layers",
     conceptSrc: "/concepts/clean/sp-stack-06-ten-layers.png",
     accent: "orange",
-    eyebrow: "Income Stack™",
-    headline: "The More Value You Create, the More Stacks Work for You",
-    body: "Instead of relying on a single commission, Super Patch created multiple streams that reward sharing products, building customers, introducing affiliates, and developing leaders. Every new activity can unlock another stream — without replacing the one before it.",
+    eyebrow: "Income Stack™ — Ten Streams",
+    headline: "Ten Ways. One Path Forward.",
+    body: "On the next slides we walk ten named streams: Retail twenty-five percent, Fast Start and Rank Advancement, Team Overrides, Managing Director Depth Bonus, Vice President Override, Generation Bonuses, Executive Leadership Override, CEO Leadership Bonus, Global President Override, and the Global Leadership Pool. We start where everyone starts.",
+    onScreenBody:
+      "Start with retail. Stack leadership as you grow. Ten named streams follow — retail, Fast Start and ranks, team overrides, MD depth, VP override, generations, executive and CEO bonuses, then Global President override and the Global Leadership Pool.",
+    voiceover: "Let's walk them one by one, starting where everyone starts.",
     flywheelArc: "income",
     motionPreset: "exploded-layers",
     requiresDisclosure: false,
