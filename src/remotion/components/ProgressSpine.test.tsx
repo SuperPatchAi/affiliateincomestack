@@ -36,4 +36,14 @@ describe("ProgressSpine", () => {
       [...dots].every((d) => d.getAttribute("data-complete") === "true"),
     ).toBe(true);
   });
+
+  it("anchors on the left rail so it does not collide with corner flywheel", () => {
+    const { container } = render(
+      <ProgressSpine activeStacks={[1]} accent="green" />,
+    );
+    const spine = container.querySelector<HTMLElement>("[data-progress-spine]");
+    expect(spine?.style.left).toBeTruthy();
+    expect(spine?.style.right).toBe("");
+    expect(Number.parseFloat(spine!.style.left)).toBeLessThan(100);
+  });
 });

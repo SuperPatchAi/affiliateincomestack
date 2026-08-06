@@ -6,7 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { heroSrc, type Slide } from "../../data/slides";
+import { hasEndCard, heroSrc, type Slide } from "../../data/slides";
 import {
   RECAP_WINDOW_SEC,
   activeStacksForSlide,
@@ -40,10 +40,8 @@ export function SlideScene({ slide }: Props) {
   const liveAnnotations = shouldShowLiveAnnotations(slide);
   const picked = pickCopyAnchor(slide);
   // Closing CTAs sit in the lower third — park copy top-left so they don't collide.
-  const hasEndCard = Boolean(
-    slide.ctaPrimary && slide.ctaSecondary && slide.disclosure,
-  );
-  const anchor = hasEndCard ? "tl" : picked.anchor;
+  const endCard = hasEndCard(slide);
+  const anchor = endCard ? "tl" : picked.anchor;
   const showAnnotations = picked.showAnnotations;
   const videoSrc = heroSrc(slide);
   const useSlabs = !videoSrc && slide.motionPreset === "parallax-slabs";
@@ -161,7 +159,7 @@ export function SlideScene({ slide }: Props) {
       ) : null}
 
       {/* Layer E — closing end card (CTAs + disclosure ≥16px) */}
-      {slide.ctaPrimary && slide.ctaSecondary && slide.disclosure ? (
+      {hasEndCard(slide) ? (
         <EndCard
           ctaPrimary={slide.ctaPrimary}
           ctaSecondary={slide.ctaSecondary}

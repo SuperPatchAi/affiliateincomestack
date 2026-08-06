@@ -143,6 +143,19 @@ export function wordCount(text: string): number {
     .filter(Boolean).length;
 }
 
+/** True when EndCard owns CTAs + disclosure (all three fields present). */
+export function hasEndCard<
+  T extends Pick<Slide, "ctaPrimary" | "ctaSecondary" | "disclosure">,
+>(
+  slide: T,
+): slide is T & {
+  ctaPrimary: string;
+  ctaSecondary: string;
+  disclosure: string;
+} {
+  return Boolean(slide.ctaPrimary && slide.ctaSecondary && slide.disclosure);
+}
+
 /**
  * Known 720p hero debt. Remove an id once its loop lands at native 1920×1080
  * (update `hero.width` / `hero.height`, then drop it from this set).
@@ -191,6 +204,12 @@ export function assertSlidesValid(slides: Slide[]): void {
       if (!s.disclosure || s.disclosure.length < 10) {
         throw new Error(`Slide ${s.id} requires disclosure`);
       }
+    }
+    // Partial CTA data would hide disclosure in CopyBlock without rendering EndCard.
+    if ((s.ctaPrimary || s.ctaSecondary) && !hasEndCard(s)) {
+      throw new Error(
+        `Slide ${s.id} has incomplete end-card CTA trio (needs ctaPrimary, ctaSecondary, and disclosure)`,
+      );
     }
     assertHeroMedia(s);
     for (const a of s.annotations ?? []) {

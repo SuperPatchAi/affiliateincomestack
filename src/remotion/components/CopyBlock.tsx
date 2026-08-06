@@ -1,6 +1,6 @@
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import type { CSSProperties } from "react";
-import type { Slide } from "../../data/slides";
+import { hasEndCard, type Slide } from "../../data/slides";
 import { accentTextColor } from "../theme";
 import { KineticHeadline } from "./KineticHeadline";
 import { COLORS } from "../theme";
@@ -109,8 +109,8 @@ export function CopyBlock({
       >
         {slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body}
       </p>
-      {/* EndCard owns disclosure + CTAs when ctaPrimary is present. */}
-      {slide.disclosure && !slide.ctaPrimary ? (
+      {/* EndCard owns disclosure + CTAs only when the full CTA trio is present. */}
+      {slide.disclosure && !hasEndCard(slide) ? (
         <p
           style={{
             margin: "14px 0 0",

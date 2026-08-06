@@ -8,6 +8,8 @@ import {
   annotationSpanPct,
   TITLE_SLAB_SRCS,
   TITLE_SLAB_BASE,
+  hasEndCard,
+  INCOME_DISCLOSURE,
   type Slide,
 } from "./slides";
 
@@ -89,6 +91,28 @@ describe("SLIDES", () => {
 
   it("assertSlidesValid passes for SLIDES", () => {
     expect(() => assertSlidesValid(SLIDES)).not.toThrow();
+  });
+
+  it("hasEndCard requires the full CTA trio", () => {
+    const close = SLIDES.find((s) => s.id === "15-closing")!;
+    expect(hasEndCard(close)).toBe(true);
+    expect(hasEndCard({ ...close, ctaSecondary: undefined })).toBe(false);
+    expect(hasEndCard({ disclosure: INCOME_DISCLOSURE })).toBe(false);
+    expect(
+      hasEndCard({
+        ctaPrimary: "Get your affiliate link",
+        disclosure: INCOME_DISCLOSURE,
+      }),
+    ).toBe(false);
+  });
+
+  it("assertSlidesValid rejects incomplete CTA end-card data", () => {
+    const broken = SLIDES.map((s) =>
+      s.id === "15-closing"
+        ? { ...s, ctaSecondary: undefined }
+        : s,
+    );
+    expect(() => assertSlidesValid(broken)).toThrow(/incomplete end-card/i);
   });
 });
 

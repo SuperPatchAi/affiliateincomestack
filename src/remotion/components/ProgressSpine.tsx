@@ -10,7 +10,8 @@ export type ProgressSpineProps = {
 };
 
 /**
- * Compact top-right rail of ten dots for income slides 07–14.
+ * Compact left-rail of ten dots for income slides 07–14.
+ * Left placement avoids collision with the corner flywheel (top-right).
  * Active stacks fill the slide accent; completed recap fills all.
  */
 export function ProgressSpine({
@@ -27,7 +28,7 @@ export function ProgressSpine({
       style={{
         position: "absolute",
         top: 36,
-        right: 48,
+        left: 48,
         zIndex: 6,
         display: "flex",
         flexDirection: "column",
