@@ -130,7 +130,7 @@ const html = `<!doctype html>
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="income-stack-main" data-width="1920" data-height="1080" data-duration="${total}">
+    <div id="root" data-composition-id="income-stack-main" data-start="0" data-width="1920" data-height="1080" data-duration="${total}">
       <div class="brand">Super Patch · Income Stack™</div>
 ${clips}
     </div>
