@@ -290,6 +290,13 @@ export const SLIDES: Slide[] = [
   {
     id: "04-flywheel",
     conceptSrc: "/concepts/clean/sp-stack-04-flywheel.png",
+    hero: {
+      src: "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
+    },
+    heroVideoSrc: "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
     accent: "multi",
     eyebrow: "The Flywheel Effect",
     headline: "Each Stack Reinforces the Others",

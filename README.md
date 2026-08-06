@@ -98,15 +98,15 @@ hero?: { src: string; width: number; height: number; annotationsBaked: boolean }
 
 ## Studio seek QA checklist
 
-`npm run remotion` → open `IncomeStackFilm` (1920×1080, 30 fps, **2298** frames). Seek these absolute frames (clip start; transition overlap = 18f):
+`npm run remotion` → open `IncomeStackFilm` (1920×1080, 30 fps, **2448** frames). Seek these absolute frames (clip start; transition overlap = 18f):
 
 | Slide | Frame | What to verify |
 |-------|------:|----------------|
 | 03 four-stacks | **414** | Hero loop + `pillars-sequence`; live annotations **off** if `annotationsBaked` |
-| 04 flywheel | **696** | `flywheel-scrub` plate entrance; hero Flywheel overlay visible |
-| 07 retail | **1092** | `coin-rise` / diagram-first; disclosure present; no “guaranteed” earnings |
-| 09 team-overrides | **1356** | `root-tiers`; annotations settle before dense copy |
-| 15 closing | **2148** | `horizon-settle`; `EndCard` CTAs + disclosure (≥16px) |
+| 04 flywheel | **696** | Native 1080p hero loop + `flywheel-scrub`; hero Flywheel overlay visible |
+| 07 retail | **1242** | `coin-rise` / diagram-first; disclosure present; no “guaranteed” earnings |
+| 09 team-overrides | **1506** | `root-tiers`; annotations settle before dense copy |
+| 15 closing | **2298** | `horizon-settle`; `EndCard` CTAs + disclosure (≥16px) |
 
 Also useful: mid-clip at start+75 for stills (150f) or start+150 for heroes (300f).
 

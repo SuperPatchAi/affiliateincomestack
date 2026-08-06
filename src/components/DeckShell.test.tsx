@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { DeckShell } from "./DeckShell";
 import { SLIDES } from "../data/slides";
+import { shouldShowLiveAnnotations } from "../remotion/labels";
 
 describe("DeckShell", () => {
   it("renders all slides with on-slide copy", () => {
@@ -40,10 +41,11 @@ describe("DeckShell", () => {
 
   it("renders plate annotations as positioned overlay type", () => {
     const { container } = render(<DeckShell />);
-    // Hero-video slides skip the overlay — the loop already carries that type.
+    // Live overlays follow annotationsBaked policy — not a blanket heroVideoSrc skip.
     const expected = SLIDES.reduce(
       (total, s) =>
-        total + (s.heroVideoSrc ? 0 : (s.annotations?.length ?? 0)),
+        total +
+        (shouldShowLiveAnnotations(s) ? (s.annotations?.length ?? 0) : 0),
       0,
     );
     const rendered = container.querySelectorAll<HTMLElement>("[data-plate-annotation]");

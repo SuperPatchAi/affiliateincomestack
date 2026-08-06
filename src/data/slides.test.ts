@@ -239,12 +239,15 @@ describe("plate annotations", () => {
     expect(TITLE_SLAB_BASE).toContain("title-base");
   });
 
-  it("uses operator-animated hero loops on slides 01 and 03", () => {
+  it("uses operator-animated hero loops on slides 01, 03, and 04", () => {
     expect(byId("01-title").heroVideoSrc).toBe(
       "/concepts/animated/sp-stack-01-title_animated.mp4",
     );
     expect(byId("03-four-stacks").heroVideoSrc).toBe(
       "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
+    );
+    expect(byId("04-flywheel").heroVideoSrc).toBe(
+      "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
     );
   });
 
@@ -260,6 +263,12 @@ describe("plate annotations", () => {
       width: 1280,
       height: 720,
       annotationsBaked: true,
+    });
+    expect(byId("04-flywheel").hero).toMatchObject({
+      src: "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
+      width: 1920,
+      height: 1080,
+      annotationsBaked: false,
     });
   });
 
