@@ -16,6 +16,13 @@ function releaseVideoDecoder(el: HTMLVideoElement | null) {
   el.load();
 }
 
+/** Policy / interrupt failures — keep the element and retry. Real media errors use onError. */
+function isTransientPlayFailure(error: unknown): boolean {
+  if (!error || typeof error !== "object") return true;
+  const name = "name" in error ? String(error.name) : "";
+  return name === "AbortError" || name === "NotAllowedError";
+}
+
 export function SceneVideo({
   variant,
   attachVideo,
@@ -26,31 +33,85 @@ export function SceneVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [readySource, setReadySource] = useState<string | null>(null);
   const [failedSource, setFailedSource] = useState<string | null>(null);
+  const [playBlocked, setPlayBlocked] = useState(false);
   const ready = readySource === variant.src;
   const failed = failedSource === variant.src;
+  // Keep the poster up while mobile autoplay is still blocked so early scenes
+  // do not flash a paused frame and then look "broken" until a later slide.
+  const videoVisible = ready && !(autoplay && playBlocked);
   const markFailed = useCallback(() => {
     releaseVideoDecoder(videoRef.current);
     setReadySource(null);
+    setPlayBlocked(false);
     setFailedSource(variant.src);
   }, [variant.src]);
+
+  const tryPlay = useCallback(
+    (el: HTMLVideoElement) => {
+      // iOS/Safari autoplay checks the DOM property, not only the muted attribute.
+      el.defaultMuted = muted;
+      el.muted = muted;
+      el.playsInline = true;
+      const playResult = el.play();
+      if (playResult && typeof playResult.then === "function") {
+        return playResult.then(
+          () => {
+            setPlayBlocked(false);
+          },
+          (error: unknown) => {
+            if (isTransientPlayFailure(error)) {
+              setPlayBlocked(true);
+              return;
+            }
+            markFailed();
+          },
+        );
+      }
+      return Promise.resolve();
+    },
+    [markFailed, muted],
+  );
 
   useEffect(() => {
     setReadySource(null);
     setFailedSource(null);
+    setPlayBlocked(false);
   }, [variant.src, variant.poster]);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !attachVideo || failed) return;
-    if (autoplay) {
-      const playResult = el.play();
-      if (playResult && typeof playResult.catch === "function") {
-        void playResult.catch(markFailed);
-      }
-    } else if (typeof el.pause === "function") {
-      el.pause();
+    el.defaultMuted = muted;
+    el.muted = muted;
+    if (!autoplay) {
+      if (typeof el.pause === "function") el.pause();
+      setPlayBlocked(false);
+      return;
     }
-  }, [attachVideo, autoplay, failed, markFailed]);
+    // Already playing: only sync mute. Re-calling play() after unmute can
+    // re-trip mobile autoplay policy and tear the scene back to a poster.
+    if (!el.paused) return;
+    void tryPlay(el);
+  }, [attachVideo, autoplay, failed, muted, tryPlay]);
+
+  // Mobile Safari often blocks the first muted play until a user gesture (scroll/touch).
+  useEffect(() => {
+    if (!attachVideo || !autoplay || failed || !playBlocked) return;
+    const unlock = () => {
+      const el = videoRef.current;
+      if (!el) return;
+      void tryPlay(el);
+    };
+    const opts: AddEventListenerOptions = { capture: true, passive: true };
+    window.addEventListener("pointerdown", unlock, opts);
+    window.addEventListener("touchstart", unlock, opts);
+    window.addEventListener("keydown", unlock, opts);
+    return () => {
+      window.removeEventListener("pointerdown", unlock, opts);
+      window.removeEventListener("touchstart", unlock, opts);
+      window.removeEventListener("keydown", unlock, opts);
+    };
+  }, [attachVideo, autoplay, failed, playBlocked, tryPlay]);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -60,17 +121,28 @@ export function SceneVideo({
     };
   }, [attachVideo, variant.src]);
 
+  const onLoadedData = useCallback(() => {
+    setReadySource(variant.src);
+    const el = videoRef.current;
+    if (el && autoplay && attachVideo && !failed) {
+      void tryPlay(el);
+    }
+  }, [attachVideo, autoplay, failed, tryPlay, variant.src]);
+
   return (
     <div
       className="scene-media-plane"
       data-scene-media
-      data-media-state={failed ? "poster-only" : ready ? "ready" : "loading"}
+      data-media-state={
+        failed ? "poster-only" : videoVisible ? "ready" : "loading"
+      }
+      data-play-blocked={playBlocked ? "true" : "false"}
       aria-hidden="true"
     >
       <img
         className="scene-poster"
         data-scene-poster
-        data-poster-visible={ready ? "false" : "true"}
+        data-poster-visible={videoVisible ? "false" : "true"}
         src={variant.poster}
         alt=""
         width={variant.width}
@@ -85,7 +157,7 @@ export function SceneVideo({
           ref={videoRef}
           className="scene-video"
           data-scene-video
-          data-video-ready={ready ? "true" : "false"}
+          data-video-ready={videoVisible ? "true" : "false"}
           src={variant.src}
           poster={variant.poster}
           muted={muted}
@@ -93,7 +165,7 @@ export function SceneVideo({
           playsInline
           preload={autoplay ? "auto" : "metadata"}
           aria-hidden="true"
-          onLoadedData={() => setReadySource(variant.src)}
+          onLoadedData={onLoadedData}
           onError={markFailed}
         />
       ) : null}

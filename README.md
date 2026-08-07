@@ -18,6 +18,7 @@ Every plate/video is **text-free**. All type — headlines, body, diagram labels
 | Posters | `public/concepts/omni-chain/posters/{16x9,9x16}/*.webp` |
 | Media window | Previous / current / next only |
 | Audio | Muted autoplay; ambient opt-in via shadcn control |
+| Mobile playback | Portrait (`9x16`) clips; keep `<video>` on Abort/NotAllowed, set `.muted` before `play()`, retry on `loadeddata` + first gesture |
 | Accessibility | WCAG 2.2 AA; `prefers-reduced-motion` → static posters + copy |
 | Performance | Poster LCP; CLS < 0.1; INP < 200 ms; ≤3 attached videos |
 | Baseline | `docs/baselines/3d-experience/2026-08-07-pre-experience.md` |

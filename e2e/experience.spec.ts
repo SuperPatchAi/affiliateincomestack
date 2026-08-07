@@ -131,6 +131,60 @@ test.describe("Income Stack 3D experience", () => {
     expect(state.playing).toBe(1);
   });
 
+  test("plays the first scene video on mobile without scrolling ahead", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "mobile-chrome",
+      "mobile first-scene playback regression",
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    // Stay on scene 1 — do not scroll. Portrait media must autoplay after mute unlock.
+    await page.waitForFunction(() => {
+      const media = document.querySelector(
+        '[data-slide="01-title"] [data-scene-media]',
+      );
+      const video = document.querySelector<HTMLVideoElement>(
+        '[data-slide="01-title"] video[data-scene-video]',
+      );
+      if (!media || !video) return false;
+      if (media.getAttribute("data-play-blocked") === "true") {
+        window.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+        return false;
+      }
+      return (
+        !video.paused &&
+        video.getAttribute("data-video-ready") === "true" &&
+        (video.currentSrc.includes("/9x16/") ||
+          Boolean(video.getAttribute("src")?.includes("/9x16/")))
+      );
+    });
+
+    const state = await page.evaluate(() => {
+      const video = document.querySelector<HTMLVideoElement>(
+        '[data-slide="01-title"] video[data-scene-video]',
+      );
+      const playing = [
+        ...document.querySelectorAll<HTMLVideoElement>("video[data-scene-video]"),
+      ].filter((el) => !el.paused);
+      return {
+        paused: video?.paused ?? true,
+        ready: video?.getAttribute("data-video-ready"),
+        src: video?.currentSrc || video?.getAttribute("src") || "",
+        playingCount: playing.length,
+        scrollY: window.scrollY,
+      };
+    });
+
+    expect(state.scrollY).toBe(0);
+    expect(state.paused).toBe(false);
+    expect(state.ready).toBe("true");
+    expect(state.src).toContain("/9x16/");
+    expect(state.playingCount).toBe(1);
+  });
+
   test("has no serious or critical axe violations on first scene", async ({
     page,
   }) => {
