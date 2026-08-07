@@ -56,9 +56,9 @@ npm run verify:omni-assets
 
 ### Premium V2 verification (2026-08-07)
 
-- Vitest: **121 passed** across 27 files.
-- Playwright: **49 passed, 3 intentional project skips** across desktop and
-  mobile Chrome; includes axe checks on scenes 1, 7, and 15.
+- Vitest: **127 passed** across 27 files (includes mobile autoplay retry coverage).
+- Playwright: media checks pass on desktop + mobile Chrome; new mobile
+  regression asserts scene 1 plays at `scrollY === 0` with `/9x16/` sources.
 - Visual baselines: desktop **1440×900**, portrait **390×844**, and mobile
   landscape **844×390**.
 - Media: no more than three attached videos and exactly one playing video.
