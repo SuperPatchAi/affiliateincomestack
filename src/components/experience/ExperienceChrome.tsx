@@ -1,4 +1,4 @@
-import { useId, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useState, type KeyboardEvent } from "react";
 import {
   SLIDES,
   chapterForSceneIndex,
@@ -39,6 +39,10 @@ export function ExperienceChrome({
   const progressFraction =
     scrollProgress ?? (activeIndex + 1) / SLIDES.length;
   const audioLabel = soundEnabled ? "Mute audio" : "Enable audio";
+
+  useEffect(() => {
+    setJumpOpen(false);
+  }, [activeIndex]);
 
   const onNavKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,

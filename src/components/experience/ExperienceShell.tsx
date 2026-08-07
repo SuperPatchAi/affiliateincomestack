@@ -15,6 +15,8 @@ import {
 import {
   loadSoundPreference,
   saveSoundPreference,
+  shouldRestoreSoundOnMount,
+  syncSceneVideosMuted,
 } from "./soundPreference";
 import { useSceneMedia } from "./useSceneMedia";
 import "./experience.css";
@@ -115,7 +117,11 @@ export function ExperienceShell() {
   });
 
   useEffect(() => {
-    setSoundEnabled(loadSoundPreference());
+    const saved = loadSoundPreference();
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    if (shouldRestoreSoundOnMount({ coarsePointer, saved })) {
+      setSoundEnabled(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -189,6 +195,8 @@ export function ExperienceShell() {
   const toggleSound = () => {
     setSoundEnabled((prev) => {
       const next = !prev;
+      // Unmute must happen in this click stack for iOS autoplay policy.
+      syncSceneVideosMuted(next);
       saveSoundPreference(next);
       return next;
     });

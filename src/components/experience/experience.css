@@ -9,6 +9,8 @@
   background: var(--sp-black);
   color: var(--sp-text);
   font-family: var(--font-body);
+  /* Prefer clip over body overflow-x:hidden so iOS fixed sticky scenes stay stable. */
+  overflow-x: clip;
 }
 
 .sr-only {
@@ -625,8 +627,25 @@
     right: calc(18px + var(--safe-right));
   }
 
+  .experience-meta {
+    display: none;
+  }
+
   .experience-orientation {
     top: calc(18px + var(--safe-top));
+    left: auto;
+    right: calc(18px + var(--safe-right));
+    transform: none;
+    align-items: flex-end;
+    text-align: right;
+    max-width: min(46vw, 168px);
+  }
+
+  .experience-chapter-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .experience-affiliate-cta {
@@ -691,8 +710,18 @@
     width: 118px;
   }
 
+  .experience-meta {
+    display: none;
+  }
+
   .experience-orientation {
     top: calc(10px + var(--safe-top));
+    left: auto;
+    right: calc(18px + var(--safe-right));
+    transform: none;
+    align-items: flex-end;
+    text-align: right;
+    max-width: min(40vw, 180px);
   }
 
   .scene-copy {
@@ -702,6 +731,10 @@
     width: min(64vw, 560px);
     max-height: calc(100svh - 78px - var(--safe-bottom));
     gap: 0.35rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   .scene-annotations,

@@ -84,20 +84,28 @@ describe("ExperienceChrome", () => {
     expect(screen.getByRole("button", { name: "Mute audio" })).toBeTruthy();
   });
 
-  it("uses a compact scene counter on mobile instead of fifteen persistent dots", () => {
-    render(
+  it("closes the compact jump panel when the active scene changes", () => {
+    const { rerender } = render(
       <ExperienceChrome
-        activeIndex={4}
+        activeIndex={0}
         soundEnabled={false}
         onToggleSound={() => {}}
         onJumpTo={() => {}}
         layout="compact"
       />,
     );
-    expect(screen.getByText("05 / 15")).toBeTruthy();
-    expect(screen.queryByRole("navigation", { name: /scene navigator/i })).toBeNull();
-    expect(
-      screen.getByRole("button", { name: /jump to scene/i }),
-    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /jump to scene/i }));
+    expect(screen.getByRole("combobox")).toBeTruthy();
+
+    rerender(
+      <ExperienceChrome
+        activeIndex={3}
+        soundEnabled={false}
+        onToggleSound={() => {}}
+        onJumpTo={() => {}}
+        layout="compact"
+      />,
+    );
+    expect(screen.queryByRole("combobox")).toBeNull();
   });
 });

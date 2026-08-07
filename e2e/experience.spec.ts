@@ -541,10 +541,73 @@ test.describe("Premium V2 experience contracts", () => {
         top: rect.top,
         bottom: rect.bottom,
         headlineSize: Number.parseFloat(getComputedStyle(headline).fontSize),
+        overflowY: getComputedStyle(copy).overflowY,
       };
     });
     expect(layout.top).toBeGreaterThanOrEqual(60);
     expect(layout.bottom).toBeLessThanOrEqual(382);
     expect(layout.headlineSize).toBeLessThanOrEqual(50);
+    expect(["auto", "scroll", "overlay"]).toContain(layout.overflowY);
+  });
+
+  test("unmutes active video inside the Enable audio gesture", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "mobile-chrome",
+      "mobile unmute gesture regression",
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.waitForFunction(() => {
+      const video = document.querySelector<HTMLVideoElement>(
+        '[data-slide="01-title"] video[data-scene-video]',
+      );
+      return Boolean(video && !video.paused);
+    });
+
+    await page.getByRole("button", { name: "Enable audio" }).click();
+    const muted = await page.evaluate(() => {
+      const video = document.querySelector<HTMLVideoElement>(
+        '[data-slide="01-title"] video[data-scene-video]',
+      );
+      return video?.muted ?? true;
+    });
+    expect(muted).toBe(false);
+  });
+
+  test("keeps portrait top chrome from overlapping on Ten Income Streams", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "mobile-chrome",
+      "portrait chrome collision regression",
+    );
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await jumpToScene(page, 7);
+    await expect(page.locator('[data-slide="07-retail"]')).toBeInViewport();
+
+    const overlap = await page.evaluate(() => {
+      const brand = document
+        .querySelector(".experience-brand")!
+        .getBoundingClientRect();
+      const orientation = document
+        .querySelector("[data-experience-orientation]")!
+        .getBoundingClientRect();
+      const meta = document.querySelector(".experience-meta");
+      const metaVisible = meta
+        ? getComputedStyle(meta).display !== "none"
+        : false;
+      const intersects =
+        brand.left < orientation.right &&
+        brand.right > orientation.left &&
+        brand.top < orientation.bottom &&
+        brand.bottom > orientation.top;
+      return { intersects, metaVisible };
+    });
+
+    expect(overlap.metaVisible).toBe(false);
+    expect(overlap.intersects).toBe(false);
   });
 });

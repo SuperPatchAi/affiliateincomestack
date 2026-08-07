@@ -100,6 +100,33 @@ describe("Premium V2 web choreography", () => {
     expect(MotionConfig.sceneDwellEnabled(14)).toBe(true);
   });
 
+  it("ignores coarse height-only resize jitter while refreshing on orientation", () => {
+    expect(
+      MotionConfig.shouldRefreshScrollTriggerOnResize({
+        coarsePointer: true,
+        previousWidth: 390,
+        previousHeight: 844,
+        nextWidth: 390,
+        nextHeight: 760,
+      }),
+    ).toBe(false);
+    expect(
+      MotionConfig.shouldRefreshScrollTriggerOnResize({
+        coarsePointer: true,
+        previousWidth: 390,
+        previousHeight: 844,
+        nextWidth: 844,
+        nextHeight: 390,
+      }),
+    ).toBe(true);
+  });
+
+  it("measures an svh probe for shuffle distance", () => {
+    expect(typeof MotionConfig.measureSceneViewportHeight).toBe("function");
+    const height = MotionConfig.measureSceneViewportHeight();
+    expect(height).toBeGreaterThan(0);
+  });
+
   it("resets future cards to a deterministic hidden state after rapid jumps", () => {
     expect(MotionConfig.sceneLayerState(10, 14, 900)).toEqual({
       y: 0,

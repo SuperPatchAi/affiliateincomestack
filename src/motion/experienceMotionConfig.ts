@@ -28,6 +28,47 @@ export function experienceMotionEnabled(conditions: MotionConditions): boolean {
   return !conditions.reduceMotion;
 }
 
+/**
+ * Align with GSAP ignoreMobileResize: on coarse pointers, ignore height-only
+ * URL-bar jitter; still refresh for orientation / width changes.
+ */
+export function shouldRefreshScrollTriggerOnResize(options: {
+  coarsePointer: boolean;
+  previousWidth: number;
+  previousHeight: number;
+  nextWidth: number;
+  nextHeight: number;
+}): boolean {
+  const {
+    coarsePointer,
+    previousWidth,
+    previousHeight,
+    nextWidth,
+    nextHeight,
+  } = options;
+  if (!coarsePointer) return true;
+  if (previousWidth !== nextWidth) return true;
+  if (previousHeight <= 0) return true;
+  const heightDelta =
+    Math.abs(nextHeight - previousHeight) / previousHeight;
+  return heightDelta > 0.25;
+}
+
+/** Match CSS `svh` scene tracks instead of dynamic `window.innerHeight`. */
+export function measureSceneViewportHeight(
+  doc: Document = document,
+): number {
+  const probe = doc.createElement("div");
+  probe.setAttribute("data-svh-probe", "true");
+  probe.style.cssText =
+    "position:fixed;left:0;top:0;height:100svh;width:0;pointer-events:none;visibility:hidden;";
+  doc.documentElement.appendChild(probe);
+  const height = probe.offsetHeight;
+  probe.remove();
+  if (height > 0) return height;
+  return doc.defaultView?.innerHeight ?? 0;
+}
+
 export function buildParallaxLayerVars(layer: ParallaxLayer): {
   yPercent: number;
   scale: number;

@@ -10,11 +10,13 @@ import {
   buildOutgoingTweenVars,
   buildParallaxLayerVars,
   experienceMotionEnabled,
+  measureSceneViewportHeight,
   resolveSceneLifecycle,
   resolveWebChoreography,
   sceneDwellEnabled,
   sceneLayerState,
   sceneScrollHeightVh,
+  shouldRefreshScrollTriggerOnResize,
 } from "./experienceMotionConfig";
 
 let registered = false;
@@ -97,6 +99,7 @@ export function useExperienceMotion({
           const scrollHeight = sceneScrollHeightVh({
             coarsePointer: Boolean(coarsePointer),
           });
+          const viewportHeight = measureSceneViewportHeight();
           let lastActiveIndex = -1;
           const reportActiveIndex = (index: number) => {
             if (index === lastActiveIndex) return;
@@ -129,8 +132,8 @@ export function useExperienceMotion({
 
             if (!card || !plane || !scrim) return;
 
-            const shuffle = buildCardShuffleVars(window.innerHeight);
-            gsap.set(card, sceneLayerState(index, 0, window.innerHeight));
+            const shuffle = buildCardShuffleVars(viewportHeight);
+            gsap.set(card, sceneLayerState(index, 0, viewportHeight));
 
             (
               [
@@ -366,9 +369,31 @@ export function useExperienceMotion({
           });
 
           let resizeTimer: ReturnType<typeof setTimeout> | undefined;
+          let lastViewport = {
+            width: window.innerWidth,
+            height: viewportHeight,
+          };
           const onResize = () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
+            resizeTimer = setTimeout(() => {
+              const next = {
+                width: window.innerWidth,
+                height: measureSceneViewportHeight() || window.innerHeight,
+              };
+              if (
+                !shouldRefreshScrollTriggerOnResize({
+                  coarsePointer: Boolean(coarsePointer),
+                  previousWidth: lastViewport.width,
+                  previousHeight: lastViewport.height,
+                  nextWidth: next.width,
+                  nextHeight: next.height,
+                })
+              ) {
+                return;
+              }
+              lastViewport = next;
+              ScrollTrigger.refresh();
+            }, 250);
           };
           window.addEventListener("resize", onResize);
 
@@ -425,13 +450,14 @@ export function scrollToScene(
     document.querySelectorAll("[data-experience-scene]"),
   );
   const targetIndex = scenes.findIndex((scene) => scene.id === `scene-${sceneId}`);
+  const viewportHeight = measureSceneViewportHeight() || window.innerHeight;
   const resetLayers = () => {
     scenes.forEach((scene, index) => {
       const card = scene.querySelector<HTMLElement>("[data-scene-card]");
       if (card && targetIndex >= 0) {
         gsap.set(
           card,
-          sceneLayerState(index, targetIndex, window.innerHeight),
+          sceneLayerState(index, targetIndex, viewportHeight),
         );
       }
       gsap.set(
