@@ -69,6 +69,26 @@ export function measureSceneViewportHeight(
   return doc.defaultView?.innerHeight ?? 0;
 }
 
+/**
+ * Prefer the stable small viewport for scroll math so Android Chrome URL-bar
+ * show/hide does not rewrite progress from innerHeight jitter.
+ */
+export function measureScrollViewportHeight(
+  win: Window & typeof globalThis = window,
+): number {
+  const svh = measureSceneViewportHeight(win.document);
+  if (svh > 0) return svh;
+  return win.visualViewport?.height || win.innerHeight || 0;
+}
+
+/** Max scroll distance using the stable viewport height. */
+export function computeMaxScroll(
+  scrollHeight: number,
+  viewportHeight: number,
+): number {
+  return Math.max(0, scrollHeight - viewportHeight);
+}
+
 export function buildParallaxLayerVars(layer: ParallaxLayer): {
   yPercent: number;
   scale: number;

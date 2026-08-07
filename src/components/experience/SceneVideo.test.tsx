@@ -162,14 +162,12 @@ describe("SceneVideo Premium V2 media contract", () => {
     expect(container.querySelector("[data-scene-video]")).toBeTruthy();
   });
 
-  it("resets readiness and releases the old decoder when the source changes", async () => {
+  it("keeps the same video element across orientation source swaps", async () => {
     const pause = vi.fn();
-    const load = vi.fn();
     vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(pause);
-    vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(load);
 
     const { container, rerender } = render(
-      <SceneVideo variant={variant} attachVideo autoplay={false} muted />,
+      <SceneVideo variant={variant} attachVideo autoplay muted />,
     );
     const firstVideo =
       container.querySelector<HTMLVideoElement>("[data-scene-video]");
@@ -189,14 +187,15 @@ describe("SceneVideo Premium V2 media contract", () => {
       <SceneVideo
         variant={portraitVariant}
         attachVideo
-        autoplay={false}
+        autoplay
         muted
       />,
     );
 
     const nextVideo =
       container.querySelector<HTMLVideoElement>("[data-scene-video]");
-    expect(nextVideo).not.toBe(firstVideo);
+    expect(nextVideo).toBe(firstVideo);
+    expect(nextVideo?.getAttribute("src")).toContain("/9x16/");
     expect(nextVideo?.getAttribute("data-video-ready")).toBe("false");
     expect(
       container
@@ -204,7 +203,30 @@ describe("SceneVideo Premium V2 media contract", () => {
         ?.getAttribute("data-poster-visible"),
     ).toBe("true");
     expect(pause).toHaveBeenCalled();
-    expect(load).toHaveBeenCalled();
+  });
+
+  it("retries a blocked play when the page becomes visible again", async () => {
+    const play = vi
+      .spyOn(HTMLMediaElement.prototype, "play")
+      .mockRejectedValueOnce(new DOMException("Not allowed", "NotAllowedError"))
+      .mockResolvedValue(undefined);
+
+    render(<SceneVideo variant={variant} attachVideo autoplay muted />);
+    await waitFor(() =>
+      expect(
+        document
+          .querySelector("[data-scene-media]")
+          ?.getAttribute("data-play-blocked"),
+      ).toBe("true"),
+    );
+    play.mockClear();
+
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "visible",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    await waitFor(() => expect(play).toHaveBeenCalled());
   });
 
   it("releases the decoder when a warm video is detached", () => {

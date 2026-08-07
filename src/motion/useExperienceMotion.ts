@@ -6,11 +6,13 @@ import { SplitText } from "gsap/SplitText";
 import type { RefObject } from "react";
 import {
   buildCardShuffleVars,
+  computeMaxScroll,
   computeScrollProgress,
   buildOutgoingTweenVars,
   buildParallaxLayerVars,
   experienceMotionEnabled,
   measureSceneViewportHeight,
+  measureScrollViewportHeight,
   resolveSceneLifecycle,
   resolveWebChoreography,
   sceneDwellEnabled,
@@ -51,11 +53,15 @@ export function useExperienceMotion({
       if (!root) return;
 
       const reportProgress = () => {
-        const maxScroll =
-          document.documentElement.scrollHeight - window.innerHeight;
+        const maxScroll = computeMaxScroll(
+          document.documentElement.scrollHeight,
+          measureScrollViewportHeight(),
+        );
         onProgress?.(computeScrollProgress(window.scrollY, maxScroll));
       };
       window.addEventListener("scroll", reportProgress, { passive: true });
+      window.visualViewport?.addEventListener("resize", reportProgress);
+      window.visualViewport?.addEventListener("scroll", reportProgress);
       reportProgress();
 
       if (!enabled) {
@@ -65,7 +71,11 @@ export function useExperienceMotion({
           ),
           { clearProps: "all" },
         );
-        return () => window.removeEventListener("scroll", reportProgress);
+        return () => {
+          window.removeEventListener("scroll", reportProgress);
+          window.visualViewport?.removeEventListener("resize", reportProgress);
+          window.visualViewport?.removeEventListener("scroll", reportProgress);
+        };
       }
 
       const mm = gsap.matchMedia();
@@ -425,6 +435,8 @@ export function useExperienceMotion({
       return () => {
         mm.revert();
         window.removeEventListener("scroll", reportProgress);
+        window.visualViewport?.removeEventListener("resize", reportProgress);
+        window.visualViewport?.removeEventListener("scroll", reportProgress);
       };
     },
     { scope, dependencies: [enabled, onActiveIndex, onProgress] },
@@ -439,12 +451,6 @@ export function scrollToScene(
   const target = `#scene-${sceneId}`;
   windowScrollTween?.kill();
   gsap.killTweensOf(window);
-
-  if (options?.reduceMotion) {
-    const el = document.querySelector(target);
-    el?.scrollIntoView({ behavior: "auto" });
-    return;
-  }
 
   const scenes = gsap.utils.toArray<HTMLElement>(
     document.querySelectorAll("[data-experience-scene]"),
@@ -468,8 +474,22 @@ export function scrollToScene(
           autoAlpha: index === targetIndex ? 1 : 0,
         },
       );
+      scene.dataset.sceneLifecycle = resolveSceneLifecycle(index, targetIndex);
+      scene.dataset.motionLayerActive =
+        resolveSceneLifecycle(index, targetIndex) === "distant"
+          ? "false"
+          : "true";
     });
   };
+
+  if (options?.reduceMotion) {
+    resetLayers();
+    const el = document.querySelector(target);
+    el?.scrollIntoView({ behavior: "auto" });
+    ScrollTrigger.update();
+    return;
+  }
+
   resetLayers();
 
   windowScrollTween = gsap.to(window, {

@@ -699,7 +699,17 @@
   }
 }
 
-@media (max-height: 520px) and (orientation: landscape) {
+@media (max-height: 520px) {
+  .experience-shell .scene-copy {
+    max-height: calc(100svh - 78px - var(--safe-bottom));
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-height: 520px) {
   .experience-top {
     top: calc(10px + var(--safe-top));
     left: calc(18px + var(--safe-left));

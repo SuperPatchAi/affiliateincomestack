@@ -20,6 +20,7 @@ Every plate/video is **text-free**. All type — headlines, body, diagram labels
 | Audio | Muted autoplay; ambient opt-in via shadcn control |
 | Mobile playback | Portrait (`9x16`) clips; keep `<video>` on Abort/NotAllowed, set `.muted` before `play()`, retry on `loadeddata` + first gesture |
 | Mobile chrome | Hide top meta; right-align chapter; ignore URL-bar resize jitter; unmute inside tap gesture; svh-matched card shuffle |
+| iOS / Android | Keep video node across orientation swaps; visibility/pageshow unlock; live Save-Data; `overflow-x: clip`; stable scroll progress; WebKit CI |
 | Accessibility | WCAG 2.2 AA; `prefers-reduced-motion` → static posters + copy |
 | Performance | Poster LCP; CLS < 0.1; INP < 200 ms; ≤3 attached videos |
 | Baseline | `docs/baselines/3d-experience/2026-08-07-pre-experience.md` |
@@ -55,11 +56,20 @@ npm run test:e2e
 npm run verify:omni-assets
 ```
 
+WebKit e2e (`mobile-webkit` / iPhone 14) needs Playwright browsers plus Linux
+GStreamer codecs when running outside macOS:
+
+```bash
+npx playwright install webkit
+sudo npx playwright install-deps webkit
+# or: sudo apt-get install gstreamer1.0-libav gstreamer1.0-plugins-good gstreamer1.0-plugins-bad
+```
+
 ### Premium V2 verification (2026-08-07)
 
-- Vitest: **127 passed** across 27 files (includes mobile autoplay retry coverage).
-- Playwright: media checks pass on desktop + mobile Chrome; new mobile
-  regression asserts scene 1 plays at `scrollY === 0` with `/9x16/` sources.
+- Vitest: **135 passed** across 29 files (mobile autoplay, unmute, Save-Data, resize).
+- Playwright: desktop Chrome, mobile Chrome (Pixel 7), and mobile WebKit (iPhone 14).
+  Linux WebKit needs GStreamer libav/good/bad packages for MP4 decode.
 - Visual baselines: desktop **1440×900**, portrait **390×844**, and mobile
   landscape **844×390**.
 - Media: no more than three attached videos and exactly one playing video.

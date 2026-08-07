@@ -52,6 +52,8 @@ export function SceneVideo({
       el.defaultMuted = muted;
       el.muted = muted;
       el.playsInline = true;
+      el.setAttribute("playsinline", "");
+      el.setAttribute("webkit-playsinline", "true");
       const playResult = el.play();
       if (playResult && typeof playResult.then === "function") {
         return playResult.then(
@@ -76,6 +78,11 @@ export function SceneVideo({
     setReadySource(null);
     setFailedSource(null);
     setPlayBlocked(false);
+    const el = videoRef.current;
+    if (el) {
+      // Orientation swaps must keep the same element so iOS retains gesture unlock.
+      el.pause();
+    }
   }, [variant.src, variant.poster]);
 
   useEffect(() => {
@@ -90,14 +97,21 @@ export function SceneVideo({
     }
     // Already playing: only sync mute. Re-calling play() after unmute can
     // re-trip mobile autoplay policy and tear the scene back to a poster.
-    if (!el.paused) return;
+    if (!el.paused && el.currentSrc.includes(variant.src)) return;
     void tryPlay(el);
-  }, [attachVideo, autoplay, failed, muted, tryPlay]);
+  }, [attachVideo, autoplay, failed, muted, tryPlay, variant.src]);
 
-  // Mobile Safari often blocks the first muted play until a user gesture (scroll/touch).
+  // Mobile Safari / Low Power Mode often block the first muted play until a
+  // user gesture or until the page is foregrounded again.
   useEffect(() => {
     if (!attachVideo || !autoplay || failed || !playBlocked) return;
     const unlock = () => {
+      if (
+        typeof document.visibilityState === "string" &&
+        document.visibilityState !== "visible"
+      ) {
+        return;
+      }
       const el = videoRef.current;
       if (!el) return;
       void tryPlay(el);
@@ -106,20 +120,24 @@ export function SceneVideo({
     window.addEventListener("pointerdown", unlock, opts);
     window.addEventListener("touchstart", unlock, opts);
     window.addEventListener("keydown", unlock, opts);
+    document.addEventListener("visibilitychange", unlock);
+    window.addEventListener("pageshow", unlock);
     return () => {
       window.removeEventListener("pointerdown", unlock, opts);
       window.removeEventListener("touchstart", unlock, opts);
       window.removeEventListener("keydown", unlock, opts);
+      document.removeEventListener("visibilitychange", unlock);
+      window.removeEventListener("pageshow", unlock);
     };
   }, [attachVideo, autoplay, failed, playBlocked, tryPlay]);
 
   useEffect(() => {
+    if (!attachVideo) return;
     const el = videoRef.current;
-    if (!el) return;
     return () => {
       releaseVideoDecoder(el);
     };
-  }, [attachVideo, variant.src]);
+  }, [attachVideo]);
 
   const onLoadedData = useCallback(() => {
     setReadySource(variant.src);
@@ -153,7 +171,6 @@ export function SceneVideo({
       />
       {attachVideo && !failed ? (
         <video
-          key={variant.src}
           ref={videoRef}
           className="scene-video"
           data-scene-video
@@ -167,8 +184,7 @@ export function SceneVideo({
           aria-hidden="true"
           onLoadedData={onLoadedData}
           onError={markFailed}
-        />
-      ) : null}
+        />      ) : null}
     </div>
   );
 }

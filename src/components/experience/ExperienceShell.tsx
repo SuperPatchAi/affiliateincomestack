@@ -19,6 +19,7 @@ import {
   syncSceneVideosMuted,
 } from "./soundPreference";
 import { useSceneMedia } from "./useSceneMedia";
+import { useDataSave } from "./useDataSave";
 import "./experience.css";
 
 function usePrefersReducedMotion(): boolean {
@@ -63,18 +64,6 @@ function useCompactChrome(): boolean {
     return () => mq.removeEventListener("change", update);
   }, []);
   return compact;
-}
-
-function useDataSave(): boolean {
-  const [save] = useState(() => {
-    const conn = (
-      navigator as Navigator & {
-        connection?: { saveData?: boolean };
-      }
-    ).connection;
-    return Boolean(conn?.saveData);
-  });
-  return save;
 }
 
 function isEditableTarget(target: EventTarget | null): boolean {
@@ -165,7 +154,10 @@ export function ExperienceShell() {
       const slide = SLIDES[index];
       if (!slide) return;
       setActiveIndex(index);
-      scrollToScene(slide.id, { reduceMotion });
+      const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      // Instant jump on touch devices — scrubbed GSAP scrollTo is flaky on iOS WebKit
+      // and leaves lifecycle/media windows on the wrong scene.
+      scrollToScene(slide.id, { reduceMotion: reduceMotion || coarsePointer });
     },
     [reduceMotion],
   );
@@ -209,6 +201,7 @@ export function ExperienceShell() {
       data-experience-shell
       data-reduced-motion={reduceMotion ? "true" : "false"}
       data-aspect={aspect}
+      data-data-save={dataSave ? "true" : "false"}
     >
       <a className="skip-link" href="#experience-main">
         Skip to experience

@@ -127,6 +127,11 @@ describe("Premium V2 web choreography", () => {
     expect(height).toBeGreaterThan(0);
   });
 
+  it("computes max scroll from a stable viewport height", () => {
+    expect(MotionConfig.computeMaxScroll(2000, 800)).toBe(1200);
+    expect(MotionConfig.computeMaxScroll(500, 800)).toBe(0);
+  });
+
   it("resets future cards to a deterministic hidden state after rapid jumps", () => {
     expect(MotionConfig.sceneLayerState(10, 14, 900)).toEqual({
       y: 0,
