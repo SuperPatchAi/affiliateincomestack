@@ -58,6 +58,16 @@ reconstruct instead of smearing. Two knobs matter:
 Originals stay in `public/concepts/` untouched. Recovered strings live on as
 `annotations` in `slides.ts`, positioned and sized from the original burned-in type.
 
+### Omni closing brand lockup
+
+The `16x9` and `9x16` Omni versions of slide 15 stop generative motion at 3s,
+hold the last clean landscape frame, then transition to a deterministic brand card.
+The card composites `public/concepts/omni-chain/superpatch-logo-original.png`
+outside Gemini so the model cannot redraw or distort the supplied SuperPatch mark.
+The source asset remains transparent, is displayed at an exact 2× aspect-preserving
+size, and has SHA-256
+`87def7bf788c59007a767cece47a70c61a9b04f5216f317f9752889d96a95650`.
+
 ## Remotion motion system (MotionDirector)
 
 Plate motion is not hard-coded in `SlideScene`. A **MotionDirector** registry maps each
