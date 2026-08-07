@@ -17,7 +17,7 @@ import {
 import { pickCopyAnchor } from "../layout";
 import { shouldShowLiveAnnotations } from "../labels";
 import { getMotionPhases } from "../motion/gating";
-import { getMotionBeat } from "../motion/presets";
+import { getMotionBeat } from "../../motion/presets";
 import { publicAssetPath } from "../timeline";
 import { COLORS } from "../theme";
 import { AnnotationLayers, SlabDropLayers } from "./DiagramLayers";

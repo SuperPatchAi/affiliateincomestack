@@ -6,7 +6,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import type { MotionBeat } from "../motion/presets";
+import type { MotionBeat } from "../../motion/presets";
 
 type Props = {
   beat: MotionBeat;

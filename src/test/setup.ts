@@ -13,3 +13,41 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => false,
   }),
 });
+
+class MockIntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = "";
+  readonly thresholds = [];
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
+Object.defineProperty(window, "IntersectionObserver", {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});
+
+Object.defineProperty(window, "scrollTo", {
+  configurable: true,
+  value: () => {},
+});
+
+Object.defineProperties(HTMLMediaElement.prototype, {
+  play: {
+    configurable: true,
+    value: () => Promise.resolve(),
+  },
+  pause: {
+    configurable: true,
+    value: () => {},
+  },
+  load: {
+    configurable: true,
+    value: () => {},
+  },
+});

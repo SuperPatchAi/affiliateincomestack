@@ -1,5 +1,5 @@
 import { interpolate } from "remotion";
-import type { SecondaryPolicy } from "./presets";
+import type { SecondaryPolicy } from "../../motion/presets";
 
 export function getMotionPhases(args: {
   frame: number;

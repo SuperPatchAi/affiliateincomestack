@@ -232,6 +232,55 @@ export function assertSlidesValid(slides: Slide[]): void {
   }
 }
 
+export type ExperienceChapterId =
+  | "foundation"
+  | "ten-income-streams"
+  | "action";
+
+export type ExperienceChapter = {
+  id: ExperienceChapterId;
+  label: string;
+  sceneStart: number;
+  sceneEnd: number;
+};
+
+/** Premium V2 chapter groupings — scenes 01–06, 07–14, 15. */
+export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
+  {
+    id: "foundation",
+    label: "Foundation",
+    sceneStart: 0,
+    sceneEnd: 5,
+  },
+  {
+    id: "ten-income-streams",
+    label: "Ten Income Streams",
+    sceneStart: 6,
+    sceneEnd: 13,
+  },
+  {
+    id: "action",
+    label: "Action",
+    sceneStart: 14,
+    sceneEnd: 14,
+  },
+];
+
+export function chapterForSceneIndex(index: number): ExperienceChapter {
+  const chapter = EXPERIENCE_CHAPTERS.find(
+    (entry) => index >= entry.sceneStart && index <= entry.sceneEnd,
+  );
+  if (!chapter) {
+    throw new Error(`No chapter for scene index ${index}`);
+  }
+  return chapter;
+}
+
+export function formatSceneCounter(index: number): string {
+  const clamped = Math.max(0, Math.min(SLIDES.length - 1, index));
+  return `${String(clamped + 1).padStart(2, "0")} / ${String(SLIDES.length).padStart(2, "0")}`;
+}
+
 export const SLIDES: Slide[] = [
   {
     id: "01-title",

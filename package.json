@@ -10,12 +10,18 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "build:e2e": "VITE_AFFILIATE_URL=https://affiliate.e2e.invalid VITE_INCOME_DISCLOSURE_URL=https://disclosure.e2e.invalid npm run build",
+    "test:e2e": "npm run build:e2e && playwright test",
+    "test:e2e:update": "npm run build:e2e && playwright test --update-snapshots",
     "hyperframes:generate": "node scripts/generate-hyperframes.mjs",
     "remotion": "remotion studio src/remotion/index.ts",
     "remotion:compositions": "remotion compositions src/remotion/index.ts",
-    "remotion:render": "remotion render src/remotion/index.ts IncomeStackFilm ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/openmontage/income-stack-deck-remotion.mp4"
+    "remotion:render": "remotion render src/remotion/index.ts IncomeStackFilm ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/openmontage/income-stack-deck-remotion.mp4",
+    "omni:animate": "node scripts/omni-animate-plates.mjs",
+    "verify:omni-assets": "node scripts/verify-omni-assets.mjs"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@remotion/cli": "^4.0.506",
     "@remotion/google-fonts": "^4.0.506",
     "@remotion/media": "^4.0.506",
@@ -26,6 +32,8 @@
     "remotion": "^4.0.506"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",

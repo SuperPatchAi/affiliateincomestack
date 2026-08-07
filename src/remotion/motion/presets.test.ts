@@ -4,7 +4,7 @@ import {
   MOTION_PRESETS,
   getMotionBeat,
   type MotionPresetId,
-} from "./presets";
+} from "../../motion/presets";
 
 describe("MOTION_PRESETS", () => {
   it("registers every motionPreset used by SLIDES", () => {

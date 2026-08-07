@@ -1,8 +1,69 @@
 # Super Patch Income Stack™ — Animated Deck
 
-Mobile-first **fluid document** presentation for new affiliates. High-quality concept plates sit in aspect-aware frames (`object-fit: contain` — full composition, no aggressive crop). Live type and per-slide GSAP entrances sit beside/below the imagery.
+Default surface: **3D scroll experience** (`ExperienceShell`) — fifteen full-viewport Omni video layers that cover one another on scroll, with live HTML typography, GSAP ScrollTrigger, and a vertical scene navigator.
 
-Every plate is **text-free**. All type — headlines, body, diagram labels, display metrics — is live DOM so it can re-typeset, re-colour with the slide accent, and animate.
+Legacy fallback: **fluid document deck** (`DeckShell`) via `?view=legacy` — high-quality concept plates in aspect-aware frames with live type and per-slide GSAP entrances.
+
+Every plate/video is **text-free**. All type — headlines, body, diagram labels, display metrics — is live DOM so it can re-typeset, re-colour with the slide accent, and animate.
+
+## 3D scroll experience
+
+| Topic | Contract |
+|-------|----------|
+| Architecture | Layered DOM + CSS perspective + GSAP ScrollTrigger (no Three.js / R3F) |
+| Spec | `docs/superpowers/specs/2026-08-07-income-stack-3d-experience-design.md` |
+| Media map | `src/data/experienceMedia.ts` |
+| Landscape | `public/concepts/omni-chain/16x9/*_omni.mp4` |
+| Portrait | `public/concepts/omni-chain/9x16/*_omni.mp4` |
+| Posters | `public/concepts/omni-chain/posters/{16x9,9x16}/*.webp` |
+| Media window | Previous / current / next only |
+| Audio | Muted autoplay; ambient opt-in via shadcn control |
+| Accessibility | WCAG 2.2 AA; `prefers-reduced-motion` → static posters + copy |
+| Performance | Poster LCP; CLS < 0.1; INP < 200 ms; ≤3 attached videos |
+| Baseline | `docs/baselines/3d-experience/2026-08-07-pre-experience.md` |
+
+Premium V2 groups the story into **Foundation (01–06)**, **Ten Income
+Streams (07–14)**, and **Action (15)**. Chrome reports the active chapter and
+continuous scroll progress; every scene resolves its `motionPreset` into a
+rotation-free handoff and dwell beat. Desktop navigation keeps 44 px pointer
+targets with restrained markers, while compact viewports use a scene selector.
+
+Production conversion links are opt-in configuration. Both values must be
+valid HTTPS URLs or the affiliate prompts remain hidden—partial pairs and hash
+placeholders are never rendered:
+
+```bash
+VITE_AFFILIATE_URL="<verified HTTPS affiliate URL>"
+VITE_INCOME_DISCLOSURE_URL="<verified HTTPS disclosure URL>"
+```
+
+Scene 04 and scene 14 intentionally retain their Omni visuals without duplicate
+web hero/recap diagrams. The existing media plus live progress treatment already
+communicate the flywheel and completed-stack recap; Remotion output is unchanged.
+
+```bash
+npm run dev
+# cinematic experience (default)
+# legacy deck:
+# open http://localhost:5173/?view=legacy
+
+npm test
+npm run build
+npm run test:e2e
+npm run verify:omni-assets
+```
+
+### Premium V2 verification (2026-08-07)
+
+- Vitest: **121 passed** across 27 files.
+- Playwright: **49 passed, 3 intentional project skips** across desktop and
+  mobile Chrome; includes axe checks on scenes 1, 7, and 15.
+- Visual baselines: desktop **1440×900**, portrait **390×844**, and mobile
+  landscape **844×390**.
+- Media: no more than three attached videos and exactly one playing video.
+- Representative browser scroll profile: zero recorded long tasks over 50 ms;
+  distant scene cards remain outside the promoted compositing neighborhood.
+- `npm run lint` and `npm run build` complete cleanly.
 
 ## Portfolio
 
@@ -70,14 +131,16 @@ aspect-preserving size over the full-frame `--sp-orange` brand color. There is n
 white logo plate, and Gemini cannot redraw the mark. The original has SHA-256
 `87def7bf788c59007a767cece47a70c61a9b04f5216f317f9752889d96a95650`.
 
-## Remotion motion system (MotionDirector)
+## Shared web + Remotion motion system
 
-Plate motion is not hard-coded in `SlideScene`. A **MotionDirector** registry maps each
-`slide.motionPreset` to a beat and phase schedule:
+Motion is not hard-coded in either renderer. One registry maps every
+`slide.motionPreset` to a beat consumed by the web experience and Remotion:
 
 | Module | Role |
 |--------|------|
-| `src/remotion/motion/presets.ts` | `MOTION_PRESETS` / `MotionBeat` / `getMotionBeat(preset)` — plate `from`, settle frames, ambient scale, `secondaryPolicy` |
+| `src/motion/presets.ts` | Shared `MOTION_PRESETS` / `MotionBeat` / `getMotionBeat(preset)` SSOT |
+| `src/motion/experienceMotionConfig.ts` | Converts shared beats to rotation-free handoff/dwell web choreography |
+| `src/motion/useExperienceMotion.ts` | Fixed-card cover, separate dwell triggers, SplitText line reveals, overlays, rapid-jump reset, continuous progress |
 | `src/remotion/motion/gating.ts` | `getMotionPhases(...)` — annotation / eyebrow / body / disclosure start frames + ambient interpolate |
 | `src/remotion/labels.ts` | `shouldShowLiveAnnotations(slide)` — hide live overlays when `hero.annotationsBaked` |
 | `src/remotion/components/SlideScene.tsx` | Consumes beat + phases; wires plate / diagrams / `CopyBlock` / `EndCard` |
