@@ -229,7 +229,7 @@ describe("SceneVideo Premium V2 media contract", () => {
     await waitFor(() => expect(play).toHaveBeenCalled());
   });
 
-  it("releases the decoder when a warm video is detached", () => {
+  it("releases the decoder when a warm video is detached", async () => {
     const pause = vi.fn();
     const load = vi.fn();
     vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(pause);
@@ -250,7 +250,9 @@ describe("SceneVideo Premium V2 media contract", () => {
     );
 
     expect(container.querySelector("[data-scene-video]")).toBeNull();
-    expect(pause).toHaveBeenCalled();
-    expect(load).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(pause).toHaveBeenCalled();
+      expect(load).toHaveBeenCalled();
+    });
   });
 });

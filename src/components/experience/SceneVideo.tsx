@@ -48,6 +48,10 @@ export function SceneVideo({
 
   const tryPlay = useCallback(
     (el: HTMLVideoElement) => {
+      // Decoder cleanup can clear the attribute while React still thinks src is set.
+      if (!el.getAttribute("src") && !el.currentSrc) {
+        el.src = variant.src;
+      }
       // iOS/Safari autoplay checks the DOM property, not only the muted attribute.
       el.defaultMuted = muted;
       el.muted = muted;
@@ -71,7 +75,7 @@ export function SceneVideo({
       }
       return Promise.resolve();
     },
-    [markFailed, muted],
+    [markFailed, muted, variant.src],
   );
 
   useEffect(() => {
@@ -134,8 +138,16 @@ export function SceneVideo({
   useEffect(() => {
     if (!attachVideo) return;
     const el = videoRef.current;
+    if (!el) return;
     return () => {
-      releaseVideoDecoder(el);
+      // Strict Mode re-runs effects while the node is still connected.
+      // Only strip the decoder when the element is truly leaving the tree.
+      el.pause();
+      queueMicrotask(() => {
+        if (!el.isConnected) {
+          releaseVideoDecoder(el);
+        }
+      });
     };
   }, [attachVideo]);
 
@@ -184,7 +196,8 @@ export function SceneVideo({
           aria-hidden="true"
           onLoadedData={onLoadedData}
           onError={markFailed}
-        />      ) : null}
+        />
+      ) : null}
     </div>
   );
 }
