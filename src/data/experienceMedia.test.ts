@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SLIDES } from "./slides";
@@ -12,6 +13,11 @@ import {
 } from "./experienceMedia";
 
 const appRoot = resolve(import.meta.dirname, "../..");
+
+function fileMd5(publicPath: string): string {
+  const abs = resolve(appRoot, publicExperiencePath(publicPath));
+  return createHash("md5").update(readFileSync(abs)).digest("hex");
+}
 
 describe("experienceMedia", () => {
   it("maps exactly 15 unique scenes that match SLIDES order", () => {
@@ -73,5 +79,15 @@ describe("experienceMedia", () => {
         ).toBe(true);
       }
     }
+  });
+
+  it("keeps four-stacks landscape poster distinct from the-question woman still", () => {
+    const question = experienceMediaForSlide("02-question")!.landscape.poster;
+    const fourStacks = experienceMediaForSlide("03-four-stacks")!.landscape.poster;
+    const questionHash = fileMd5(question);
+    const fourStacksHash = fileMd5(fourStacks);
+    expect(fourStacksHash).not.toBe(questionHash);
+    // Guard against a near-duplicate woman still being copied under the four-stacks name.
+    expect(fourStacksHash).toBe("49c66a63b61b7a0579c6d1e8ee798439");
   });
 });
