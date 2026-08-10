@@ -501,6 +501,12 @@
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
 }
 
+@media (max-width: 900px), (orientation: portrait) {
+  .scene-annotations .plate-annotation.role-label {
+    letter-spacing: 0.02em;
+  }
+}
+
 .scene-copy {
   position: absolute;
   left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));

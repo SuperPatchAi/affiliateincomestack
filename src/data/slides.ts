@@ -88,13 +88,46 @@ export function annotationSpanPct(a: PlateAnnotation): {
  */
 export const COMPACT_ANNOTATION_MAX_Y_PCT = 58;
 
+/** Max label/metric width budget on compact layouts, as % of container width. */
+const COMPACT_MAX_WIDTH_PCT: Record<PlateAnnotationRole, number> = {
+  label: 30,
+  metric: 44,
+};
+
+/**
+ * Font-size CSS for plate annotations. Desktop keeps height-based `cqh` (plate parity).
+ * Compact also caps by `cqw` so tall phones cannot blow labels past the viewport width
+ * (e.g. PRODUCT + BRAND merging into one clipped word on flywheel).
+ */
+export function annotationFontSizeCss(
+  annotation: PlateAnnotation,
+  compact: boolean,
+): string {
+  const heightPct = fittedSizePct(annotation);
+  if (!compact) return `${heightPct}cqh`;
+  const widthPct =
+    COMPACT_MAX_WIDTH_PCT[annotation.role] /
+    (annotation.text.length * EM_PER_CHAR[annotation.role]);
+  return `min(${heightPct}cqh, ${widthPct.toFixed(2)}cqw)`;
+}
+
 export function annotationsVisibleInLayout(
   annotations: PlateAnnotation[] | undefined,
   compact: boolean,
 ): PlateAnnotation[] {
   const list = annotations ?? [];
   if (!compact) return list;
-  return list.filter((annotation) => annotation.yPct < COMPACT_ANNOTATION_MAX_Y_PCT);
+  return list.filter((annotation) => {
+    if (annotation.yPct >= COMPACT_ANNOTATION_MAX_Y_PCT) return false;
+    // Hide labels that would still be unreadably wide/tiny after the width cap.
+    if (annotation.role === "label") {
+      const widthPct =
+        COMPACT_MAX_WIDTH_PCT.label /
+        (annotation.text.length * EM_PER_CHAR.label);
+      if (widthPct < 2.8) return false;
+    }
+    return true;
+  });
 }
 
 export type HeroMedia = {

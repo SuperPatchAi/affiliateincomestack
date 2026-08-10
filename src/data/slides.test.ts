@@ -6,6 +6,7 @@ import {
   assertHeroMedia,
   fittedSizePct,
   annotationSpanPct,
+  annotationFontSizeCss,
   annotationsVisibleInLayout,
   TITLE_SLAB_SRCS,
   TITLE_SLAB_BASE,
@@ -234,6 +235,24 @@ describe("plate annotations", () => {
     expect(
       annotationsVisibleInLayout(byId("07-retail").annotations, true).map((a) => a.text),
     ).toEqual(["25%"]);
+  });
+
+  it("caps compact annotation font size by container width so labels stay on-screen", () => {
+    const product = byId("04-flywheel").annotations!.find((a) => a.text === "PRODUCT")!;
+    const brand = byId("04-flywheel").annotations!.find((a) => a.text === "BRAND")!;
+    expect(annotationFontSizeCss(product, false)).toBe(`${fittedSizePct(product)}cqh`);
+    expect(annotationFontSizeCss(product, true)).toMatch(
+      /^min\(\d+(\.\d+)?cqh, \d+(\.\d+)?cqw\)$/,
+    );
+    const productCqw = Number(
+      annotationFontSizeCss(product, true).match(/,\s*([\d.]+)cqw/)?.[1],
+    );
+    const brandCqw = Number(
+      annotationFontSizeCss(brand, true).match(/,\s*([\d.]+)cqw/)?.[1],
+    );
+    // Each label ≤ ~30% of viewport width → they cannot merge into one clipped word.
+    expect(productCqw * product.text.length * 0.95).toBeLessThanOrEqual(31);
+    expect(brandCqw * brand.text.length * 0.95).toBeLessThanOrEqual(31);
   });
 
   it("rejects annotations positioned off the plate", () => {

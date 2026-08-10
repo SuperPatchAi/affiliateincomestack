@@ -4,8 +4,8 @@ import {
   resolveExperienceSrc,
 } from "../../data/experienceMedia";
 import {
+  annotationFontSizeCss,
   annotationsVisibleInLayout,
-  fittedSizePct,
   type Slide as SlideData,
 } from "../../data/slides";
 import {
@@ -97,7 +97,7 @@ export function ExperienceScene({
                       style={{
                         left: `${annotation.xPct}%`,
                         top: `${annotation.yPct}%`,
-                        fontSize: `${fittedSizePct(annotation)}cqh`,
+                        fontSize: annotationFontSizeCss(annotation, compact),
                       }}
                       data-plate-annotation
                       data-anim="annotation"
