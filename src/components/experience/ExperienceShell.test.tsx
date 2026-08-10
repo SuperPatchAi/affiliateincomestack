@@ -161,12 +161,16 @@ describe("ExperienceShell", () => {
   it("uses Omni landscape sources by default with WebP posters", () => {
     const { container } = render(<ExperienceShell />);
     // Title scene is the live 3D hero — no Omni video on slide 01.
-    expect(
-      container.querySelector('[data-slide="01-title"] [data-scene-hero3d]'),
-    ).toBeTruthy();
+    const titleHero = container.querySelector(
+      '[data-slide="01-title"] [data-scene-hero3d]',
+    );
+    expect(titleHero).toBeTruthy();
     expect(
       container.querySelector('[data-slide="01-title"] video'),
     ).toBeNull();
+    expect(
+      container.querySelector('[data-slide="01-title"]')?.getAttribute("data-hero3d"),
+    ).toBe("true");
     const titlePoster = container.querySelector<HTMLImageElement>(
       '[data-slide="01-title"] [data-scene-poster]',
     );

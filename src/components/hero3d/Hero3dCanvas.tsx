@@ -56,7 +56,8 @@ function CanvasSizeSync({
   const { gl, setSize, camera } = useThree();
 
   useLayoutEffect(() => {
-    setSize(width, height, false);
+    // R3F v9: setSize(width, height, top?, left?) — not the old updateStyle boolean.
+    setSize(width, height);
     if (camera instanceof THREE.PerspectiveCamera) {
       camera.aspect = width / Math.max(1, height);
       camera.updateProjectionMatrix();

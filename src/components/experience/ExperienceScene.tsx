@@ -84,8 +84,10 @@ export function ExperienceScene({
           <div className="scene-plane" data-scene-plane>
             {hero3d ? (
               <SceneHero3d
-                active={autoplay}
-                reducedMotion={reduceMotion || !attachVideo}
+                // Mount while the title scene is the active play target.
+                // Do not gate on attachVideo/data-save — that forced the Omni poster on mobile.
+                active={autoplay || lifecycle === "active"}
+                reducedMotion={reduceMotion}
                 poster={variant.poster}
                 priority={index === 0}
               />
