@@ -144,11 +144,18 @@ describe("ExperienceShell", () => {
         playedSources.push(this.getAttribute("src") ?? "");
         return Promise.resolve();
       });
-    render(<ExperienceShell />);
+    const { container } = render(<ExperienceShell />);
     expect(play).toHaveBeenCalled();
     for (const source of playedSources) {
       expect(source).toMatch(/\/9x16\//);
     }
+    // Plate labels sit above the scrim / outside the drifting media plane so
+    // cover-crop + scale cannot clip them on mobile.
+    const flywheelLayer = container.querySelector(
+      '[data-slide="04-flywheel"] [data-annotation-layer]',
+    );
+    expect(flywheelLayer).toBeTruthy();
+    expect(flywheelLayer?.closest("[data-scene-plane]")).toBeNull();
   });
 
   it("uses Omni landscape sources by default with WebP posters", () => {

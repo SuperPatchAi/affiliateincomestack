@@ -384,6 +384,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  container-type: size;
   transform-origin: center center;
   background: var(--sp-black);
   will-change: auto;
@@ -483,8 +484,11 @@
 .scene-annotations {
   position: absolute;
   inset: 0;
+  /* Above media + scrim, below lower-third copy, and outside the drifting plane
+     so media scale/overflow cannot crop plate labels. */
   z-index: 2;
   pointer-events: none;
+  container-type: size;
 }
 
 .scene-annotations .plate-annotation {

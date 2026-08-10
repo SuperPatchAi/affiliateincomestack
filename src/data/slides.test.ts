@@ -6,6 +6,7 @@ import {
   assertHeroMedia,
   fittedSizePct,
   annotationSpanPct,
+  annotationsVisibleInLayout,
   TITLE_SLAB_SRCS,
   TITLE_SLAB_BASE,
   hasEndCard,
@@ -216,6 +217,23 @@ describe("plate annotations", () => {
     for (const a of byId("03-four-stacks").annotations!) {
       expect(fittedSizePct(a)).toBe(a.sizePct);
     }
+  });
+
+  it("drops flywheel lower-third labels on compact layouts so copy does not clip them", () => {
+    const flywheel = byId("04-flywheel").annotations!;
+    expect(annotationsVisibleInLayout(flywheel, false).map((a) => a.text)).toEqual([
+      "PRODUCT",
+      "BRAND",
+      "PEOPLE",
+      "INCOME",
+    ]);
+    expect(annotationsVisibleInLayout(flywheel, true).map((a) => a.text)).toEqual([
+      "PRODUCT",
+      "BRAND",
+    ]);
+    expect(
+      annotationsVisibleInLayout(byId("07-retail").annotations, true).map((a) => a.text),
+    ).toEqual(["25%"]);
   });
 
   it("rejects annotations positioned off the plate", () => {

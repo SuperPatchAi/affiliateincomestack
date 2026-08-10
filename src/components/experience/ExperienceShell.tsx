@@ -274,6 +274,7 @@ export function ExperienceShell() {
               soundEnabled={soundEnabled}
               lifecycle={lifecycle}
               motionLayerActive={lifecycle !== "distant"}
+              compact={compactChrome}
               ctaLinks={ctaLinks}
             />
           );

@@ -82,6 +82,21 @@ export function annotationSpanPct(a: PlateAnnotation): {
   };
 }
 
+/**
+ * Compact / portrait chrome owns the cinematic lower third. Annotations below this
+ * Y% collide with copy + scrim and read as “cut off”, so drop them on compact layouts.
+ */
+export const COMPACT_ANNOTATION_MAX_Y_PCT = 58;
+
+export function annotationsVisibleInLayout(
+  annotations: PlateAnnotation[] | undefined,
+  compact: boolean,
+): PlateAnnotation[] {
+  const list = annotations ?? [];
+  if (!compact) return list;
+  return list.filter((annotation) => annotation.yPct < COMPACT_ANNOTATION_MAX_Y_PCT);
+}
+
 export type HeroMedia = {
   src: string;
   /** Native pixel size of the source file. New assets must be 1920×1080. */

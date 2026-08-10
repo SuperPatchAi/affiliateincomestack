@@ -4,6 +4,7 @@ import {
   resolveExperienceSrc,
 } from "../../data/experienceMedia";
 import {
+  annotationsVisibleInLayout,
   fittedSizePct,
   type Slide as SlideData,
 } from "../../data/slides";
@@ -28,6 +29,7 @@ type Props = {
   soundEnabled: boolean;
   lifecycle: SceneLifecycle;
   motionLayerActive?: boolean;
+  compact?: boolean;
   ctaLinks?: ProductionCtaLinks | null;
 };
 
@@ -40,6 +42,7 @@ export function ExperienceScene({
   soundEnabled,
   lifecycle,
   motionLayerActive = true,
+  compact = false,
   ctaLinks = null,
 }: Props) {
   const media = experienceMediaForSlide(slide.id);
@@ -49,6 +52,10 @@ export function ExperienceScene({
   const variant = resolveExperienceSrc(media, aspect);
   const HeadingTag = index === 0 ? "h1" : "h2";
   const showAnnotations = shouldShowLiveAnnotations(slide);
+  const visibleAnnotations = annotationsVisibleInLayout(
+    slide.annotations,
+    compact,
+  );
   const showStreamIndex = isStreamIndexSlide(slide.id);
   const showSpine = isIncomeStreamSlide(slide.id);
   const activeStacks = new Set(activeStacksForSlide(slide.id));
@@ -76,30 +83,31 @@ export function ExperienceScene({
               muted={!soundEnabled}
               priority={index === 0}
             />
-            {showAnnotations && slide.annotations?.length ? (
-              <div className="scene-annotations" data-annotation-layer aria-hidden>
-                {motionLayerActive
-                  ? slide.annotations.map((annotation, i) => (
-                      <span
-                        key={`${annotation.text}-${i}`}
-                        className={`plate-annotation role-${annotation.role}`}
-                        style={{
-                          left: `${annotation.xPct}%`,
-                          top: `${annotation.yPct}%`,
-                          fontSize: `${fittedSizePct(annotation)}cqh`,
-                        }}
-                        data-plate-annotation
-                        data-anim="annotation"
-                      >
-                        {annotation.text}
-                      </span>
-                    ))
-                  : null}
-              </div>
-            ) : null}
           </div>
 
           <div className="scene-scrim" data-scene-scrim aria-hidden="true" />
+
+          {showAnnotations && visibleAnnotations.length > 0 ? (
+            <div className="scene-annotations" data-annotation-layer aria-hidden>
+              {motionLayerActive
+                ? visibleAnnotations.map((annotation, i) => (
+                    <span
+                      key={`${annotation.text}-${i}`}
+                      className={`plate-annotation role-${annotation.role}`}
+                      style={{
+                        left: `${annotation.xPct}%`,
+                        top: `${annotation.yPct}%`,
+                        fontSize: `${fittedSizePct(annotation)}cqh`,
+                      }}
+                      data-plate-annotation
+                      data-anim="annotation"
+                    >
+                      {annotation.text}
+                    </span>
+                  ))
+                : null}
+            </div>
+          ) : null}
 
           <div
             className="scene-copy"
