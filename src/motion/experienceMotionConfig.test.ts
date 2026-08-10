@@ -82,6 +82,24 @@ describe("Premium V2 web choreography", () => {
     );
   });
 
+  it("uses touch copyMode on coarse pointers without body parallax scrub", () => {
+    const cinematic = MotionConfig.resolveWebChoreography(
+      SLIDES[1].motionPreset,
+      { coarsePointer: false },
+    );
+    const touch = MotionConfig.resolveWebChoreography(SLIDES[1].motionPreset, {
+      coarsePointer: true,
+    });
+    expect(cinematic.copyMode).toBe("cinematic");
+    expect(cinematic.parallaxCopyLayers).toBe(true);
+    expect(touch.copyMode).toBe("touch");
+    expect(touch.parallaxCopyLayers).toBe(false);
+    expect(touch.headlineLineStagger).toBeLessThan(cinematic.headlineLineStagger);
+    expect(touch.handoff.copyStagger).toBeLessThanOrEqual(
+      cinematic.handoff.copyStagger,
+    );
+  });
+
   it("provides modest dwell with a shorter touch scroll track", () => {
     expect(MotionConfig.sceneScrollHeightVh({ coarsePointer: false })).toBeGreaterThan(
       MotionConfig.sceneScrollHeightVh({ coarsePointer: true }),

@@ -84,6 +84,41 @@ describe("ExperienceChrome", () => {
     expect(screen.getByRole("button", { name: "Mute audio" })).toBeTruthy();
   });
 
+  it("shows the mid-funnel affiliate CTA on compact layouts when links are verified", () => {
+    render(
+      <ExperienceChrome
+        activeIndex={6}
+        soundEnabled={false}
+        onToggleSound={() => {}}
+        onJumpTo={() => {}}
+        layout="compact"
+        showAffiliateCta
+        ctaLinks={{
+          primary: "https://affiliate.example.com",
+          disclosure: "https://disclosure.example.com",
+        }}
+      />,
+    );
+    const link = screen.getByRole("link", { name: /affiliate link/i });
+    expect(link.getAttribute("href")).toBe("https://affiliate.example.com");
+  });
+
+  it("keeps compact chrome controls at least 44px tall", () => {
+    render(
+      <ExperienceChrome
+        activeIndex={0}
+        soundEnabled={false}
+        onToggleSound={() => {}}
+        onJumpTo={() => {}}
+        layout="compact"
+      />,
+    );
+    const jump = screen.getByRole("button", { name: /jump to scene/i });
+    const sound = screen.getByRole("button", { name: /Enable audio/i });
+    expect(jump.className).toMatch(/experience-touch-target/);
+    expect(sound.className).toMatch(/experience-touch-target/);
+  });
+
   it("closes the compact jump panel when the active scene changes", () => {
     const { rerender } = render(
       <ExperienceChrome

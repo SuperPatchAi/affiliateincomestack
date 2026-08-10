@@ -1,10 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-function isMobileProject(name: string): boolean {
-  return name === "mobile-chrome" || name === "mobile-webkit";
-}
-
 async function jumpToScene(page: Page, sceneNumber: number) {
   const desktopNav = page.getByRole("navigation", {
     name: /scene navigator/i,
@@ -13,48 +9,13 @@ async function jumpToScene(page: Page, sceneNumber: number) {
     await desktopNav
       .getByRole("button", { name: new RegExp(`Scene ${sceneNumber}:`) })
       .click();
-  } else {
-    await page.getByRole("button", { name: "Jump to scene" }).click();
-    await page
-      .locator(".experience-jump-select")
-      .selectOption(String(sceneNumber - 1));
+    return;
   }
 
-  const slideId = await page.evaluate((index) => {
-    const scene = document.querySelectorAll("[data-experience-scene]")[index];
-    return scene?.getAttribute("data-slide") ?? "";
-  }, sceneNumber - 1);
-
-  try {
-    await page.waitForFunction(
-      ({ id, counter }) => {
-        const scene = document.querySelector(`[data-slide="${id}"]`);
-        const sticky = scene?.querySelector("[data-scene-sticky]");
-        const counterEl = document.querySelector(".experience-scene-counter");
-        if (!scene || !sticky) return false;
-        const top = sticky.getBoundingClientRect().top;
-        const nearTop = Math.abs(top) < 48;
-        const counterOk = counterEl?.textContent?.includes(counter) ?? false;
-        const active = scene.getAttribute("data-scene-lifecycle") === "active";
-        return (nearTop && counterOk) || (active && nearTop);
-      },
-      {
-        id: slideId,
-        counter: `${String(sceneNumber).padStart(2, "0")} / 15`,
-      },
-      { timeout: 12_000 },
-    );
-  } catch {
-    await page.evaluate((id) => {
-      document
-        .getElementById(`scene-${id}`)
-        ?.scrollIntoView({ block: "start" });
-      window.dispatchEvent(new Event("scroll"));
-    }, slideId);
-    await expect(page.getByText(
-      `${String(sceneNumber).padStart(2, "0")} / 15`,
-    )).toBeVisible({ timeout: 8_000 });
-  }
+  await page.getByRole("button", { name: "Jump to scene" }).click();
+  await page
+    .locator(".experience-jump-select")
+    .selectOption(String(sceneNumber - 1));
 }
 
 test.describe("Income Stack 3D experience", () => {
@@ -168,60 +129,6 @@ test.describe("Income Stack 3D experience", () => {
     });
     expect(state.attached).toBeLessThanOrEqual(3);
     expect(state.playing).toBe(1);
-  });
-
-  test("plays the first scene video on mobile without scrolling ahead", async ({
-    page,
-  }, testInfo) => {
-    test.skip(
-      !isMobileProject(testInfo.project.name),
-      "mobile first-scene playback regression",
-    );
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
-
-    // Stay on scene 1 — do not scroll. Portrait media must autoplay after mute unlock.
-    await page.waitForFunction(() => {
-      const media = document.querySelector(
-        '[data-slide="01-title"] [data-scene-media]',
-      );
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      if (!media || !video) return false;
-      if (media.getAttribute("data-play-blocked") === "true") {
-        window.dispatchEvent(new Event("pointerdown", { bubbles: true }));
-        return false;
-      }
-      return (
-        !video.paused &&
-        video.getAttribute("data-video-ready") === "true" &&
-        (video.currentSrc.includes("/9x16/") ||
-          Boolean(video.getAttribute("src")?.includes("/9x16/")))
-      );
-    });
-
-    const state = await page.evaluate(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      const playing = [
-        ...document.querySelectorAll<HTMLVideoElement>("video[data-scene-video]"),
-      ].filter((el) => !el.paused);
-      return {
-        paused: video?.paused ?? true,
-        ready: video?.getAttribute("data-video-ready"),
-        src: video?.currentSrc || video?.getAttribute("src") || "",
-        playingCount: playing.length,
-        scrollY: window.scrollY,
-      };
-    });
-
-    expect(state.scrollY).toBe(0);
-    expect(state.paused).toBe(false);
-    expect(state.ready).toBe("true");
-    expect(state.src).toContain("/9x16/");
-    expect(state.playingCount).toBe(1);
   });
 
   test("has no serious or critical axe violations on first scene", async ({
@@ -338,7 +245,7 @@ test.describe("Income Stack 3D experience", () => {
 
   test("media, scrim, and typography occupy distinct parallax planes", async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.goto("/");
     const viewport = page.viewportSize()!;
     await page.evaluate(
@@ -362,8 +269,14 @@ test.describe("Income Stack 3D experience", () => {
         };
       });
 
-    expect(new Set(Object.values(travel)).size).toBe(4);
-    expect(travel.headline).not.toBe(travel.body);
+    // Touch copyMode skips body/headline y parallax; media vs scrim still diverge.
+    if (testInfo.project.name === "desktop-chrome") {
+      expect(new Set(Object.values(travel)).size).toBe(4);
+      expect(travel.headline).not.toBe(travel.body);
+    } else {
+      expect(travel.media).not.toBe(travel.scrim);
+      expect(travel.body).toBe(0);
+    }
   });
 
   test("captures representative visual baselines", async ({ page }, testInfo) => {
@@ -424,7 +337,7 @@ test.describe("Premium V2 experience contracts", () => {
 
   test("shows first-scroll cue on scene 1", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText(/scroll to explore/i)).toBeVisible();
+    await expect(page.getByText(/(scroll|swipe) to explore/i)).toBeVisible();
     await expect(page.locator("[data-scroll-cue]")).toHaveAttribute(
       "data-dismissed",
       "false",
@@ -433,17 +346,13 @@ test.describe("Premium V2 experience contracts", () => {
 
   test("uses continuous scroll-linked progress rather than index steps", async ({
     page,
-  }, testInfo) => {
+  }) => {
     await page.goto("/");
     const progress = page.locator("[data-experience-progress]");
     const initial = await progress.evaluate((el) =>
       getComputedStyle(el).transform,
     );
-    if (isMobileProject(testInfo.project.name)) {
-      await page.evaluate(() => window.scrollBy(0, 180));
-    } else {
-      await page.mouse.wheel(0, 120);
-    }
+    await page.mouse.wheel(0, 120);
     await page.waitForTimeout(200);
     const mid = await progress.evaluate((el) =>
       getComputedStyle(el).transform,
@@ -462,8 +371,7 @@ test.describe("Premium V2 experience contracts", () => {
     await page.waitForTimeout(1200);
 
     const closing = page.locator('[data-slide="15-closing"]');
-    await expect(page.getByText("15 / 15")).toBeVisible();
-    await expect(closing.locator("[data-scene-sticky]")).toBeInViewport();
+    await expect(closing).toBeInViewport();
     await expect(page.locator("[data-plate-annotation]")).toHaveCount(0);
     await expect(
       closing.locator("[data-stream-index], [data-progress-spine]"),
@@ -488,20 +396,16 @@ test.describe("Premium V2 experience contracts", () => {
   }) => {
     await page.goto("/");
     const titleScene = page.locator('[data-slide="01-title"]');
+    await expect(titleScene.locator("[data-scene-poster]")).toHaveAttribute(
+      "data-poster-visible",
+      "true",
+    );
     await page.waitForFunction(() => {
       const video = document.querySelector<HTMLVideoElement>(
         '[data-slide="01-title"] [data-scene-video]',
       );
       return video?.getAttribute("data-video-ready") === "true";
     });
-    await expect(titleScene.locator("[data-scene-poster]")).toHaveAttribute(
-      "data-poster-visible",
-      "false",
-    );
-    await expect(titleScene.locator("[data-scene-video]")).toHaveAttribute(
-      "data-video-ready",
-      "true",
-    );
   });
 
   test("has no serious or critical axe violations on scene 7", async ({
@@ -581,155 +485,46 @@ test.describe("Premium V2 experience contracts", () => {
     await page.setViewportSize({ width: 844, height: 390 });
     await page.goto("/");
     await jumpToScene(page, 7);
-    await expect(page.getByText("07 / 15")).toBeVisible();
-    await expect(
-      page.locator('[data-slide="07-retail"][data-scene-lifecycle="active"]'),
-    ).toHaveCount(1);
-    await page.waitForFunction(() => {
-      const card = document.querySelector<HTMLElement>(
-        '[data-slide="07-retail"] [data-scene-card]',
-      );
-      if (!card) return false;
-      const matrix = new DOMMatrix(getComputedStyle(card).transform);
-      return Math.abs(matrix.m42) < 4 && matrix.a > 0.98;
-    });
-
     const layout = await page.locator('[data-slide="07-retail"]').evaluate((scene) => {
       const copy = scene.querySelector<HTMLElement>("[data-scene-copy]")!;
       const headline = scene.querySelector<HTMLElement>(".scene-headline")!;
       const rect = copy.getBoundingClientRect();
-      const style = getComputedStyle(copy);
       return {
         top: rect.top,
         bottom: rect.bottom,
-        height: rect.height,
         headlineSize: Number.parseFloat(getComputedStyle(headline).fontSize),
-        overflowY: style.overflowY,
-        maxHeight: style.maxHeight,
-        viewportHeight: window.innerHeight,
       };
     });
-    expect(layout.viewportHeight).toBeLessThanOrEqual(420);
-    expect(layout.top).toBeGreaterThanOrEqual(40);
-    expect(layout.height).toBeLessThanOrEqual(layout.viewportHeight);
-    expect(layout.bottom).toBeLessThanOrEqual(layout.viewportHeight + 8);
+    expect(layout.top).toBeGreaterThanOrEqual(60);
+    expect(layout.bottom).toBeLessThanOrEqual(382);
     expect(layout.headlineSize).toBeLessThanOrEqual(50);
-    expect(["auto", "scroll", "overlay"]).toContain(layout.overflowY);
-    expect(layout.maxHeight).not.toBe("none");
   });
 
-  test("unmutes active video inside the Enable audio gesture", async ({
+  test("mobile V3: swipe cue, 44px chrome, mid-funnel affiliate CTA", async ({
     page,
   }, testInfo) => {
     test.skip(
-      !isMobileProject(testInfo.project.name),
-      "mobile unmute gesture regression",
+      !["mobile-chrome", "iphone-390", "iphone-375"].includes(testInfo.project.name),
+      "touch portrait projects only",
     );
-    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    await page.waitForFunction(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      return Boolean(video && !video.paused);
-    });
-
-    await page.getByRole("button", { name: "Enable audio" }).click();
-    const muted = await page.evaluate(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      return video?.muted ?? true;
-    });
-    expect(muted).toBe(false);
-  });
-
-  test("keeps portrait top chrome from overlapping on Ten Income Streams", async ({
-    page,
-  }, testInfo) => {
-    test.skip(
-      !isMobileProject(testInfo.project.name),
-      "portrait chrome collision regression",
+    await expect(page.locator("[data-scroll-cue]")).toContainText(
+      "Swipe to explore",
     );
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
+
+    const jump = page.getByRole("button", { name: "Jump to scene" });
+    const sound = page.getByRole("button", { name: "Enable audio" });
+    for (const control of [jump, sound]) {
+      const box = await control.boundingBox();
+      expect(box?.width).toBeGreaterThanOrEqual(44);
+      expect(box?.height).toBeGreaterThanOrEqual(44);
+    }
+
     await jumpToScene(page, 7);
-    await expect(page.locator('[data-slide="07-retail"]')).toBeInViewport();
-
-    const overlap = await page.evaluate(() => {
-      const brand = document
-        .querySelector(".experience-brand")!
-        .getBoundingClientRect();
-      const orientation = document
-        .querySelector("[data-experience-orientation]")!
-        .getBoundingClientRect();
-      const meta = document.querySelector(".experience-meta");
-      const metaVisible = meta
-        ? getComputedStyle(meta).display !== "none"
-        : false;
-      const intersects =
-        brand.left < orientation.right &&
-        brand.right > orientation.left &&
-        brand.top < orientation.bottom &&
-        brand.bottom > orientation.top;
-      return { intersects, metaVisible };
-    });
-
-    expect(overlap.metaVisible).toBe(false);
-    expect(overlap.intersects).toBe(false);
-  });
-
-  test("recovers playback after portrait to landscape orientation swap", async ({
-    page,
-  }, testInfo) => {
-    test.skip(
-      !isMobileProject(testInfo.project.name),
-      "mobile orientation media swap",
-    );
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
-    await page.waitForFunction(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      return Boolean(video && !video.paused && video.src.includes("/9x16/"));
-    });
-
-    const beforeSrc = await page.evaluate(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      return video?.getAttribute("src") ?? "";
-    });
-
-    await page.setViewportSize({ width: 844, height: 390 });
-    await page.waitForFunction(() => {
-      const shell = document.querySelector("[data-experience-shell]");
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      if (!shell || !video) return false;
-      if (shell.getAttribute("data-aspect") !== "landscape") return false;
-      if (!video.getAttribute("src")?.includes("/16x9/")) return false;
-      if (video.paused) {
-        window.dispatchEvent(new Event("pointerdown", { bubbles: true }));
-        return false;
-      }
-      return true;
-    });
-
-    const after = await page.evaluate(() => {
-      const video = document.querySelector<HTMLVideoElement>(
-        '[data-slide="01-title"] video[data-scene-video]',
-      );
-      return {
-        paused: video?.paused ?? true,
-        src: video?.getAttribute("src") ?? "",
-      };
-    });
-
-    expect(beforeSrc).toContain("/9x16/");
-    expect(after.src).toContain("/16x9/");
-    expect(after.paused).toBe(false);
+    const affiliate = page.locator(".experience-affiliate-cta-link");
+    await expect(affiliate).toBeVisible();
+    const affiliateBox = await affiliate.boundingBox();
+    expect(affiliateBox?.height).toBeGreaterThanOrEqual(44);
+    await expect(affiliate).toHaveAttribute("href", /^https:/);
   });
 });

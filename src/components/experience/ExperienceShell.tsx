@@ -78,6 +78,29 @@ function shouldShowAffiliateCta(activeIndex: number): boolean {
   return activeIndex >= 6 && activeIndex <= 13;
 }
 
+function ScrollExploreCue({ compact }: { compact: boolean }) {
+  const [coarse, setCoarse] = useState(() =>
+    window.matchMedia("(pointer: coarse)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    const update = () => setCoarse(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return (
+    <div
+      className="experience-scroll-cue"
+      data-scroll-cue
+      data-dismissed="false"
+      aria-hidden="false"
+    >
+      {coarse || compact ? "Swipe to explore" : "Scroll to explore"}
+    </div>
+  );
+}
+
 export function ExperienceShell() {
   const reduceMotion = usePrefersReducedMotion();
   const aspect = useExperienceAspect();
@@ -230,14 +253,7 @@ export function ExperienceShell() {
       />
 
       {activeIndex === 0 && !scrollCueDismissed ? (
-        <div
-          className="experience-scroll-cue"
-          data-scroll-cue
-          data-dismissed="false"
-          aria-hidden="false"
-        >
-          Scroll to explore
-        </div>
+        <ScrollExploreCue compact={compactChrome} />
       ) : null}
 
       <main id="experience-main" className="experience-main">

@@ -101,7 +101,12 @@ export function ExperienceScene({
 
           <div className="scene-scrim" data-scene-scrim aria-hidden="true" />
 
-          <div className="scene-copy" data-scene-copy>
+          <div
+            className="scene-copy"
+            data-scene-copy
+            tabIndex={0}
+            aria-label={`${slide.headline} scene copy`}
+          >
             {slide.flywheelArc ? (
               <div className="scene-flywheel" data-flywheel-wrap>
                 <Flywheel active={slide.flywheelArc} size="corner" />

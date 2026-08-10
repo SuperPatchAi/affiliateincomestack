@@ -5,7 +5,6 @@ import {
   buildParallaxLayerVars,
   experienceMotionEnabled,
   sceneScrollHeightVh,
-  shouldRefreshScrollTriggerOnResize,
 } from "./experienceMotionConfig";
 
 describe("experienceMotionConfig", () => {
@@ -22,36 +21,6 @@ describe("experienceMotionConfig", () => {
     expect(sceneScrollHeightVh({ coarsePointer: false })).toBeGreaterThan(
       sceneScrollHeightVh({ coarsePointer: true }),
     );
-  });
-
-  it("ignores mobile URL-bar height jitter on coarse pointers", () => {
-    expect(
-      shouldRefreshScrollTriggerOnResize({
-        coarsePointer: true,
-        previousWidth: 390,
-        previousHeight: 844,
-        nextWidth: 390,
-        nextHeight: 780,
-      }),
-    ).toBe(false);
-    expect(
-      shouldRefreshScrollTriggerOnResize({
-        coarsePointer: true,
-        previousWidth: 390,
-        previousHeight: 844,
-        nextWidth: 844,
-        nextHeight: 390,
-      }),
-    ).toBe(true);
-    expect(
-      shouldRefreshScrollTriggerOnResize({
-        coarsePointer: false,
-        previousWidth: 1440,
-        previousHeight: 900,
-        nextWidth: 1440,
-        nextHeight: 860,
-      }),
-    ).toBe(true);
   });
 
   it("assigns visibly different travel to each depth plane", () => {

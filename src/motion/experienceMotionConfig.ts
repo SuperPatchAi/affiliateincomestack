@@ -154,8 +154,15 @@ export function buildOutgoingTweenVars(): {
   };
 }
 
+export type CopyMode = "cinematic" | "touch";
+
 export type WebChoreography = {
   presetId: string;
+  copyMode: CopyMode;
+  /** Whether eyebrow/body/CTA/disclosure use scrubbed parallax offsets. */
+  parallaxCopyLayers: boolean;
+  /** SplitText line stagger for headlines. */
+  headlineLineStagger: number;
   handoff: {
     durationRatio: number;
     copyStart: number;
@@ -203,7 +210,10 @@ function overlayStarts(beat: MotionBeat): Pick<
 }
 
 /** Convert the shared film beat into rotation-free, scroll-normalized web motion. */
-export function resolveWebChoreography(preset: string): WebChoreography {
+export function resolveWebChoreography(
+  preset: string,
+  options: { coarsePointer?: boolean } = {},
+): WebChoreography {
   const beat = getMotionBeat(preset);
   const mediaHandoffEnd = buildParallaxLayerVars("media");
   const scrimHandoffEnd = buildParallaxLayerVars("scrim");
@@ -212,12 +222,17 @@ export function resolveWebChoreography(preset: string): WebChoreography {
     Math.max(0.5, beat.plate.durationFrames / beat.primarySettleFrames),
   );
   const scale = Math.min(1.06, Math.max(1, beat.ambientScale[1]));
+  const copyMode: CopyMode = options.coarsePointer ? "touch" : "cinematic";
+  const touch = copyMode === "touch";
 
   return {
     presetId: beat.id,
+    copyMode,
+    parallaxCopyLayers: !touch,
+    headlineLineStagger: touch ? 0.05 : 0.08,
     handoff: {
       durationRatio,
-      copyStagger: 0.06,
+      copyStagger: touch ? 0.04 : 0.06,
       mediaEnd: mediaHandoffEnd,
       scrimEnd: scrimHandoffEnd,
       ...overlayStarts(beat),

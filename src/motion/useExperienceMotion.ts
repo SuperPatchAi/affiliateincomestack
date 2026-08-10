@@ -132,7 +132,9 @@ export function useExperienceMotion({
             const card = scene.querySelector<HTMLElement>("[data-scene-card]");
             const plane = scene.querySelector<HTMLElement>("[data-scene-plane]");
             const scrim = scene.querySelector<HTMLElement>("[data-scene-scrim]");
-            const preset = resolveWebChoreography(scene.dataset.motion ?? "");
+            const preset = resolveWebChoreography(scene.dataset.motion ?? "", {
+              coarsePointer: Boolean(coarsePointer),
+            });
             const prev =
               index > 0
                 ? scenes[index - 1]?.querySelector<HTMLElement>(
@@ -159,6 +161,14 @@ export function useExperienceMotion({
               );
               if (!element) return;
               if (layer === "headline") return;
+              if (!preset.parallaxCopyLayers) {
+                gsap.set(element, {
+                  yPercent: 0,
+                  scale: 1,
+                  opacity: index === 0 ? 1 : 0,
+                });
+                return;
+              }
               const layerVars = buildParallaxLayerVars(layer);
               gsap.set(element, {
                 yPercent: index === 0 ? 0 : -layerVars.yPercent,
@@ -230,13 +240,20 @@ export function useExperienceMotion({
               );
 
               (
-                ["eyebrow", "headline", "body", "cta", "disclosure"] as const
+                ["eyebrow", "body", "cta", "disclosure"] as const
               ).forEach((layer, layerIndex) => {
                 const element = scene.querySelector<HTMLElement>(
                   `[data-anim-layer="${layer}"]`,
                 );
                 if (!element) return;
-                const layerVars = buildParallaxLayerVars(layer);
+                // Headline is owned by SplitText — never tween the parent layer.
+                if (preset.parallaxCopyLayers) {
+                  const layerVars = buildParallaxLayerVars(layer);
+                  gsap.set(element, {
+                    yPercent: -layerVars.yPercent,
+                    scale: layerVars.scale,
+                  });
+                }
                 handoff.to(
                   element,
                   {
@@ -244,15 +261,11 @@ export function useExperienceMotion({
                     scale: 1,
                     opacity: 1,
                     ease: "power2.out",
-                    duration: 0.72,
+                    duration: preset.parallaxCopyLayers ? 0.72 : 0.4,
                   },
                   preset.handoff.copyStart +
                     layerIndex * preset.handoff.copyStagger,
                 );
-                gsap.set(element, {
-                  yPercent: -layerVars.yPercent,
-                  scale: layerVars.scale,
-                });
               });
 
               if (annotations.length > 0) {
@@ -333,6 +346,11 @@ export function useExperienceMotion({
               const headline =
                 scene.querySelector<HTMLElement>("[data-anim-layer='headline']");
               if (!headline) continue;
+              const headlineChoreo = resolveWebChoreography(
+                scene.dataset.motion ?? "",
+                { coarsePointer: Boolean(coarsePointer) },
+              );
+              const lineStagger = headlineChoreo.headlineLineStagger;
               const record: HeadlineSplitRecord = { cleaned: false };
               const split = SplitText.create(headline, {
                 type: "lines",
@@ -346,8 +364,8 @@ export function useExperienceMotion({
                       ? gsap.from(self.lines, {
                           yPercent: 105,
                           opacity: 0,
-                          duration: 0.65,
-                          stagger: 0.08,
+                          duration: headlineChoreo.copyMode === "touch" ? 0.5 : 0.65,
+                          stagger: lineStagger,
                           ease: "power3.out",
                           overwrite: "auto",
                         })
@@ -357,13 +375,16 @@ export function useExperienceMotion({
                           {
                             yPercent: 0,
                             opacity: 1,
-                            stagger: 0.08,
+                            stagger: lineStagger,
                             ease: "power3.out",
                             overwrite: "auto",
                             scrollTrigger: {
                               trigger: scene,
                               start: "top 78%",
-                              end: "top 28%",
+                              end:
+                                headlineChoreo.copyMode === "touch"
+                                  ? "top 40%"
+                                  : "top 28%",
                               scrub: coarsePointer ? 0.85 : 0.65,
                               invalidateOnRefresh: true,
                             },
