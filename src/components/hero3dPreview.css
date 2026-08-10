@@ -1,0 +1,175 @@
+/* Full-bleed 3D hero shell — sized by visualViewport CSS vars (iOS Safari). */
+
+.hero3d-shell {
+  position: fixed;
+  left: 0;
+  top: var(--hero3d-vv-offset-top, 0px);
+  width: var(--hero3d-vv-width, 100%);
+  height: var(--hero3d-vv-height, 100dvh);
+  max-height: -webkit-fill-available;
+  background: #000000;
+  color: #e8eef8;
+  font-family: var(--font-body);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero3d-canvas-host {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  /* Canvas paints edge-to-edge; safe-area is reserved for chrome only. */
+}
+
+.hero3d-canvas-host canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+/* Title-slide chrome over the live 3D hero — mirrors experience scene-copy. */
+
+.hero3d-title-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      105deg,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.35) 38%,
+      transparent 62%
+    ),
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.55) 0%,
+      transparent 42%
+    );
+}
+
+.hero3d-title-overlay {
+  position: absolute;
+  left: max(24px, env(safe-area-inset-left, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(52px, env(safe-area-inset-bottom, 0px));
+  z-index: 3;
+  width: min(680px, calc(100% - 48px));
+  max-width: calc(100% - 32px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.4vw, 1.1rem);
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.68);
+  pointer-events: none;
+  color: var(--sp-text);
+}
+
+.hero3d-title-overlay [data-anim-layer] {
+  will-change: opacity, transform;
+}
+
+.hero3d-title-overlay .scene-eyebrow {
+  margin: 0;
+  color: var(--sp-white, #fff);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: clamp(0.68rem, 0.65vw, 0.82rem);
+  font-weight: 900;
+}
+
+.hero3d-title-overlay .scene-eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 3px;
+  margin: 0 12px 3px 0;
+  background: var(--sp-red);
+}
+
+.hero3d-title-overlay .scene-headline {
+  margin: 0;
+  max-width: 16ch;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 5.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  font-weight: 900;
+  text-wrap: balance;
+}
+
+.hero3d-title-overlay .scene-body {
+  margin: 0;
+  max-width: 48ch;
+  color: var(--sp-muted);
+  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.hero3d-dev-hint {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  top: max(16px, env(safe-area-inset-top, 0px));
+  z-index: 3;
+  margin: 0;
+  max-width: 220px;
+  text-align: right;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  pointer-events: none;
+  color: var(--sp-muted);
+}
+
+@media (max-width: 720px) {
+  .hero3d-title-overlay {
+    width: min(100%, calc(100% - 32px));
+    bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    gap: 0.65rem;
+  }
+
+  .hero3d-title-overlay .scene-headline {
+    font-size: clamp(1.75rem, 8.5vw, 2.8rem);
+    max-width: 14ch;
+  }
+
+  .hero3d-title-overlay .scene-body {
+    font-size: clamp(0.88rem, 3.6vw, 1.05rem);
+    max-width: 36ch;
+  }
+
+  .hero3d-dev-hint {
+    max-width: 140px;
+    font-size: 10px;
+  }
+}
+
+/* Short phones / landscape with URL bar — keep copy readable above home indicator. */
+@media (max-height: 700px) {
+  .hero3d-title-overlay {
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    gap: 0.5rem;
+  }
+
+  .hero3d-title-overlay .scene-headline {
+    font-size: clamp(1.55rem, 7vw, 2.4rem);
+  }
+
+  .hero3d-title-overlay .scene-body {
+    font-size: clamp(0.82rem, 3.2vw, 0.98rem);
+    line-height: 1.4;
+  }
+}
+
+@supports (height: 100dvh) {
+  .hero3d-shell {
+    height: var(--hero3d-vv-height, 100dvh);
+  }
+}

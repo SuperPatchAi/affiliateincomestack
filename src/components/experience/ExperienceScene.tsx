@@ -18,6 +18,8 @@ import { shouldShowLiveAnnotations } from "../../remotion/labels";
 import type { SceneLifecycle } from "../../motion/experienceMotionConfig";
 import { Flywheel } from "../Flywheel";
 import type { ProductionCtaLinks } from "./ctaLinks";
+import { SceneHero3d } from "./SceneHero3d";
+import { isHero3dExperienceSlide } from "./hero3dExperienceSlide";
 import { SceneVideo } from "./SceneVideo";
 
 type Props = {
@@ -31,6 +33,7 @@ type Props = {
   motionLayerActive?: boolean;
   compact?: boolean;
   ctaLinks?: ProductionCtaLinks | null;
+  reduceMotion?: boolean;
 };
 
 export function ExperienceScene({
@@ -44,6 +47,7 @@ export function ExperienceScene({
   motionLayerActive = true,
   compact = false,
   ctaLinks = null,
+  reduceMotion = false,
 }: Props) {
   const media = experienceMediaForSlide(slide.id);
   if (!media) {
@@ -60,6 +64,7 @@ export function ExperienceScene({
   const showSpine = isIncomeStreamSlide(slide.id);
   const activeStacks = new Set(activeStacksForSlide(slide.id));
   const body = slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body;
+  const hero3d = isHero3dExperienceSlide(slide.id);
 
   return (
     <section
@@ -70,19 +75,29 @@ export function ExperienceScene({
       data-motion={slide.motionPreset}
       data-scene-lifecycle={lifecycle}
       data-motion-layer-active={motionLayerActive ? "true" : "false"}
+      data-hero3d={hero3d ? "true" : "false"}
       aria-label={`Scene ${index + 1}: ${slide.headline}`}
       style={{ zIndex: index + 1 }}
     >
       <div className="scene-sticky" data-scene-sticky>
         <div className="scene-card" data-scene-card>
           <div className="scene-plane" data-scene-plane>
-            <SceneVideo
-              variant={variant}
-              attachVideo={attachVideo}
-              autoplay={autoplay}
-              muted={!soundEnabled}
-              priority={index === 0}
-            />
+            {hero3d ? (
+              <SceneHero3d
+                active={autoplay}
+                reducedMotion={reduceMotion || !attachVideo}
+                poster={variant.poster}
+                priority={index === 0}
+              />
+            ) : (
+              <SceneVideo
+                variant={variant}
+                attachVideo={attachVideo}
+                autoplay={autoplay}
+                muted={!soundEnabled}
+                priority={index === 0}
+              />
+            )}
           </div>
 
           <div className="scene-scrim" data-scene-scrim aria-hidden="true" />

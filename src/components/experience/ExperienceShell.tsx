@@ -276,6 +276,7 @@ export function ExperienceShell() {
               motionLayerActive={lifecycle !== "distant"}
               compact={compactChrome}
               ctaLinks={ctaLinks}
+              reduceMotion={reduceMotion}
             />
           );
         })}

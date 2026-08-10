@@ -160,21 +160,41 @@ describe("ExperienceShell", () => {
 
   it("uses Omni landscape sources by default with WebP posters", () => {
     const { container } = render(<ExperienceShell />);
-    const titleVideo = container.querySelector<HTMLVideoElement>(
-      '[data-slide="01-title"] video',
-    );
-    // When attached in warm window, src is Omni; otherwise poster img is shown.
+    // Title scene is the live 3D hero — no Omni video on slide 01.
+    expect(
+      container.querySelector('[data-slide="01-title"] [data-scene-hero3d]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-slide="01-title"] video'),
+    ).toBeNull();
     const titlePoster = container.querySelector<HTMLImageElement>(
       '[data-slide="01-title"] [data-scene-poster]',
     );
     expect(titlePoster?.getAttribute("src")).toMatch(
       /\/concepts\/omni-chain\/posters\/16x9\/sp-stack-01-title\.webp$/,
     );
-    if (titleVideo?.getAttribute("src")) {
-      expect(titleVideo.getAttribute("src")).toMatch(
-        /\/concepts\/omni-chain\/16x9\/sp-stack-01-title_omni\.mp4$/,
-      );
-    }
+    // Later scenes still use Omni video (warm window attaches src).
+    const qVideo = container.querySelector<HTMLVideoElement>(
+      '[data-slide="02-question"] video',
+    );
+    const qPoster = container.querySelector<HTMLImageElement>(
+      '[data-slide="02-question"] [data-scene-poster]',
+    );
+    const qSrc =
+      qVideo?.getAttribute("src") ?? qPoster?.getAttribute("src") ?? "";
+    expect(qSrc).toMatch(/sp-stack-02-the-question/);
+  });
+
+  it("keeps the experience title overlay copy on the 3D hero scene", () => {
+    const { container } = render(<ExperienceShell />);
+    const copy = container.querySelector(
+      '[data-slide="01-title"] [data-scene-copy]',
+    );
+    expect(copy?.querySelector("[data-anim-layer='headline']")?.textContent).toMatch(
+      /10 Ways to Build Life-Changing Income/i,
+    );
+    expect(copy?.querySelector("[data-anim-layer='eyebrow']")).toBeTruthy();
+    expect(copy?.querySelector("[data-anim-layer='body']")).toBeTruthy();
   });
 
   it("exposes a vertical scene navigator with 15 steps", () => {

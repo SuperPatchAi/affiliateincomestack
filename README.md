@@ -86,6 +86,30 @@ npm test
 
 Open on a phone-width viewport (~390px) and scroll.
 
+## Cinematic 3D hero (title scene)
+
+Default experience slide `01-title` uses the interactive photoreal stack
+(`SceneHero3d`) in place of the Omni video. The experience shell keeps the
+same title overlay (eyebrow / headline / body). Standalone preview remains at
+`?view=hero3d`.
+
+Mobile / iOS notes:
+
+| Concern | Approach |
+|---------|----------|
+| Dynamic Safari chrome | Shell sized from `visualViewport` (`viewportMetrics.ts`) via `--hero3d-vv-*` CSS vars |
+| Safe areas | Canvas full-bleed; title / hint use `env(safe-area-inset-*)` |
+| Rubber-band / scroll hijack | `overscroll-behavior: none`, body overflow lock while mounted |
+| Retina GPU cost | Phone DPR cap (`phoneDprCap`), no MSAA, no DOF, no rim spot |
+| Portrait framing | Wider FOV + `orbitDistanceMul` so stack clears title copy |
+| Full orbit | Explicit unidirectional azimuth (≥1 turn → front); no autoRotate reverse |
+| Plate physics | Spring-damper driven by orbit ω/α (inertial lag + centrifugal lean) |
+
+```bash
+npm run dev
+# open http://localhost:5173/?view=hero3d
+```
+
 ## Text-free plates
 
 The concept plates shipped with headlines and diagram labels baked into the pixels, which

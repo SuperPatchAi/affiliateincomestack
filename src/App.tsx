@@ -1,17 +1,22 @@
 import { DeckShell } from "./components/DeckShell";
 import { ExperienceShell } from "./components/experience/ExperienceShell";
+import { Hero3dPreview } from "./components/Hero3dPreview";
 import "./components/deck.css";
 
-function useLegacyView(): boolean {
-  if (typeof window === "undefined") return false;
+type AppView = "legacy" | "hero3d" | "experience";
+
+function useAppView(): AppView {
+  if (typeof window === "undefined") return "experience";
   const params = new URLSearchParams(window.location.search);
-  if (params.get("view") === "legacy") return true;
-  // Constrained / forced static path for QA.
-  if (params.get("view") === "static") return true;
-  return false;
+  const view = params.get("view");
+  if (view === "legacy" || view === "static") return "legacy";
+  if (view === "hero3d") return "hero3d";
+  return "experience";
 }
 
 export default function App() {
-  const legacy = useLegacyView();
-  return legacy ? <DeckShell /> : <ExperienceShell />;
+  const view = useAppView();
+  if (view === "legacy") return <DeckShell />;
+  if (view === "hero3d") return <Hero3dPreview />;
+  return <ExperienceShell />;
 }
