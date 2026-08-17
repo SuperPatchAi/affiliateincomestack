@@ -9,6 +9,8 @@ type Props = {
   reducedMotion: boolean;
   poster: string;
   priority?: boolean;
+  /** Per-scene GLB — logo on the opener, 3D patch on Product Stack. */
+  modelUrl?: string;
 };
 
 /**
@@ -21,6 +23,7 @@ export function SceneHero3d({
   reducedMotion,
   poster,
   priority = false,
+  modelUrl,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 390, height: 844 });
@@ -86,6 +89,7 @@ export function SceneHero3d({
               reducedMotion={reducedMotion}
               embedded
               variant="patch"
+              modelUrl={modelUrl}
               onError={handlePatchError}
               onReady={handlePatchReady}
             />

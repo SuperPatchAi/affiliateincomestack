@@ -15,7 +15,10 @@ import { Flywheel } from "../Flywheel";
 import { ChipStage } from "./ChipStage";
 import type { ProductionCtaLinks } from "./ctaLinks";
 import { SceneHero3d } from "./SceneHero3d";
-import { isHero3dExperienceSlide } from "./hero3dExperienceSlide";
+import {
+  hero3dModelUrl,
+  isHero3dExperienceSlide,
+} from "./hero3dExperienceSlide";
 import { SceneVideo } from "./SceneVideo";
 
 /** Scene 01 product caption — rendered uppercase via CSS; headline stays sentence case for aria. */
@@ -84,6 +87,7 @@ export function ExperienceScene({
                 reducedMotion={reduceMotion}
                 poster={variant.poster}
                 priority={index === 0}
+                modelUrl={hero3dModelUrl(slide.id)}
               />
             ) : (
               <SceneVideo

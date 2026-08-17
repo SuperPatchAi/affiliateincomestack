@@ -54,6 +54,7 @@ type Props = {
   width: number;
   height: number;
   fovDeg: number;
+  modelUrl?: string;
   onReady?: () => void;
 };
 
@@ -101,10 +102,11 @@ export function PatchHeroScene({
   width,
   height,
   fovDeg,
+  modelUrl = PATCH_MODEL_URL,
   onReady,
 }: Props) {
-  useGLTF.preload(PATCH_MODEL_URL);
-  const { scene: gltfScene } = useGLTF(PATCH_MODEL_URL);
+  useGLTF.preload(modelUrl);
+  const { scene: gltfScene } = useGLTF(modelUrl);
   const { gl, camera } = useThree();
   const fieldRefs = useRef<Record<string, THREE.Group | null>>({});
   const gridRef = useRef<THREE.Group>(null);

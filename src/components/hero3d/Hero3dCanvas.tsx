@@ -12,6 +12,7 @@ import { PhotorealStackScene } from "./PhotorealStackScene";
 import {
   PATCH_CAMERA_Y,
   PATCH_CAMERA_Z,
+  PATCH_MODEL_URL,
   PATCH_TONE_MAPPING_EXPOSURE,
 } from "./patchHero";
 import { qualityTierConfig } from "./qualityTier";
@@ -86,6 +87,8 @@ type Props = {
   /** Prefer host size over window metrics for quality tier (embedded). */
   embedded?: boolean;
   variant?: Hero3dVariant;
+  /** GLB for `variant="patch"` — logo on the opener, 3D patch on Product Stack. */
+  modelUrl?: string;
   /** Surface R3F / useGLTF throws so the host can unmount the canvas. */
   onError?: () => void;
   /** First framed patch frame — host may hide the title poster. */
@@ -103,6 +106,7 @@ export function Hero3dCanvas({
   reducedMotion,
   embedded = false,
   variant = "stack",
+  modelUrl = PATCH_MODEL_URL,
   onError,
   onReady,
 }: Props) {
@@ -144,6 +148,7 @@ export function Hero3dCanvas({
       className="hero3d-canvas-host"
       data-hero3d-canvas
       data-hero3d-variant={variant}
+      data-hero3d-model={variant === "patch" ? modelUrl : undefined}
       data-quality-tier={config.tier}
       style={{
         width: "100%",
@@ -192,6 +197,7 @@ export function Hero3dCanvas({
               width={width}
               height={height}
               fovDeg={config.cameraFov}
+              modelUrl={modelUrl}
               onReady={onReady}
             />
           </PatchErrorBoundary>

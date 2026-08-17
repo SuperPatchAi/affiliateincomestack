@@ -1,4 +1,7 @@
+/** Title opener (01/21) — SuperPatch wordmark GLB. */
 export const PATCH_MODEL_URL = "/models/superpatch_logo.glb";
+/** Product Stack (06/21) — original 3D patch + receding floor. */
+export const PRODUCT_PATCH_MODEL_URL = "/models/superpatch-title.glb";
 
 export const TILT_YAW_MAX = (32 * Math.PI) / 180;
 export const TILT_PITCH_MAX = (22 * Math.PI) / 180;

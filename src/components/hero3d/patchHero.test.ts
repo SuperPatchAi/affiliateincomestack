@@ -7,6 +7,7 @@ import {
   PATCH_DIAMOND_ROLL,
   PATCH_FILL_INTENSITY,
   PATCH_MODEL_URL,
+  PRODUCT_PATCH_MODEL_URL,
   PATCH_SPOTLIGHTS,
   PATCH_TARGET_HEIGHT,
   PATCH_TONE_MAPPING_EXPOSURE,
@@ -16,8 +17,12 @@ import {
 } from "./patchHero";
 
 describe("patchHero framing", () => {
-  it("loads the SuperPatch logo GLB", () => {
+  it("loads the SuperPatch logo GLB on the title opener", () => {
     expect(PATCH_MODEL_URL).toBe("/models/superpatch_logo.glb");
+  });
+
+  it("keeps the original 3D patch GLB for Product Stack", () => {
+    expect(PRODUCT_PATCH_MODEL_URL).toBe("/models/superpatch-title.glb");
   });
 
   it("fits the hero 20 percent larger than the half-size pass", () => {

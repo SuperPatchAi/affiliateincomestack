@@ -13,10 +13,12 @@ const { patchCanvasShouldFail, patchCanvasInnerFail, patchCanvasReady } =
 vi.mock("../hero3d/Hero3dCanvas", () => ({
   Hero3dCanvas: ({
     variant,
+    modelUrl,
     onError,
     onReady,
   }: {
     variant?: string;
+    modelUrl?: string;
     onError?: () => void;
     onReady?: () => void;
   }) => {
@@ -32,7 +34,11 @@ vi.mock("../hero3d/Hero3dCanvas", () => ({
       throw new Error("GLB load failed");
     }
     return (
-      <div data-hero3d-canvas data-hero3d-variant={variant ?? "stack"} />
+      <div
+        data-hero3d-canvas
+        data-hero3d-variant={variant ?? "stack"}
+        data-hero3d-model={modelUrl}
+      />
     );
   },
 }));
@@ -83,6 +89,23 @@ describe("SceneHero3d", () => {
       container.querySelector<HTMLImageElement>("[data-scene-poster]")?.style
         .opacity,
     ).not.toBe("0");
+  });
+
+  it("forwards the per-scene patch GLB to the canvas", () => {
+    mockWebgl();
+    const { container } = render(
+      <SceneHero3d
+        active
+        reducedMotion={false}
+        poster="/concepts/omni-chain/posters/16x9/sp-stack-01-title.webp"
+        modelUrl="/models/superpatch-title.glb"
+      />,
+    );
+    expect(
+      container
+        .querySelector("[data-hero3d-canvas]")
+        ?.getAttribute("data-hero3d-model"),
+    ).toBe("/models/superpatch-title.glb");
   });
 
   it("hides the poster after the patch canvas reports ready", async () => {
