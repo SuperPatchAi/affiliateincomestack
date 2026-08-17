@@ -17,6 +17,7 @@ import {
   resolveWebChoreography,
   sceneDwellEnabled,
   sceneLayerState,
+  sceneScrollHeightVh,
   shouldRefreshScrollTriggerOnResize,
 } from "./experienceMotionConfig";
 import {
@@ -25,9 +26,10 @@ import {
   resumeNearbyChipDwells,
 } from "./chipDwellParking";
 import {
-  buildDwellSegments,
-  sceneScrollHeightVhForChips,
-} from "./chipSequence";
+  CHIP_COPY_EXIT_MS,
+  createChipAutoCycle,
+  type ChipAutoCycle,
+} from "./chipAutoCycle";
 import { applyTitlePatchExit } from "./titlePatchExit";
 
 let registered = false;
@@ -40,6 +42,135 @@ function ensurePlugins() {
 }
 
 let windowScrollTween: gsap.core.Tween | undefined;
+
+type SceneChipCycle = { cycle: ChipAutoCycle; dispose: () => void };
+
+/**
+ * Bind the video-timed chip cycle to a scene's DOM. Copy exit, chip text
+ * crossfades, backdrop fades, and playback are all keyed to each omni clip's
+ * `ended` event — the clip's warp finale is the transition cue, not scroll.
+ * When `onSequenceComplete` is given, the final clip's ending fires it
+ * (auto-scroll to the next scene); otherwise the final clip loops in place.
+ */
+function buildSceneChipCycle(
+  scene: HTMLElement,
+  onSequenceComplete?: () => void,
+): SceneChipCycle | null {
+  const chipEls = Array.from(
+    scene.querySelectorAll<HTMLElement>("[data-chip-item]"),
+  );
+  if (chipEls.length === 0) return null;
+  const copyBlock = scene.querySelector<HTMLElement>("[data-scene-copy]");
+  if (!copyBlock) return null;
+  const backdrops = Array.from(
+    scene.querySelectorAll<HTMLElement>("[data-chip-backdrop]"),
+  );
+  const videos = backdrops.map((backdrop) =>
+    backdrop.querySelector("video"),
+  );
+
+  const stopVideo = (video: HTMLVideoElement | null) => {
+    if (!video) return;
+    video.pause();
+    try {
+      video.currentTime = 0;
+    } catch {
+      // Media not loaded yet; nothing to rewind.
+    }
+  };
+
+  const cycle = createChipAutoCycle({
+    chipCount: chipEls.length,
+    handlers: {
+      exitCopy() {
+        gsap.to(copyBlock, {
+          x: () => -(copyBlock.getBoundingClientRect().right + 64),
+          duration: CHIP_COPY_EXIT_MS / 1000,
+          ease: "power2.in",
+          overwrite: "auto",
+        });
+      },
+      enterChip(index, { loop }) {
+        gsap.fromTo(
+          chipEls[index],
+          { opacity: 0, x: 72 },
+          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", overwrite: "auto" },
+        );
+        const backdrop = backdrops[index];
+        if (backdrop) {
+          gsap.fromTo(
+            backdrop,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.8, ease: "none", overwrite: "auto" },
+          );
+        }
+        const video = videos[index] ?? null;
+        if (!video || (!video.getAttribute("src") && !video.currentSrc)) {
+          return false;
+        }
+        video.loop = loop;
+        video.muted = true;
+        try {
+          video.currentTime = 0;
+        } catch {
+          // First play; element decides the start position.
+        }
+        void video.play()?.catch(() => {
+          // Autoplay denied: the poster still holds; cycle stays on this beat.
+        });
+        return true;
+      },
+      exitChip(index) {
+        gsap.to(chipEls[index], {
+          opacity: 0,
+          x: -72,
+          duration: 0.5,
+          ease: "power2.in",
+          overwrite: "auto",
+        });
+        const backdrop = backdrops[index];
+        if (backdrop) {
+          gsap.to(backdrop, {
+            opacity: 0,
+            duration: 0.8,
+            ease: "none",
+            overwrite: "auto",
+            onComplete: () => stopVideo(videos[index] ?? null),
+          });
+        } else {
+          stopVideo(videos[index] ?? null);
+        }
+      },
+      reset() {
+        gsap.killTweensOf([copyBlock, ...chipEls, ...backdrops]);
+        gsap.set(copyBlock, { x: 0 });
+        gsap.set(chipEls, { opacity: 0, x: 72 });
+        if (backdrops.length > 0) {
+          gsap.set(backdrops, { opacity: 0 });
+        }
+        for (const video of videos) stopVideo(video ?? null);
+      },
+      completeSequence: onSequenceComplete,
+    },
+  });
+
+  const listeners = videos.map((video, index) => {
+    if (!video) return null;
+    const onEnded = () => cycle.handleVideoEnded(index);
+    video.addEventListener("ended", onEnded);
+    return { video, onEnded };
+  });
+
+  return {
+    cycle,
+    dispose() {
+      cycle.stop();
+      for (const entry of listeners) {
+        entry?.video.removeEventListener("ended", entry.onEnded);
+      }
+    },
+  };
+}
 
 type Options = {
   enabled: boolean;
@@ -116,6 +247,7 @@ export function useExperienceMotion({
             root.querySelectorAll("[data-experience-scene]"),
           );
           const viewportHeight = measureSceneViewportHeight();
+          const chipCycles = new Map<number, SceneChipCycle>();
           let lastActiveIndex = -1;
           const reportActiveIndex = (index: number) => {
             if (index === lastActiveIndex) return;
@@ -130,6 +262,11 @@ export function useExperienceMotion({
                   lifecycle === "distant" ? "auto" : "transform, opacity";
               }
             });
+            // Chip beats are video-timed: run only on the active scene.
+            for (const [sceneIndex, entry] of chipCycles) {
+              if (sceneIndex === index) entry.cycle.start();
+              else entry.cycle.stop();
+            }
             if (resumeNearbyChipDwells(scenes)) {
               ScrollTrigger.update();
             }
@@ -137,13 +274,11 @@ export function useExperienceMotion({
           };
 
           scenes.forEach((scene, index) => {
-            const chipItems = scene.querySelectorAll<HTMLElement>("[data-chip-item]");
             scene.style.height =
               index === 0
                 ? "100svh"
-                : `${sceneScrollHeightVhForChips({
+                : `${sceneScrollHeightVh({
                     coarsePointer: Boolean(coarsePointer),
-                    chipCount: chipItems.length,
                   })}svh`;
             const card = scene.querySelector<HTMLElement>("[data-scene-card]");
             const plane = scene.querySelector<HTMLElement>("[data-scene-plane]");
@@ -315,11 +450,7 @@ export function useExperienceMotion({
             }
 
             if (sceneDwellEnabled(index)) {
-              const chipEls = Array.from(
-                scene.querySelectorAll<HTMLElement>("[data-chip-item]"),
-              );
-              const copyBlock = scene.querySelector<HTMLElement>("[data-scene-copy]");
-              const dwell = gsap
+              gsap
                 .timeline({
                   scrollTrigger: {
                     id: chipDwellTriggerId(scene.id),
@@ -357,51 +488,49 @@ export function useExperienceMotion({
                   },
                   0,
                 );
+            }
 
-              const segments = buildDwellSegments(chipEls.length);
-              if (segments && copyBlock) {
-                scene.dataset.chipsAnimated = "true";
-                gsap.set(chipEls, { opacity: 0 });
-                // Copy reads until READ_HOLD_END, then slides fully off the left edge.
-                dwell.to(
-                  copyBlock,
-                  {
-                    x: () => -(copyBlock.getBoundingClientRect().right + 64),
-                    ease: "power1.in",
-                    immediateRender: false,
-                    duration: segments.copyExit.end - segments.copyExit.start,
-                  },
-                  segments.copyExit.start,
-                );
-                chipEls.forEach((item, chipIndex) => {
-                  const win = segments.chips[chipIndex];
-                  dwell.fromTo(
-                    item,
-                    { opacity: 0, x: 72 },
-                    {
-                      opacity: 1,
-                      x: 0,
-                      ease: "none",
-                      immediateRender: false,
-                      duration: win.enter.end - win.enter.start,
-                    },
-                    win.enter.start,
-                  );
-                  if (win.exit) {
-                    dwell.to(
-                      item,
-                      {
-                        opacity: 0,
-                        x: -72,
-                        ease: "none",
-                        immediateRender: false,
-                        duration: win.exit.end - win.exit.start,
-                      },
-                      win.exit.start,
-                    );
+            // Chip beats are timed to their omni clips: build the cycle now,
+            // arm it when this scene becomes active. The hero copy holds until
+            // the user scrolls into the scene (scroll gate below); after that
+            // chips auto-advance and the final clip's warp ending auto-scrolls
+            // into the next scene.
+            const nextScene = scenes[index + 1] ?? null;
+            const chipCycle = buildSceneChipCycle(
+              scene,
+              nextScene
+                ? () => {
+                    windowScrollTween?.kill();
+                    windowScrollTween = gsap.to(window, {
+                      scrollTo: { y: nextScene, autoKill: true },
+                      duration: coarsePointer ? 1.4 : 1.8,
+                      ease: "power2.inOut",
+                    });
                   }
-                });
+                : undefined,
+            );
+            if (chipCycle) {
+              scene.dataset.chipsAnimated = "true";
+              gsap.set(scene.querySelectorAll("[data-chip-item]"), {
+                opacity: 0,
+                x: 72,
+              });
+              const backdrops = scene.querySelectorAll("[data-chip-backdrop]");
+              if (backdrops.length > 0) {
+                gsap.set(backdrops, { opacity: 0 });
               }
+              chipCycles.set(index, chipCycle);
+              // Scroll gate: the hero holds at the scene top; the first scroll
+              // past it begins the chip sequence. beginChips() is idempotent
+              // and a no-op unless this scene's cycle is armed (active scene),
+              // so the final-chip auto-scroll passing through is harmless.
+              ScrollTrigger.create({
+                trigger: scene,
+                start: "top top-=160",
+                end: "bottom bottom",
+                onUpdate: () => chipCycle.cycle.beginChips(),
+                onEnter: () => chipCycle.cycle.beginChips(),
+              });
             }
           });
 
@@ -505,6 +634,10 @@ export function useExperienceMotion({
 
           return () => {
             cancelled = true;
+            for (const entry of chipCycles.values()) {
+              entry.dispose();
+            }
+            chipCycles.clear();
             for (const record of splitRecords) {
               if (record.cleaned) continue;
               record.cleaned = true;
@@ -571,6 +704,7 @@ export function scrollToScene(
       // Chip state is owned by the scrubbed dwell timeline; park everything
       // hidden and let ScrollTrigger.update() re-apply the correct progress.
       gsap.set(scene.querySelectorAll("[data-chip-item]"), { opacity: 0, x: 72 });
+      gsap.set(scene.querySelectorAll("[data-chip-backdrop]"), { opacity: 0 });
       const copyBlock = scene.querySelector<HTMLElement>("[data-scene-copy]");
       if (copyBlock) {
         gsap.set(copyBlock, { x: 0 });

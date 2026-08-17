@@ -1,0 +1,71 @@
+{
+  "model": "gemini-2.5-flash-image",
+  "entries": {
+    "01-title/better-health": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. Accent lighting: electric blue with a soft cyan aura. A single luminous glass wellness patch floats above the reflective floor, radiating slow concentric rings of healing light that ripple outward across the dark mirror surface. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/better-health.png",
+      "generatedAt": "2026-08-17T18:01:08.395Z"
+    },
+    "16x9/01-title/better-health": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue with a soft cyan aura. A single luminous glass wellness patch floats above the reflective floor, radiating slow concentric rings of healing light that ripple outward across the dark mirror surface. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/better-health.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-17T18:07:07.905Z"
+    },
+    "16x9/01-title/greater-freedom": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue. Ten thin streams of light rise from a single point on the reflective floor and arc outward like a fountain opening, each stream a slightly different cool hue. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/better-health.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/greater-freedom.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-17T18:07:23.899Z"
+    },
+    "16x9/01-title/bigger-impact": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue. A wave of light expands across the dark reflective floor toward a distant horizon lined with countless tiny glowing wireframe figures, each igniting as the wave reaches them. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/greater-freedom.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/bigger-impact.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-17T18:07:40.414Z"
+    },
+    "9x16/01-title/better-health": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue with a soft cyan aura. A single luminous glass wellness patch floats above the reflective floor, radiating slow concentric rings of healing light that ripple outward across the dark mirror surface. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/better-health.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-17T18:07:52.051Z"
+    },
+    "9x16/01-title/greater-freedom": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue. Ten thin streams of light rise from a single point on the reflective floor and arc outward like a fountain opening, each stream a slightly different cool hue. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/better-health.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/greater-freedom.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-17T18:08:07.997Z"
+    },
+    "9x16/01-title/bigger-impact": {
+      "prompt": "Premium keynote motion-graphic still in a Tron-like aesthetic: pitch-black void, luminous edge-lit glass structures, holographic wireframe light-figures, thin neon light trails, and a dark reflective floor mirroring every glow. Apple x Nike x McKinsey cinematic presentation style — large scale, abstract, restrained. Keep the hero subject in the center of frame with quiet, dark edges reserved for later interface overlays. All surfaces stay pure and unmarked: no HUD readouts, no data panels, no dashboards, no tiny glyph-like clusters, no interface markings or symbol-like details anywhere in the scene. Accent lighting: electric blue. A wave of light expands across the dark reflective floor toward a distant horizon lined with countless tiny glowing wireframe figures, each igniting as the wave reaches them. Match the palette, lighting mood, and floor reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean/sp-stack-01-title.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/greater-freedom.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/bigger-impact.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-17T18:08:22.578Z"
+    }
+  }
+}

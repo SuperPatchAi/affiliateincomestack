@@ -10,7 +10,9 @@ import {
   isIncomeStreamSlide,
   isStreamIndexSlide,
 } from "../../data/streamIndex";
+import { chipMediaForSlide } from "../../data/chipImagery";
 import type { SceneLifecycle } from "../../motion/experienceMotionConfig";
+import { ChipBackdrops } from "./ChipBackdrops";
 import { ChipStage } from "./ChipStage";
 import type { ProductionCtaLinks } from "./ctaLinks";
 import { SceneHero3d } from "./SceneHero3d";
@@ -63,6 +65,7 @@ export function ExperienceScene({
   const body = slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body;
   const hero3d = isHero3dExperienceSlide(slide.id);
   const pinDisclosure = Boolean(slide.chips?.length && slide.disclosure);
+  const chipMedia = slide.chips?.length ? chipMediaForSlide(slide.id, aspect) : [];
 
   return (
     <section
@@ -105,6 +108,9 @@ export function ExperienceScene({
                 priority={index === 0}
               />
             )}
+            {!reduceMotion && chipMedia.length > 0 ? (
+              <ChipBackdrops entries={chipMedia} attachVideo={attachVideo} />
+            ) : null}
           </div>
 
           <div className="scene-scrim" data-scene-scrim aria-hidden="true" />

@@ -425,6 +425,27 @@
   touch-action: pan-y;
 }
 
+/* Per-chip omni warp backdrops — opacity scrubbed by the dwell timeline. */
+.chip-backdrops {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.chip-backdrop {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.chip-backdrop video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .scene-hero3d-canvas {
   z-index: 1;
 }
@@ -603,8 +624,8 @@
   max-width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
 }
 
-/* Scroll-sequenced chips occupy the lower-third seat the copy vacates.
-   Items are grid-stacked; the motion hook drives opacity/x per scroll segment. */
+/* Video-timed chips occupy the lower-third seat the copy vacates. Items are
+   grid-stacked; the chip auto-cycle advances them as each omni clip ends. */
 .chip-stage {
   position: absolute;
   left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));

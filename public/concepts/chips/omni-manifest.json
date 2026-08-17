@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-08-17T18:47:17.083Z",
+  "aspects": [
+    "9:16"
+  ],
+  "results": [
+    {
+      "key": "9:16 01-title/better-health",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/better-health_omni.mp4",
+      "cost_usd": 0.8
+    },
+    {
+      "key": "9:16 01-title/greater-freedom",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/greater-freedom_omni.mp4",
+      "cost_usd": 0.8
+    },
+    {
+      "key": "9:16 01-title/bigger-impact",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/bigger-impact_omni.mp4",
+      "cost_usd": 0.8
+    }
+  ],
+  "okCount": 3,
+  "failCount": 0,
+  "cost_usd_sum": 2.4000000000000004
+}
