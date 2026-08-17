@@ -156,6 +156,15 @@ describe("ExperienceShell", () => {
       /\/concepts\/clean\/sp-stack-18-different\.webp$/,
     );
     expect(
+      container.querySelector('[data-slide="05-product"]')?.getAttribute("data-hero3d"),
+    ).toBe("true");
+    expect(
+      container.querySelector('[data-slide="05-product"] [data-scene-hero3d]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-slide="05-product"] video'),
+    ).toBeNull();
+    expect(
       container
         .querySelector('[data-slide="01-title"] [data-scene-poster]')
         ?.getAttribute("src"),

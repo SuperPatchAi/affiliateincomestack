@@ -6,6 +6,7 @@ import {
   PATCH_CAMERA_Y,
   PATCH_DIAMOND_ROLL,
   PATCH_FILL_INTENSITY,
+  PATCH_MODEL_URL,
   PATCH_SPOTLIGHTS,
   PATCH_TARGET_HEIGHT,
   PATCH_TONE_MAPPING_EXPOSURE,
@@ -15,6 +16,10 @@ import {
 } from "./patchHero";
 
 describe("patchHero framing", () => {
+  it("loads the SuperPatch logo GLB", () => {
+    expect(PATCH_MODEL_URL).toBe("/models/superpatch_logo.glb");
+  });
+
   it("fits the hero 20 percent larger than the half-size pass", () => {
     expect(PATCH_TARGET_HEIGHT).toBeCloseTo(0.93);
   });

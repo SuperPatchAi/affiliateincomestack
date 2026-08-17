@@ -1,4 +1,4 @@
-export const PATCH_MODEL_URL = "/models/superpatch-title.glb";
+export const PATCH_MODEL_URL = "/models/superpatch_logo.glb";
 
 export const TILT_YAW_MAX = (32 * Math.PI) / 180;
 export const TILT_PITCH_MAX = (22 * Math.PI) / 180;

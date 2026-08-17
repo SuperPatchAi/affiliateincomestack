@@ -4,7 +4,7 @@ import { PatchErrorBoundary } from "../hero3d/patchErrorBoundary";
 import { canUseWebGL } from "./hero3dExperienceSlide";
 
 type Props = {
-  /** Mount the live WebGL scene (active playing title slide). */
+  /** Mount the live WebGL scene (active playing title or product slide). */
   active: boolean;
   reducedMotion: boolean;
   poster: string;
