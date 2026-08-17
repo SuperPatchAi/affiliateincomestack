@@ -149,12 +149,9 @@ describe("ExperienceShell", () => {
     expect(
       container.querySelector('[data-slide="00-super-stack"]')?.getAttribute("data-hero3d"),
     ).toBe("true");
-    const titlePoster = container.querySelector<HTMLImageElement>(
-      '[data-slide="00-super-stack"] [data-scene-poster]',
-    );
-    expect(titlePoster?.getAttribute("src")).toMatch(
-      /\/concepts\/clean\/sp-stack-18-different\.webp$/,
-    );
+    expect(
+      container.querySelector('[data-slide="00-super-stack"] [data-scene-poster]'),
+    ).toBeNull();
     expect(
       container.querySelector('[data-slide="05-product"]')?.getAttribute("data-hero3d"),
     ).toBe("true");
@@ -233,6 +230,12 @@ describe("ExperienceShell", () => {
     expect(
       card?.querySelector("[data-scene-copy] [data-anim-layer='headline']"),
     ).toBeTruthy();
+  });
+
+  it("does not render the corner flywheel above scene titles", () => {
+    const { container } = render(<ExperienceShell />);
+    expect(container.querySelectorAll("[data-flywheel]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-flywheel-wrap]")).toHaveLength(0);
   });
 
   it("uses the approved Super Patch corporate mark in the chrome", () => {

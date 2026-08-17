@@ -15,6 +15,7 @@ import {
   PATCH_MODEL_URL,
   PATCH_TONE_MAPPING_EXPOSURE,
 } from "./patchHero";
+import { titleIntroCamera } from "./patchIntro";
 import { qualityTierConfig } from "./qualityTier";
 import {
   readViewportMetrics,
@@ -89,6 +90,8 @@ type Props = {
   variant?: Hero3dVariant;
   /** GLB for `variant="patch"` — logo on the opener, 3D patch on Product Stack. */
   modelUrl?: string;
+  compactScaleMul?: number;
+  cinematicIntro?: boolean;
   /** Surface R3F / useGLTF throws so the host can unmount the canvas. */
   onError?: () => void;
   /** First framed patch frame — host may hide the title poster. */
@@ -107,6 +110,8 @@ export function Hero3dCanvas({
   embedded = false,
   variant = "stack",
   modelUrl = PATCH_MODEL_URL,
+  compactScaleMul = 1,
+  cinematicIntro = false,
   onError,
   onReady,
 }: Props) {
@@ -142,6 +147,10 @@ export function Hero3dCanvas({
       viewport.portrait,
     ],
   );
+  const introStart = titleIntroCamera(0, PATCH_CAMERA_Y);
+  const patchCameraPosition = cinematicIntro
+    ? ([introStart.x, introStart.y, introStart.z] as const)
+    : ([0, PATCH_CAMERA_Y, PATCH_CAMERA_Z] as const);
 
   return (
     <div
@@ -161,7 +170,12 @@ export function Hero3dCanvas({
         dpr={[1, config.dprCap]}
         camera={
           variant === "patch"
-            ? { position: [0, PATCH_CAMERA_Y, PATCH_CAMERA_Z], fov: config.cameraFov, near: 0.05, far: 40 }
+            ? {
+                position: patchCameraPosition,
+                fov: config.cameraFov,
+                near: 0.05,
+                far: 40,
+              }
             : { position: [1.35, 1.15, 4.2], fov: config.cameraFov, near: 0.05, far: 40 }
         }
         gl={{
@@ -198,6 +212,8 @@ export function Hero3dCanvas({
               height={height}
               fovDeg={config.cameraFov}
               modelUrl={modelUrl}
+              compactScaleMul={compactScaleMul}
+              cinematicIntro={cinematicIntro}
               onReady={onReady}
             />
           </PatchErrorBoundary>

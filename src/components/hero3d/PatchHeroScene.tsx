@@ -16,6 +16,14 @@ import {
   patchResponsiveFrame,
 } from "./patchFrame";
 import {
+  titleIntroCamera,
+  titleIntroDurationSec,
+  titleIntroEase,
+  titleIntroIdleMix,
+  titleIntroProgress,
+  titleIntroSpinYaw,
+} from "./patchIntro";
+import {
   HOVER_FOLLOW_MS,
   HOVER_ROLL_MAX,
   HOVER_SCALE_BOOST,
@@ -55,6 +63,8 @@ type Props = {
   height: number;
   fovDeg: number;
   modelUrl?: string;
+  compactScaleMul?: number;
+  cinematicIntro?: boolean;
   onReady?: () => void;
 };
 
@@ -103,6 +113,8 @@ export function PatchHeroScene({
   height,
   fovDeg,
   modelUrl = PATCH_MODEL_URL,
+  compactScaleMul = 1,
+  cinematicIntro = false,
   onReady,
 }: Props) {
   useGLTF.preload(modelUrl);
@@ -119,8 +131,8 @@ export function PatchHeroScene({
   const didReportReady = useRef(false);
 
   const frame = useMemo(
-    () => patchResponsiveFrame({ width, height, fovDeg }),
-    [width, height, fovDeg],
+    () => patchResponsiveFrame({ width, height, fovDeg, compactScaleMul }),
+    [width, height, fovDeg, compactScaleMul],
   );
 
   const fit = useMemo(() => {
@@ -143,11 +155,14 @@ export function PatchHeroScene({
 
   useEffect(() => {
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.position.set(0, frame.yLift, PATCH_CAMERA_Z);
+      const start = cinematicIntro
+        ? titleIntroCamera(0, frame.yLift)
+        : { x: 0, y: frame.yLift, z: PATCH_CAMERA_Z };
+      camera.position.set(start.x, start.y, start.z);
       camera.lookAt(0, frame.yLift, 0);
       camera.updateProjectionMatrix();
     }
-  }, [camera, frame.yLift]);
+  }, [camera, cinematicIntro, frame.yLift]);
 
   useEffect(() => {
     const el = gl.domElement;
@@ -169,7 +184,20 @@ export function PatchHeroScene({
 
   useFrame((_, dt) => {
     elapsed.current += dt;
-    const idle =
+    const exitT = readTitlePatchExit(gl.domElement);
+    const introProgress =
+      cinematicIntro && !reducedMotion
+        ? exitT > 0
+          ? 1
+          : titleIntroProgress(
+              elapsed.current,
+              titleIntroDurationSec(frame.mode === "compact"),
+            )
+        : 1;
+    const introEased = titleIntroEase(introProgress);
+    const idleMix = cinematicIntro ? titleIntroIdleMix(introProgress) : 1;
+    const spinYaw = cinematicIntro ? titleIntroSpinYaw(introEased) : 0;
+    const rock =
       mode === "none"
         ? restPose()
         : idleRockAt(
@@ -178,16 +206,23 @@ export function PatchHeroScene({
             IDLE_ROCK_PITCH,
             IDLE_ROCK_HZ,
           );
+    const idle = {
+      yaw: rock.yaw * idleMix,
+      pitch: rock.pitch * idleMix,
+    };
+    const allowHover = introProgress >= 1;
     const directed =
-      mode === "tilt" && pointer.current
+      mode === "tilt" && pointer.current && allowHover
         ? tiltFromNdc(pointer.current, TILT_YAW_MAX, TILT_PITCH_MAX)
         : restPose();
     const target = mode === "none" ? restPose() : composeHeroPose(directed, idle);
     const followMs =
-      mode === "tilt" && pointer.current ? HOVER_FOLLOW_MS : TILT_RETURN_MS;
+      mode === "tilt" && pointer.current && allowHover
+        ? HOVER_FOLLOW_MS
+        : TILT_RETURN_MS;
     pose.current = dampPose(pose.current, target, dt, followMs);
     const targetFlex =
-      mode === "tilt"
+      mode === "tilt" && allowHover
         ? hoverFlexFromPointer(pointer.current, {
             scaleBoost: HOVER_SCALE_BOOST,
             zBoost: HOVER_Z_BOOST,
@@ -195,7 +230,15 @@ export function PatchHeroScene({
           })
         : { scale: 1, z: 0, roll: 0 };
     flex.current = dampHoverFlex(flex.current, targetFlex, dt, followMs);
-    const exitT = readTitlePatchExit(gl.domElement);
+    if (
+      cinematicIntro &&
+      !reducedMotion &&
+      camera instanceof THREE.PerspectiveCamera
+    ) {
+      const cam = titleIntroCamera(introEased, frame.yLift);
+      camera.position.set(cam.x, cam.y, cam.z);
+      camera.lookAt(0, frame.yLift, 0);
+    }
     if (gridRef.current) {
       gridRef.current.position.z = reducedMotion
         ? 0
@@ -207,7 +250,7 @@ export function PatchHeroScene({
       const pos = patchInstanceWorldPosition(instance, fit.lift, exitT);
       node.position.set(pos.x, pos.y, pos.z + flex.current.z);
       node.rotation.order = "YXZ";
-      node.rotation.y = pose.current.yaw;
+      node.rotation.y = pose.current.yaw + spinYaw;
       node.rotation.x = pose.current.pitch;
       node.rotation.z = PATCH_DIAMOND_ROLL + flex.current.roll;
       node.scale.setScalar(fit.scale * instance.scale * flex.current.scale);

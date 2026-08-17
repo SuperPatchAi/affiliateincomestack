@@ -7,10 +7,12 @@ type Props = {
   /** Mount the live WebGL scene (active playing title or product slide). */
   active: boolean;
   reducedMotion: boolean;
-  poster: string;
+  poster?: string;
   priority?: boolean;
   /** Per-scene GLB — logo on the opener, 3D patch on Product Stack. */
   modelUrl?: string;
+  compactScaleMul?: number;
+  cinematicIntro?: boolean;
 };
 
 /**
@@ -24,6 +26,8 @@ export function SceneHero3d({
   poster,
   priority = false,
   modelUrl,
+  compactScaleMul = 1,
+  cinematicIntro = false,
 }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 390, height: 844 });
@@ -70,16 +74,18 @@ export function SceneHero3d({
       data-scene-hero3d
       data-hero3d-active={mountCanvas ? "true" : "false"}
     >
-      <img
-        className="scene-poster"
-        data-scene-poster
-        src={poster}
-        alt=""
-        draggable={false}
-        decoding={priority ? "sync" : "async"}
-        fetchPriority={priority ? "high" : "auto"}
-        style={{ opacity: posterHidden ? 0 : 1 }}
-      />
+      {poster ? (
+        <img
+          className="scene-poster"
+          data-scene-poster
+          src={poster}
+          alt=""
+          draggable={false}
+          decoding={priority ? "sync" : "async"}
+          fetchPriority={priority ? "high" : "auto"}
+          style={{ opacity: posterHidden ? 0 : 1 }}
+        />
+      ) : null}
       {mountCanvas ? (
         <div className="scene-hero3d-canvas">
           <PatchErrorBoundary onError={handlePatchError}>
@@ -90,6 +96,8 @@ export function SceneHero3d({
               embedded
               variant="patch"
               modelUrl={modelUrl}
+              compactScaleMul={compactScaleMul}
+              cinematicIntro={cinematicIntro}
               onError={handlePatchError}
               onReady={handlePatchReady}
             />

@@ -60,16 +60,21 @@ export function patchResponsiveFrame(input: {
   height: number;
   fovDeg: number;
   cameraZ?: number;
+  /** Compact-only scale. Title opener uses 1.2; Product Stack stays 1. */
+  compactScaleMul?: number;
 }): PatchResponsiveFrame {
   const mode = patchLayoutMode(input.width, input.height);
   const view = visibleSizeAtOrigin(input);
   const yLiftFrac = mode === "wide" ? 0.044 : 0.08;
+  const compactMul =
+    mode === "compact" ? Math.max(0.2, input.compactScaleMul ?? 1) : 1;
   return {
     mode,
-    targetHeight: Math.min(
-      view.height * PATCH_VIEW_HEIGHT_FRAC,
-      view.width * PATCH_VIEW_WIDTH_FRAC,
-    ),
+    targetHeight:
+      Math.min(
+        view.height * PATCH_VIEW_HEIGHT_FRAC,
+        view.width * PATCH_VIEW_WIDTH_FRAC,
+      ) * compactMul,
     yLift: view.height * yLiftFrac,
   };
 }

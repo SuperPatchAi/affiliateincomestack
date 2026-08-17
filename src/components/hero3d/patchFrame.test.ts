@@ -74,6 +74,30 @@ describe("patchFitTransform", () => {
     expect(compact.targetHeight / compactView.width).toBeLessThan(0.4);
   });
 
+  it("can enlarge the compact title logo by 20 percent without changing wide", () => {
+    const compact = patchResponsiveFrame({
+      width: 390,
+      height: 844,
+      fovDeg: 40,
+    });
+    const title = patchResponsiveFrame({
+      width: 390,
+      height: 844,
+      fovDeg: 40,
+      compactScaleMul: 1.2,
+    });
+    const wide = patchResponsiveFrame({
+      width: 1440,
+      height: 900,
+      fovDeg: 32,
+      compactScaleMul: 1.2,
+    });
+    expect(title.targetHeight / compact.targetHeight).toBeCloseTo(1.2);
+    expect(wide.targetHeight).toBeCloseTo(
+      patchResponsiveFrame({ width: 1440, height: 900, fovDeg: 32 }).targetHeight,
+    );
+  });
+
   it("places the perspective grid under the patch and recedes it over time", () => {
     const frame = patchResponsiveFrame({
       width: 1440,

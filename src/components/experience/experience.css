@@ -540,7 +540,7 @@
   flex-direction: column;
   gap: 0.08em;
   font-family: var(--font-display);
-  font-size: clamp(1.85rem, 4.6vw, 4.6rem);
+  font-size: clamp(2.35rem, 5.8vw, 5.75rem);
   line-height: 0.98;
   letter-spacing: 0.045em;
   font-weight: 900;
@@ -831,6 +831,15 @@
     bottom: calc(clamp(76px, 10vh, 112px) + var(--safe-bottom));
     width: auto;
     max-width: none;
+  }
+
+  .scene-copy-hero {
+    top: 72%;
+    width: min(94vw, 900px);
+  }
+
+  .scene-hero-title {
+    font-size: clamp(2.5rem, 9.4vw, 3.85rem);
   }
 
   .scene-headline {

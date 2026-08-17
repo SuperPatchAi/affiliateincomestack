@@ -21,6 +21,16 @@ export function hero3dModelUrl(slideId: string): string {
   return slideId === "05-product" ? PRODUCT_PATCH_MODEL_URL : PATCH_MODEL_URL;
 }
 
+/** Title opener only — 20% larger logo on compact / portrait. */
+export function hero3dCompactScaleMul(slideId: string): number {
+  return slideId === HERO3D_EXPERIENCE_SLIDE_ID ? 1.2 : 1;
+}
+
+/** Title opener only — camera flyover + one spin, then idle rock. */
+export function hero3dPlaysCinematicIntro(slideId: string): boolean {
+  return slideId === HERO3D_EXPERIENCE_SLIDE_ID;
+}
+
 /** Prefer WebGL2, fall back to WebGL1; false in jsdom / data-saver paths. */
 export function canUseWebGL(
   createCanvas: () => HTMLCanvasElement = () =>

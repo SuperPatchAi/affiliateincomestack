@@ -11,12 +11,13 @@ import {
   isStreamIndexSlide,
 } from "../../data/streamIndex";
 import type { SceneLifecycle } from "../../motion/experienceMotionConfig";
-import { Flywheel } from "../Flywheel";
 import { ChipStage } from "./ChipStage";
 import type { ProductionCtaLinks } from "./ctaLinks";
 import { SceneHero3d } from "./SceneHero3d";
 import {
+  hero3dCompactScaleMul,
   hero3dModelUrl,
+  hero3dPlaysCinematicIntro,
   isHero3dExperienceSlide,
 } from "./hero3dExperienceSlide";
 import { SceneVideo } from "./SceneVideo";
@@ -85,9 +86,15 @@ export function ExperienceScene({
                 // Do not gate on attachVideo/data-save — that forced the Omni poster on mobile.
                 active={autoplay || lifecycle === "active"}
                 reducedMotion={reduceMotion}
-                poster={variant.poster}
+                poster={
+                  hero3dPlaysCinematicIntro(slide.id)
+                    ? undefined
+                    : variant.poster
+                }
                 priority={index === 0}
                 modelUrl={hero3dModelUrl(slide.id)}
+                compactScaleMul={hero3dCompactScaleMul(slide.id)}
+                cinematicIntro={hero3dPlaysCinematicIntro(slide.id)}
               />
             ) : (
               <SceneVideo
@@ -123,11 +130,6 @@ export function ExperienceScene({
               tabIndex={0}
               aria-label={`${slide.headline} scene copy`}
             >
-              {slide.flywheelArc ? (
-                <div className="scene-flywheel" data-flywheel-wrap>
-                  <Flywheel active={slide.flywheelArc} size="corner" />
-                </div>
-              ) : null}
               <p
                 className="scene-eyebrow"
                 data-anim="eyebrow"
