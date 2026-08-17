@@ -21,6 +21,12 @@ export type ChipImageSpec = {
   subject: string;
   /** Motion note reused when the still is animated with Omni. */
   motion: string;
+  /** Optional style anchor override (defaults to CHIP_STYLE_ANCHOR). */
+  style?: string;
+  /** Optional scene setting for the motion prompt (defaults to the dark void). */
+  setting?: string;
+  /** Optional vertically-native recomposition used for 9:16 renders. */
+  portraitSubject?: string;
 };
 
 export type PlateRetakeSpec = {
@@ -30,6 +36,8 @@ export type PlateRetakeSpec = {
   accent: string;
   subject: string;
   motion: string;
+  /** Optional style anchor override (defaults to CHIP_STYLE_ANCHOR). */
+  style?: string;
 };
 
 /** Canonical deck style — matches the fifteen on-style clean plates. */
@@ -43,22 +51,67 @@ export const CHIP_STYLE_ANCHOR =
   "no data panels, no dashboards, no tiny glyph-like clusters, no interface markings " +
   "or symbol-like details anywhere in the scene.";
 
-export function buildChipImagePrompt(spec: ChipImageSpec): string {
+/**
+ * Real-world style anchor shared by the photoreal scenes (01-title, 02-world):
+ * cinematic photography of a neon night city instead of the abstract Tron
+ * void, still strictly text-free.
+ */
+export const NEON_CITY_STYLE_ANCHOR =
+  "Cinematic photorealistic night-city photograph: a rain-slicked metropolis " +
+  "after dark, alive with vivid mixed neon color — cyan, magenta, amber, and " +
+  "violet — glowing from windows, abstract signage shapes, and traffic light " +
+  "trails, with wet asphalt and glass mirroring every glow. Shot like a premium " +
+  "Apple x Nike commercial on anamorphic lenses: shallow depth of field, deep " +
+  "clean blacks, cinematic contrast. Keep the hero subject centered with " +
+  "quieter, darker edges reserved for later interface overlays. Every sign, " +
+  "screen, and billboard reads as pure abstract glowing shape or soft bokeh — " +
+  "no readable characters anywhere in the scene.";
+
+export function buildChipImagePrompt(
+  spec: ChipImageSpec,
+  aspect: ChipAspect = "16:9",
+): string {
+  const subject =
+    aspect === "9:16" && spec.portraitSubject
+      ? spec.portraitSubject
+      : spec.subject;
   return [
-    CHIP_STYLE_ANCHOR,
+    spec.style ?? CHIP_STYLE_ANCHOR,
     `Accent lighting: ${spec.accent}.`,
-    spec.subject,
-    "Match the palette, lighting mood, and floor reflections of the reference images exactly.",
+    subject,
+    "Match the palette, lighting mood, and reflections of the reference images exactly.",
+    OMNI_TEXT_BAN,
+  ].join(" ");
+}
+
+/**
+ * Portrait pass for photoreal chips: rather than composing 9:16 from scratch
+ * (which reliably produces letterboxed collages), recompose the approved 16:9
+ * still — attached as the sole reference — into one continuous vertical frame.
+ */
+export function buildPortraitRecomposePrompt(spec: ChipImageSpec): string {
+  return [
+    "Recompose the attached photograph as a tall vertical portrait image for a phone screen.",
+    "Keep the exact same scene, subject, lighting, palette, and photographic style.",
+    "One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge —",
+    "no black bars, no borders, no split panels, no collage.",
+    "Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter, darker, and softer.",
     OMNI_TEXT_BAN,
   ].join(" ");
 }
 
 export function buildPlateRetakePrompt(spec: PlateRetakeSpec): string {
   return [
-    CHIP_STYLE_ANCHOR,
+    spec.style ?? CHIP_STYLE_ANCHOR,
     `Accent lighting: ${spec.accent}.`,
     spec.subject,
-    "Match the palette, lighting mood, and floor reflections of the reference images exactly.",
+    // Style-override retakes render without style references; the anchor
+    // itself carries the look.
+    ...(spec.style
+      ? []
+      : [
+          "Match the palette, lighting mood, and reflections of the reference images exactly.",
+        ]),
     OMNI_TEXT_BAN,
   ].join(" ");
 }
@@ -84,15 +137,25 @@ export function chipVideoPath(
 }
 
 /**
- * Slides whose per-chip stills + omni clips have been generated (both aspects)
- * and live under public/concepts/chips/<slideId>/. Add ids here as batches land.
+ * Slides whose per-chip stills have been generated (both aspects) and live
+ * under public/concepts/chips/<slideId>/. Add ids here as batches land.
  */
-export const CHIP_MEDIA_READY_SLIDES: readonly string[] = ["01-title"];
+export const CHIP_MEDIA_READY_SLIDES: readonly string[] = [
+  "01-title",
+  "02-world",
+];
+
+/**
+ * Slides whose omni warp clips have also been generated (both aspects).
+ * Slides listed in CHIP_MEDIA_READY_SLIDES but not here run stills-only:
+ * the poster shows and the chip cycle advances on its fallback timer.
+ */
+export const CHIP_VIDEO_READY_SLIDES: readonly string[] = [];
 
 export type ChipMediaEntry = {
   slug: string;
-  /** Omni warp clip for this chip beat. */
-  video: string;
+  /** Omni warp clip for this chip beat; absent when the slide is stills-only. */
+  video?: string;
   /** Text-free still, used as the video poster / reduced-motion fallback. */
   poster: string;
 };
@@ -103,11 +166,12 @@ export function chipMediaForSlide(
   aspect: "landscape" | "portrait",
 ): ChipMediaEntry[] {
   if (!CHIP_MEDIA_READY_SLIDES.includes(slideId)) return [];
+  const hasVideo = CHIP_VIDEO_READY_SLIDES.includes(slideId);
   const chipAspect: ChipAspect = aspect === "landscape" ? "16:9" : "9:16";
   return CHIP_IMAGE_SPECS.filter((spec) => spec.slideId === slideId).map(
     (spec) => ({
       slug: spec.slug,
-      video: chipVideoPath(spec, chipAspect),
+      ...(hasVideo ? { video: chipVideoPath(spec, chipAspect) } : {}),
       poster: chipImagePath(spec, chipAspect),
     }),
   );
@@ -128,11 +192,17 @@ export function buildChipMotionPrompt(
       `light trails shifting toward ${next.accent} as the frame fills with motion blur.`
     : `[6-8s] Ease every element back toward the opening composition so the clip loops cleanly, ` +
       `letting the scene settle to rest.`;
+  const setting =
+    spec.setting ??
+    `Dark void with ${spec.accent} accent lighting on a dark reflective floor.`;
+  const aesthetic = spec.setting
+    ? "Premium Apple x Nike commercial film aesthetic — large scale, cinematic, photoreal motion."
+    : "Apple x Nike x McKinsey cinematic presentation aesthetic — large scale, premium, abstract motion.";
   return [
     "In a single continuous shot with no scene cuts.",
-    "<FIRST_FRAME> Animate this premium keynote motion graphic still.",
-    `Dark void with ${spec.accent} accent lighting on a dark reflective floor.`,
-    "Apple x Nike x McKinsey cinematic presentation aesthetic — large scale, premium, abstract motion.",
+    `<FIRST_FRAME> Animate this ${spec.setting ? "cinematic photoreal still" : "premium keynote motion graphic still"}.`,
+    setting,
+    aesthetic,
     "[0-2s] Awaken the composition with a restrained camera drift.",
     `[2-6s] ${spec.motion} Keep primary motion in the center sixty percent of the frame; quieter edges for later interface overlays.`,
     exit,
@@ -141,74 +211,101 @@ export function buildChipMotionPrompt(
 }
 
 export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
-  // 01-title — Health / Freedom / Impact (blue)
+  // 01-title — Health / Freedom / Impact, real people in the neon city
   {
     slideId: "01-title",
     chipIndex: 0,
     slug: "better-health",
-    accent: "electric blue with a soft cyan aura",
+    accent: "cool cyan rim light against warm amber street glow",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
     subject:
-      "A single luminous glass wellness patch floats above the reflective floor, radiating slow concentric rings of healing light that ripple outward across the dark mirror surface.",
+      "A lone runner in sleek athletic gear sprints across a rain-slicked city crosswalk at night, caught mid-stride, body reading as a crisp silhouette rimmed in cyan light. Amber and magenta neon reflections ripple across the wet asphalt beneath each step, and the street behind dissolves into soft glowing bokeh.",
     motion:
-      "The patch bobs gently while rings of light pulse outward across the floor.",
+      "The runner strides through the crosswalk as neon reflections ripple across the wet asphalt beneath each footfall.",
   },
   {
     slideId: "01-title",
     chipIndex: 1,
     slug: "greater-freedom",
-    accent: "electric blue",
+    accent: "violet and cyan skyline glow under a deep dark sky",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A high rooftop terrace at night above a vast glowing neon metropolis.",
     subject:
-      "Ten thin streams of light rise from a single point on the reflective floor and arc outward like a fountain opening, each stream a slightly different cool hue.",
+      "A person stands relaxed at the railing of a high rooftop terrace at night, back to camera, jacket stirring in the wind, gazing out over a vast metropolis that stretches to the horizon in fields of cyan, magenta, and amber light. The sky above stays deep, dark, and open.",
     motion:
-      "Streams rise and fan outward, particles drifting off their crests.",
+      "The jacket stirs in the wind while the sea of city lights shimmers softly far below.",
   },
   {
     slideId: "01-title",
     chipIndex: 2,
     slug: "bigger-impact",
-    accent: "electric blue",
+    accent: "warm amber crowd glow amid vivid mixed neon",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A great rain-slicked city intersection at night, seen from high above.",
     subject:
-      "A wave of light expands across the dark reflective floor toward a distant horizon lined with countless tiny glowing wireframe figures, each igniting as the wave reaches them.",
+      "Seen from high above, a great city intersection at night fills with people crossing in every direction, their umbrellas catching the surrounding neon so each one glows a different color — a spreading field of small colored lights moving together across the rain-slicked crossing, mirrored in the wet asphalt. The surrounding towers carry no signboards or billboards at all: their facades glow purely with bare neon tubes, colored strip lights, and blurred lit windows.",
     motion:
-      "The wave sweeps outward and the horizon figures ignite in sequence.",
+      "The crowd flows through the crossing as the glowing umbrella colors drift and mingle across the wet asphalt.",
   },
 
-  // 02-world — how earning changed (cool)
+  // 02-world — one real neon city, four real ways people earn in it
   {
     slideId: "02-world",
     chipIndex: 0,
     slug: "traditional-jobs",
-    accent: "dim steel blue",
+    accent: "cool fluorescent white-blue against warm amber street glow",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
     subject:
-      "A single dim glass column stands locked inside a rigid lattice cage of faint light lines, evenly gridded like an endless office, cold and motionless.",
-    motion: "The cage lines hum faintly while the column stays fixed.",
+      "A towering glass office block fills the frame at night, shot from street level looking up: a vast grid of identical fluorescent-lit windows with tiny silhouettes still working at desks, row after row. Below, the rain-slicked street mirrors the tower's cold light while one warm streetlamp glows at the curb.",
+    motion:
+      "Window lights flicker subtly across the tower while a thin sheet of rain drifts past the streetlamp.",
   },
   {
     slideId: "02-world",
     chipIndex: 1,
     slug: "gig-economy",
-    accent: "cool cyan",
+    accent: "magenta and cyan neon streaked across wet asphalt",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
     subject:
-      "Dozens of small glass shards drift loosely through the void, each glowing on its own but unconnected, scattering soft reflections across the dark floor.",
-    motion: "Shards drift and slowly rotate, never touching.",
+      "A delivery rider on a scooter cuts through a narrow rain-slicked street at night, insulated courier box on the back. The street has no signboards at all: it is lit purely by bare neon tubes, colored strip lights, and glowing shop windows, all smeared by motion blur into ribbons of magenta and cyan. The rider reads as a silhouette in a wet jacket; the handlebar-mounted phone glows as a soft blank rectangle of light.",
+    motion:
+      "The rider leans through the street as neon reflections streak past in the wet asphalt.",
   },
   {
     slideId: "02-world",
     chipIndex: 2,
     slug: "creator-economy",
-    accent: "cool cyan and violet",
+    accent: "warm amber ring-light glow against violet and cyan city bokeh",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A dim apartment home studio at night above a neon city, warm practicals against cool bokeh.",
     subject:
-      "One glowing wireframe figure stands at center projecting thin beams of light outward to a constellation of small floating glass panes that brighten as the beams arrive.",
-    motion: "Beams sweep outward and panes flare one by one.",
+      "Inside a dim apartment at night, a creator sits with their back to camera at a desk, facing a glowing ring light and a camera on a tripod, warm amber light pooling around them. Behind the desk a floor-to-ceiling window reveals the neon city below as soft violet and cyan bokeh. Every screen faces away or glows as a soft blank shape.",
+    motion:
+      "The ring light breathes warmly while city bokeh twinkles beyond the window.",
   },
   {
     slideId: "02-world",
     chipIndex: 3,
     slug: "social-commerce",
-    accent: "cool cyan",
+    accent: "vivid mixed neon shop glow — pink, cyan, and amber",
+    style: NEON_CITY_STYLE_ANCHOR,
+    setting:
+      "A small neon-lit shop counter at night in the city, vivid mixed glow on close surfaces.",
     subject:
-      "A flowing ribbon of glowing glass panes streams between wireframe figures, light passing hand to hand along the ribbon like momentum moving through a feed.",
-    motion: "The ribbon flows continuously, glow passing pane to pane.",
+      "At a small neon-lit shop counter at night, a pair of hands holds a phone upright to film a product standing on the counter, the vertical phone screen a soft blank rectangle of glow. The shop has no signs or lettering anywhere: tall shelves of colorfully lit products rise high behind the counter, outlined purely by bare colored neon tubes and strip lights that melt into vivid pink, cyan, and amber bokeh. One single continuous photograph filling the whole frame.",
+    portraitSubject:
+      "A vertical over-the-shoulder photograph in one unbroken depth of field: a person stands at a small neon-lit shop counter at night, holding a phone upright to film a product on the counter, the phone screen a soft blank glow. Tall shelves of colorfully lit products tower above the counter, lit only by bare pink, cyan, and amber neon tubes — no signs or lettering anywhere — the highest shelves dissolving into soft bokeh. One single continuous photograph, one camera, one focus plane, filling the whole frame edge to edge.",
+    motion:
+      "The hands steady the phone as neon bokeh shimmers and colored glow shifts across the product.",
   },
 
   // 03-four-stacks — one pillar per chip (multi)
@@ -752,6 +849,16 @@ export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
 
 /** The four photographic plates that break the Tron arc, remade in deck style. */
 export const PLATE_RETAKES: PlateRetakeSpec[] = [
+  {
+    plateFile: "sp-stack-02-world.png",
+    slideId: "02-world",
+    accent: "vivid mixed neon — cyan, magenta, amber, violet — over deep night blacks",
+    style: NEON_CITY_STYLE_ANCHOR,
+    subject:
+      "A sweeping aerial view from high above a vast real metropolis at night after rain: one great avenue of white and amber headlight trails flows in from the foreground, then splits and branches into many glowing routes that spread through the neon grid of the city, each branch taking on its own color as it weaves between towers lit cyan, magenta, amber, and violet. Wet streets and glass facades mirror every light. The skyline recedes to a softly glowing horizon under a dark clear sky, and the upper band of the frame stays quiet and dark.",
+    motion:
+      "Traffic light-trails stream along the great avenue, split at the branch point, and flow outward through the neon grid while window lights flicker softly across the towers.",
+  },
   {
     plateFile: "sp-stack-13-executive.png",
     slideId: "13-executive",

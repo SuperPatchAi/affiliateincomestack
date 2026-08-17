@@ -30,8 +30,12 @@ const MANIFEST_PATH = join(CHIP_OUT, "manifest.json");
 const MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
 const API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
 
-/** Style references for the four plate retakes: same-accent on-style plates. */
+/**
+ * Style references for the plate retakes: same-accent on-style plates.
+ * The world plate is photoreal (own style anchor) and renders without refs.
+ */
 const RETAKE_REFS = {
+  "sp-stack-02-world.png": [],
   "sp-stack-13-executive.png": ["sp-stack-08-fast-start.png", "sp-stack-07-development.png"],
   "sp-stack-19-future.png": ["sp-stack-08-fast-start.png", "sp-stack-06-ten-layers.png"],
   "sp-stack-15-closing.png": ["sp-stack-08-fast-start.png", "sp-stack-12-generations.png"],
@@ -81,21 +85,38 @@ function imagePart(path) {
   };
 }
 
-async function generateImage({ apiKey, prompt, refPaths, outPath, aspect }) {
+async function generateImage({
+  apiKey,
+  prompt,
+  refPaths,
+  outPath,
+  aspect,
+  styled,
+  recompose = false,
+}) {
   const portraitNote =
-    aspect === "9:16"
-      ? " Vertical portrait composition for a phone screen: stack the scene " +
-        "vertically, keep the hero subject in the middle band of the frame, " +
-        "and leave the top and bottom thirds quiet and dark."
+    aspect === "9:16" && !recompose
+      ? styled
+        ? " Vertical portrait composition for a phone screen: recompose the " +
+          "photograph to fill the entire vertical frame edge to edge with the " +
+          "scene — absolutely no black bars, borders, or letterboxing. Keep " +
+          "the hero subject in the middle band with the upper and lower " +
+          "thirds dim and out of focus but still part of the continuous scene."
+        : " Vertical portrait composition for a phone screen: stack the scene " +
+          "vertically, keep the hero subject in the middle band of the frame, " +
+          "and leave the top and bottom thirds quiet and dark."
+      : "";
+  // Recompose mode inverts the usual ref guidance: the prompt itself asks the
+  // model to re-frame the attached photograph, so no style-only note applies.
+  const refNote =
+    refPaths.length > 0 && !recompose
+      ? " Use the attached reference images strictly as the style, " +
+        "palette, lighting, and reflection guide. Compose a brand new scene; " +
+        "do not copy the reference composition."
       : "";
   const parts = [
     ...refPaths.map(imagePart),
-    {
-      text:
-        `${prompt} Use the attached reference images strictly as the style, ` +
-        "palette, lighting, and floor-reflection guide. Compose a brand new scene; " +
-        `do not copy the reference composition.${portraitNote}`,
-    },
+    { text: `${prompt}${refNote}${portraitNote}` },
   ];
   const body = {
     contents: [{ parts }],
@@ -180,14 +201,20 @@ async function main() {
     PLATE_RETAKES,
     buildChipImagePrompt,
     buildPlateRetakePrompt,
+    buildPortraitRecomposePrompt,
     chipImagePath,
   } = imagery;
   const slideById = new Map(slides.SLIDES.map((s) => [s.id, s]));
   const manifest = loadManifest();
 
   if (retakesMode) {
+    // Optional slide-id args narrow which retakes run (e.g. --retakes 02-world).
+    const retakes =
+      slideIds.length > 0
+        ? PLATE_RETAKES.filter((r) => slideIds.includes(r.slideId))
+        : PLATE_RETAKES;
     for (const aspect of aspects) {
-      for (const retake of PLATE_RETAKES) {
+      for (const retake of retakes) {
         const outPath = join(RETAKE_OUT, aspectDir(aspect), retake.plateFile);
         if (existsSync(outPath) && !force) {
           console.log(`skip (exists): ${aspectDir(aspect)}/${retake.plateFile}`);
@@ -199,7 +226,14 @@ async function main() {
         const prompt = buildPlateRetakePrompt(retake);
         console.log(`retake: ${aspectDir(aspect)}/${retake.plateFile}`);
         await withRetries(() =>
-          generateImage({ apiKey, prompt, refPaths, outPath, aspect }),
+          generateImage({
+            apiKey,
+            prompt,
+            refPaths,
+            outPath,
+            aspect,
+            styled: Boolean(retake.style),
+          }),
         );
         manifest.entries[`retake:${aspectDir(aspect)}/${retake.plateFile}`] = {
           prompt,
@@ -239,17 +273,38 @@ async function main() {
         continue;
       }
 
-      const platePath = join(APP, "public", slide.conceptSrc.replace(/^\//, ""));
-      const refPaths = [platePath];
-      const prev = prevBySlide.get(spec.slideId);
-      if (prev && existsSync(prev)) refPaths.push(prev);
+      // Style-override chips (photoreal scenes) render without references —
+      // chained refs force the model to clone the plate's composition.
+      // Their 9:16 pass instead recomposes the approved 16:9 still, which
+      // avoids the letterboxed-collage failure mode of fresh portrait renders.
+      const widePath = join(APP, "public", chipImagePath(spec, "16:9"));
+      const recompose =
+        Boolean(spec.style) && aspect === "9:16" && existsSync(widePath);
+      const refPaths = [];
+      if (recompose) {
+        refPaths.push(widePath);
+      } else if (!spec.style) {
+        refPaths.push(join(APP, "public", slide.conceptSrc.replace(/^\//, "")));
+        const prev = prevBySlide.get(spec.slideId);
+        if (prev && existsSync(prev)) refPaths.push(prev);
+      }
 
-      const prompt = buildChipImagePrompt(spec);
+      const prompt = recompose
+        ? buildPortraitRecomposePrompt(spec)
+        : buildChipImagePrompt(spec, aspect);
       console.log(
-        `chip: ${spec.slideId}/${spec.slug} ${aspect} (${refPaths.length} refs)`,
+        `chip: ${spec.slideId}/${spec.slug} ${aspect} (${refPaths.length} refs${recompose ? ", recompose" : ""})`,
       );
       await withRetries(() =>
-        generateImage({ apiKey, prompt, refPaths, outPath, aspect }),
+        generateImage({
+          apiKey,
+          prompt,
+          refPaths,
+          outPath,
+          aspect,
+          styled: Boolean(spec.style),
+          recompose,
+        }),
       );
       prevBySlide.set(spec.slideId, outPath);
       manifest.entries[`${aspectDir(aspect)}/${spec.slideId}/${spec.slug}`] = {

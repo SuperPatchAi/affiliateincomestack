@@ -55,6 +55,19 @@ describe("ChipBackdrops", () => {
     expect(video.getAttribute("poster")).toBe(ENTRIES[0].poster);
   });
 
+  it("shows only the poster for stills-only entries, so the cycle falls back to its timer", () => {
+    const stillsOnly = ENTRIES.map(({ video: _video, ...rest }) => rest);
+    const { container } = render(
+      <ChipBackdrops entries={stillsOnly} attachVideo={true} />,
+    );
+    const video = container.querySelector<HTMLVideoElement>(
+      "[data-chip-backdrop] video",
+    )!;
+    expect(video.getAttribute("src")).toBeNull();
+    expect(video.getAttribute("preload")).toBe("none");
+    expect(video.getAttribute("poster")).toBe(ENTRIES[0].poster);
+  });
+
   it("renders nothing without entries", () => {
     const { container } = render(
       <ChipBackdrops entries={[]} attachVideo={true} />,

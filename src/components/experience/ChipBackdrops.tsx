@@ -25,11 +25,11 @@ export function ChipBackdrops({
           data-chip-index={index}
         >
           <video
-            src={attachVideo ? entry.video : undefined}
+            src={attachVideo && entry.video ? entry.video : undefined}
             poster={entry.poster}
             muted
             playsInline
-            preload={attachVideo ? "auto" : "none"}
+            preload={attachVideo && entry.video ? "auto" : "none"}
             disablePictureInPicture
             tabIndex={-1}
             aria-hidden="true"
