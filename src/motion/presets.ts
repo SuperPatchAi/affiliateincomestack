@@ -50,6 +50,12 @@ function beat(id: string, options: BeatOptions = {}): MotionBeat {
 
 /** Motion preset SSOT shared by the web experience and Remotion film. */
 export const MOTION_PRESETS = {
+  "hero-patch": beat("hero-patch", {
+    policy: "copy-only",
+    settle: 18,
+    from: { y: 28, scale: 1.04 },
+    ambientScale: [1, 1.03],
+  }),
   "parallax-slabs": beat("parallax-slabs", {
     settle: 60,
     from: { opacity: 0, y: 0, scale: 1 },

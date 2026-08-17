@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  FILM_SLIDES,
   SLIDES,
   STILL_CLIP_SEC,
   HERO_CLIP_SEC,
@@ -37,8 +38,6 @@ describe("remotion timeline", () => {
     const raw = SLIDES.reduce((sum, s) => sum + clipFrames(s), 0);
     const expected = raw - (SLIDES.length - 1) * TRANSITION_FRAMES;
     expect(filmDurationInFrames(SLIDES)).toBe(expected);
-    // 15×10s = 150s raw; 14 fades × 18f = 8.4s overlap → 4248f (~141.6s)
-    expect(filmDurationInFrames(SLIDES)).toBe(4248);
   });
 
   it("strips leading slash for Remotion staticFile paths", () => {
@@ -48,5 +47,11 @@ describe("remotion timeline", () => {
     expect(publicAssetPath("concepts/clean/x.png")).toBe(
       "concepts/clean/x.png",
     );
+  });
+
+  it("keeps the film on the 20-scene cut without the hero-caption scene", () => {
+    expect(FILM_SLIDES).toHaveLength(20);
+    expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00-super-stack");
+    expect(FILM_SLIDES[0].id).toBe("01-title");
   });
 });

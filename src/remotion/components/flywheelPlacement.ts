@@ -5,7 +5,7 @@ export type FlywheelPlacement = "hero" | "corner";
 /**
  * Remotion flywheel placement from slide metadata.
  * Slide 04 (`flywheel-scrub`) gets a hero overlay; other `flywheelArc` slides get corner.
- * Slides without `flywheelArc` (e.g. 02-question) render none.
+ * Slides without `flywheelArc` (e.g. 02-world) render none.
  */
 export function flywheelPlacement(slide: Slide): FlywheelPlacement | null {
   if (!slide.flywheelArc) return null;

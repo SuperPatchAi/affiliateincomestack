@@ -10,6 +10,7 @@ import {
   mediaWindow,
   publicExperiencePath,
   resolveExperienceSrc,
+  type ExperienceMedia,
 } from "./experienceMedia";
 
 const appRoot = resolve(import.meta.dirname, "../..");
@@ -20,16 +21,24 @@ function fileMd5(publicPath: string): string {
 }
 
 describe("experienceMedia", () => {
-  it("maps exactly 15 unique scenes that match SLIDES order", () => {
-    expect(EXPERIENCE_MEDIA).toHaveLength(15);
+  it("maps exactly 21 unique scenes that match SLIDES order", () => {
+    expect(EXPERIENCE_MEDIA).toHaveLength(SLIDES.length);
+    expect(EXPERIENCE_MEDIA).toHaveLength(21);
     expect(EXPERIENCE_MEDIA.map((m) => m.slideId)).toEqual(
       SLIDES.map((s) => s.id),
     );
-    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(15);
+    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(21);
   });
 
-  it("provides landscape and portrait clips plus WebP posters for every scene", () => {
+  it("provides Omni mp4s for motion scenes and empty src for still-only rows", () => {
     for (const media of EXPERIENCE_MEDIA) {
+      if (media.stillOnly) {
+        expect(media.landscape.src).toBe("");
+        expect(media.portrait.src).toBe("");
+        expect(media.landscape.poster).toMatch(/^\/concepts\/clean\//);
+        expect(media.portrait.poster).toMatch(/^\/concepts\/clean\//);
+        continue;
+      }
       expect(media.landscape.src).toMatch(
         /^\/concepts\/omni-chain\/16x9\/sp-stack-\d{2}-.+_omni\.mp4$/,
       );
@@ -62,18 +71,20 @@ describe("experienceMedia", () => {
     expect(title).toBeTruthy();
     expect(resolveExperienceSrc(title!, "landscape").src).toContain("/16x9/");
     expect(resolveExperienceSrc(title!, "portrait").src).toContain("/9x16/");
-    expect(mediaWindow(0, 15)).toEqual([0, 1]);
-    expect(mediaWindow(7, 15)).toEqual([6, 7, 8]);
-    expect(mediaWindow(14, 15)).toEqual([13, 14]);
+    expect(mediaWindow(0, 21)).toEqual([0, 1]);
+    expect(mediaWindow(7, 21)).toEqual([6, 7, 8]);
+    expect(mediaWindow(20, 21)).toEqual([19, 20]);
   });
 
   it("points public paths at files that exist on disk", () => {
     assertExperienceMediaValid(EXPERIENCE_MEDIA);
     for (const media of EXPERIENCE_MEDIA) {
       for (const variant of [media.landscape, media.portrait]) {
-        expect(existsSync(resolve(appRoot, publicExperiencePath(variant.src)))).toBe(
-          true,
-        );
+        if (variant.src) {
+          expect(existsSync(resolve(appRoot, publicExperiencePath(variant.src)))).toBe(
+            true,
+          );
+        }
         expect(
           existsSync(resolve(appRoot, publicExperiencePath(variant.poster))),
         ).toBe(true);
@@ -81,12 +92,42 @@ describe("experienceMedia", () => {
     }
   });
 
-  it("keeps four-stacks landscape poster distinct from the-question woman still", () => {
-    const question = experienceMediaForSlide("02-question")!.landscape.poster;
+  it("serves the super stack scene as a still-only poster row", () => {
+    const superStack = experienceMediaForSlide("00-super-stack");
+    expect(superStack?.stillOnly).toBe(true);
+    expect(superStack?.landscape.poster).toBe(
+      "/concepts/clean/sp-stack-18-different.webp",
+    );
+    expect(superStack?.landscape.src).toBe("");
+  });
+
+  it("treats an empty src as still-only poster media", () => {
+    const still: ExperienceMedia = {
+      slideId: "05-product",
+      stillOnly: true,
+      landscape: {
+        src: "",
+        poster: "/concepts/clean/sp-stack-07-retail.png",
+        width: 1920,
+        height: 1080,
+      },
+      portrait: {
+        src: "",
+        poster: "/concepts/clean/sp-stack-07-retail.png",
+        width: 1920,
+        height: 1080,
+      },
+    };
+    expect(still.stillOnly).toBe(true);
+    expect(still.landscape.src).toBe("");
+  });
+
+  it("keeps four-stacks landscape poster distinct from the title still", () => {
+    const title = experienceMediaForSlide("01-title")!.landscape.poster;
     const fourStacks = experienceMediaForSlide("03-four-stacks")!.landscape.poster;
-    const questionHash = fileMd5(question);
+    const titleHash = fileMd5(title);
     const fourStacksHash = fileMd5(fourStacks);
-    expect(fourStacksHash).not.toBe(questionHash);
+    expect(fourStacksHash).not.toBe(titleHash);
     // Guard against a near-duplicate woman still being copied under the four-stacks name.
     expect(fourStacksHash).toBe("49c66a63b61b7a0579c6d1e8ee798439");
   });

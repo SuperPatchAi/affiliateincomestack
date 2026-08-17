@@ -136,10 +136,15 @@
 
 .experience-navigator {
   position: fixed;
-  top: 50%;
+  top: 1rem;
+  bottom: 1rem;
   right: 0.55rem;
   z-index: 46;
-  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Keep all 20 step targets user-reachable inside short viewports. */
+  overflow: hidden;
 }
 
 .experience-nav-list {
@@ -149,6 +154,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .experience-nav-step {
@@ -299,7 +308,7 @@
   position: fixed;
   right: calc(var(--scene-rail) + var(--safe-right));
   bottom: calc(1.25rem + var(--safe-bottom));
-  z-index: 46;
+  z-index: 60;
 }
 
 .ui-btn {
@@ -413,7 +422,7 @@
 
 .scene-hero3d {
   z-index: 1;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .scene-hero3d-canvas {
@@ -489,38 +498,12 @@
 
 .experience-scene[data-motion-layer-active="false"]
   :is(
-    [data-annotation-layer],
+    [data-chip-stage],
     [data-stream-index],
     [data-progress-spine]
   ) {
   visibility: hidden !important;
   opacity: 0 !important;
-}
-
-.scene-annotations {
-  position: absolute;
-  inset: 0;
-  /* Above media + scrim, below lower-third copy, and outside the drifting plane
-     so media scale/overflow cannot crop plate labels. */
-  z-index: 2;
-  pointer-events: none;
-  container-type: size;
-}
-
-.scene-annotations .plate-annotation {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  color: var(--slide-accent-text, var(--slide-accent));
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
-}
-
-@media (max-width: 900px), (orientation: portrait) {
-  .scene-annotations .plate-annotation.role-label {
-    letter-spacing: 0.02em;
-  }
 }
 
 .scene-copy {
@@ -535,6 +518,34 @@
   gap: clamp(0.75rem, 1.4vw, 1.1rem);
   text-shadow: 0 8px 28px rgba(0, 0, 0, 0.68);
   pointer-events: auto;
+}
+
+/* Scene 01 hero caption: centered under the patch, above the receding floor.
+   Not the left lower third — do not reuse .scene-copy offsets. */
+.scene-copy-hero {
+  position: absolute;
+  left: 50%;
+  top: 71%;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: min(90vw, 900px);
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.68);
+}
+
+.scene-hero-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08em;
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4.6vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: 0.045em;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--sp-white);
 }
 
 .scene-eyebrow {
@@ -580,6 +591,104 @@
   color: var(--sp-fine);
   font-size: 0.78rem;
   line-height: 1.4;
+}
+
+/* Compliance: on chip scenes the disclosure must outlive the copy exit,
+   so it pins to the bottom edge outside [data-scene-copy]. */
+.scene-disclosure-pinned {
+  position: absolute;
+  left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));
+  bottom: calc(clamp(14px, 2.2vh, 26px) + var(--safe-bottom));
+  z-index: 4;
+  max-width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
+}
+
+/* Scroll-sequenced chips occupy the lower-third seat the copy vacates.
+   Items are grid-stacked; the motion hook drives opacity/x per scroll segment. */
+.chip-stage {
+  position: absolute;
+  left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));
+  bottom: calc(clamp(52px, 8vh, 104px) + var(--safe-bottom));
+  z-index: 3;
+  width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
+  display: grid;
+  pointer-events: none;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.68);
+}
+
+/* Hidden until the motion hook owns the sequence; static mode uses the fallback list. */
+[data-experience-scene]:not([data-chips-animated="true"]) .chip-stage {
+  display: none;
+}
+
+.chip-stage-item {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.45rem, 0.9vw, 0.75rem);
+  opacity: 0;
+}
+
+.chip-stage-count {
+  margin: 0;
+  color: var(--sp-fine);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  font-weight: 900;
+}
+
+.chip-stage-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.6vw, 4.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--slide-accent-text, var(--slide-accent));
+  text-wrap: balance;
+}
+
+.chip-stage-sub {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--sp-white);
+  font-size: clamp(1.02rem, 1.3vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* Static fallback: visible list under the body copy when motion is off/reduced. */
+.scene-chip-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--sp-muted);
+  font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+  line-height: 1.4;
+}
+
+.scene-chip-list strong {
+  color: var(--slide-accent-text, var(--slide-accent));
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: 0.4em;
+}
+
+/* When the animated sequence owns the chips, keep the list for screen readers only. */
+[data-chips-animated="true"] .scene-chip-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .scene-cta-group {
@@ -796,7 +905,6 @@
     overscroll-behavior: contain;
   }
 
-  .scene-annotations,
   .scene-flywheel {
     display: none;
   }

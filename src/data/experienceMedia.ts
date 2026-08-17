@@ -16,16 +16,15 @@ export type ExperienceMedia = {
   portrait: ExperienceVariant;
   /** Closing scene uses the deterministic SuperPatch brand lockup treatment. */
   brandLockup?: boolean;
+  stillOnly?: boolean;
 };
 
 /** Omni plate slug keyed by slide id — plate filenames differ from a few slide ids. */
 const SLIDE_TO_OMNI_SLUG: Record<string, string> = {
   "01-title": "title",
-  "02-question": "the-question",
   "03-four-stacks": "four-stacks",
   "04-flywheel": "flywheel",
-  "05-ecosystem": "ecosystem",
-  "06-ten-layers": "ten-layers",
+  "08-ten-layers": "ten-layers",
   "07-retail": "retail",
   "08-fast-start": "fast-start",
   "09-team-overrides": "team-overrides",
@@ -36,6 +35,17 @@ const SLIDE_TO_OMNI_SLUG: Record<string, string> = {
   "14-global": "global-pool",
   "15-closing": "closing",
 };
+
+const STILL_ONLY_IDS = new Set([
+  "00-super-stack",
+  "02-world",
+  "05-product",
+  "06-brand",
+  "07-development",
+  "17-compounding",
+  "18-different",
+  "19-future",
+]);
 
 function omniIdForSlide(slideId: string): string {
   const plate = OMNI_PLATES.find(
@@ -68,12 +78,26 @@ function variantFor(
   };
 }
 
-export const EXPERIENCE_MEDIA: ExperienceMedia[] = SLIDES.map((slide) => ({
-  slideId: slide.id,
-  landscape: variantFor(slide.id, "16x9", 1280, 720),
-  portrait: variantFor(slide.id, "9x16", 720, 1280),
-  brandLockup: slide.id === "15-closing" ? true : undefined,
-}));
+export const EXPERIENCE_MEDIA: ExperienceMedia[] = SLIDES.map((slide) => {
+  if (STILL_ONLY_IDS.has(slide.id)) {
+    const poster =
+      slide.id === "00-super-stack"
+        ? "/concepts/clean/sp-stack-18-different.webp"
+        : slide.conceptSrc;
+    return {
+      slideId: slide.id,
+      stillOnly: true,
+      landscape: { src: "", poster, width: 1920, height: 1080 },
+      portrait: { src: "", poster, width: 1920, height: 1080 },
+    };
+  }
+  return {
+    slideId: slide.id,
+    landscape: variantFor(slide.id, "16x9", 1280, 720),
+    portrait: variantFor(slide.id, "9x16", 720, 1280),
+    brandLockup: slide.id === "15-closing" ? true : undefined,
+  };
+});
 
 export function experienceMediaForSlide(
   slideId: string,
@@ -104,14 +128,25 @@ export function publicExperiencePath(publicPath: string): string {
 }
 
 export function assertExperienceMediaValid(media: ExperienceMedia[]): void {
-  if (media.length !== 15) {
-    throw new Error(`Expected 15 experience media entries, got ${media.length}`);
+  if (media.length !== SLIDES.length) {
+    throw new Error(
+      `Expected ${SLIDES.length} experience media entries, got ${media.length}`,
+    );
   }
   const ids = media.map((m) => m.slideId);
   if (new Set(ids).size !== ids.length) {
     throw new Error("Duplicate experience media slide ids");
   }
   for (const entry of media) {
+    if (entry.stillOnly) {
+      if (entry.landscape.src || entry.portrait.src) {
+        throw new Error(`stillOnly ${entry.slideId} must have empty src`);
+      }
+      if (!entry.landscape.poster || !entry.portrait.poster) {
+        throw new Error(`stillOnly ${entry.slideId} needs posters`);
+      }
+      continue;
+    }
     const slug = SLIDE_TO_OMNI_SLUG[entry.slideId];
     if (!slug) {
       throw new Error(`Missing Omni slug for ${entry.slideId}`);

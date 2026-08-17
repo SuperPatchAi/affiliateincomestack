@@ -85,7 +85,7 @@ export function isIncomeStreamSlide(slideId: string): boolean {
 }
 
 export function isStreamIndexSlide(slideId: string): boolean {
-  return slideId === "06-ten-layers";
+  return slideId === "08-ten-layers";
 }
 
 export function isRecapSlide(slideId: string): boolean {

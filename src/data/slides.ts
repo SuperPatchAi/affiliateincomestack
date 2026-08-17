@@ -139,6 +139,12 @@ export type HeroMedia = {
   annotationsBaked: boolean;
 };
 
+/** One step of the scroll-driven chip sequence: big accent label + one-line context. */
+export type SequencedChip = {
+  label: string;
+  sub: string;
+};
+
 export type Slide = {
   id: string;
   conceptSrc: string;
@@ -157,8 +163,12 @@ export type Slide = {
   voiceover?: string;
   presenterNotes?: string;
   annotations?: PlateAnnotation[];
+  /** Scroll-sequenced lower-third chips; replaces the web plate-annotation overlay. */
+  chips?: SequencedChip[];
   flywheelArc?: FlywheelArc;
   motionPreset: string;
+  /** Scene 01 renders a centered hero caption instead of the cinematic lower third. */
+  copyLayout?: "lower-third" | "hero-caption";
   requiresDisclosure: boolean;
 };
 
@@ -233,20 +243,26 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 15) {
-    throw new Error(`Expected 15 slides, got ${slides.length}`);
+  if (slides.length !== 21) {
+    throw new Error(`Expected 21 slides, got ${slides.length}`);
   }
   for (const s of slides) {
-    if (!s.eyebrow?.trim() || !s.headline?.trim() || !s.body?.trim()) {
-      throw new Error(`Slide ${s.id} missing copy fields`);
+    const heroCaption = s.copyLayout === "hero-caption";
+    if (!s.headline?.trim()) {
+      throw new Error(`Slide ${s.id} missing headline`);
     }
-    // Film overlay word budget: prefer onScreenBody; otherwise body is the on-screen script.
-    const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
-    const n = wordCount(filmCopy);
-    if (n < 30 || n > 50) {
-      throw new Error(
-        `Slide ${s.id} ${s.onScreenBody?.trim() ? "onScreenBody" : "body"} word count ${n} not in 30–50`,
-      );
+    if (!heroCaption) {
+      if (!s.eyebrow?.trim() || !s.body?.trim()) {
+        throw new Error(`Slide ${s.id} missing copy fields`);
+      }
+      // Film overlay word budget: prefer onScreenBody; otherwise body is the on-screen script.
+      const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
+      const n = wordCount(filmCopy);
+      if (n < 30 || n > 50) {
+        throw new Error(
+          `Slide ${s.id} ${s.onScreenBody?.trim() ? "onScreenBody" : "body"} word count ${n} not in 30–50`,
+        );
+      }
     }
     if (s.requiresDisclosure) {
       if (!s.disclosure || s.disclosure.length < 10) {
@@ -277,12 +293,34 @@ export function assertSlidesValid(slides: Slide[]): void {
         );
       }
     }
+    const chips = s.chips ?? [];
+    if (chips.length > 0 && s.copyLayout === "hero-caption") {
+      throw new Error(`Slide ${s.id} is hero-caption and cannot carry chips`);
+    }
+    if (chips.length > 6) {
+      throw new Error(`Slide ${s.id} has ${chips.length} chips; at most 6 chips per scene`);
+    }
+    for (const chip of chips) {
+      const words = wordCount(chip.label);
+      if (!chip.label.trim() || words < 1 || words > 4 || chip.label.length > 28) {
+        throw new Error(
+          `Slide ${s.id} chip label "${chip.label}" must be 1-4 words and <= 28 chars`,
+        );
+      }
+      if (chip.sub.length < 12 || chip.sub.length > 90) {
+        throw new Error(
+          `Slide ${s.id} chip "${chip.label}" sub must be 12-90 chars, got ${chip.sub.length}`,
+        );
+      }
+    }
   }
 }
 
 export type ExperienceChapterId =
-  | "foundation"
+  | "super-stack"
+  | "full-stack"
   | "ten-income-streams"
+  | "momentum"
   | "action";
 
 export type ExperienceChapter = {
@@ -292,26 +330,13 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Premium V2 chapter groupings — scenes 01–06, 07–14, 15. */
+/** Super Stack layout chapter groupings — scenes 01, 02–08, 09–17, 18–20, 21. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  {
-    id: "foundation",
-    label: "Foundation",
-    sceneStart: 0,
-    sceneEnd: 5,
-  },
-  {
-    id: "ten-income-streams",
-    label: "Ten Income Streams",
-    sceneStart: 6,
-    sceneEnd: 13,
-  },
-  {
-    id: "action",
-    label: "Action",
-    sceneStart: 14,
-    sceneEnd: 14,
-  },
+  { id: "super-stack", label: "Super Stack", sceneStart: 0, sceneEnd: 0 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 1, sceneEnd: 7 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 8, sceneEnd: 16 },
+  { id: "momentum", label: "Momentum", sceneStart: 17, sceneEnd: 19 },
+  { id: "action", label: "Action", sceneStart: 20, sceneEnd: 20 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -331,6 +356,17 @@ export function formatSceneCounter(index: number): string {
 
 export const SLIDES: Slide[] = [
   {
+    id: "00-super-stack",
+    conceptSrc: "/concepts/clean/sp-stack-18-different.png",
+    accent: "blue",
+    eyebrow: "",
+    headline: "The SuperPatch Super Stack",
+    body: "",
+    copyLayout: "hero-caption",
+    motionPreset: "hero-patch",
+    requiresDisclosure: false,
+  },
+  {
     id: "01-title",
     conceptSrc: "/concepts/clean/sp-stack-01-title.png",
     hero: {
@@ -342,26 +378,41 @@ export const SLIDES: Slide[] = [
     heroVideoSrc: "/concepts/animated/sp-stack-01-title_animated.mp4",
     accent: "blue",
     eyebrow: "The Super Patch Income Stack™",
-    headline: "10 Ways to Build Life-Changing Income",
-    body: "At Super Patch, we didn't create just another affiliate program. We built an Income Stack™ — ten ways to earn as you grow. Every new activity can unlock another stream without replacing the one before it.",
+    headline: "More Than an Affiliate Program. A Complete Opportunity.",
+    body: "At Super Patch we did not build another affiliate program. We built a complete opportunity: better health, greater freedom, and bigger impact. One company. Four stacks. Ten income streams. Infinite potential.",
+    annotations: [
+      { text: "BETTER HEALTH", xPct: 22, yPct: 16, sizePct: 3.2, role: "label" },
+      { text: "GREATER FREEDOM", xPct: 50, yPct: 16, sizePct: 3.2, role: "label" },
+      { text: "BIGGER IMPACT", xPct: 78, yPct: 16, sizePct: 3.2, role: "label" },
+    ],
+    chips: [
+      { label: "BETTER HEALTH", sub: "World-class wellness solutions that deliver real results." },
+      { label: "GREATER FREEDOM", sub: "Ten income streams you can build at your own pace." },
+      { label: "BIGGER IMPACT", sub: "A global movement of leaders building together." },
+    ],
     flywheelArc: "income",
     motionPreset: "parallax-slabs",
     requiresDisclosure: false,
   },
   {
-    id: "02-question",
-    conceptSrc: "/concepts/clean/sp-stack-02-the-question.png",
-    hero: {
-      src: "/concepts/animated/sp-stack-02-the-question_animated.mp4",
-      width: 1920,
-      height: 1080,
-      annotationsBaked: false,
-    },
-    heroVideoSrc: "/concepts/animated/sp-stack-02-the-question_animated.mp4",
+    id: "02-world",
+    conceptSrc: "/concepts/clean/sp-stack-02-world.png",
     accent: "cool",
-    eyebrow: "The Old Model",
-    headline: "One Commission Is Not a Business",
-    body: "Most affiliate programs pay a single stream and leave you hoping volume alone will work. When growth stalls, so does income. Super Patch rewards every stage of building — customers, teams, and leaders — so progress compounds instead of resetting.",
+    eyebrow: "The World Has Changed",
+    headline: "Multiple income streams are no longer optional.",
+    body: "People want more freedom, more purpose, and more control of their future. Traditional jobs, the gig economy, the creator economy, and social commerce all point the same way: one stream is not a plan. Multiple income streams are essential.",
+    annotations: [
+      { text: "TRADITIONAL JOBS", xPct: 16, yPct: 18, sizePct: 3.0, role: "label" },
+      { text: "GIG ECONOMY", xPct: 38, yPct: 18, sizePct: 3.0, role: "label" },
+      { text: "CREATOR ECONOMY", xPct: 60, yPct: 18, sizePct: 3.0, role: "label" },
+      { text: "SOCIAL COMMERCE", xPct: 82, yPct: 18, sizePct: 3.0, role: "label" },
+    ],
+    chips: [
+      { label: "TRADITIONAL JOBS", sub: "One paycheck, capped upside, and someone else's schedule." },
+      { label: "GIG ECONOMY", sub: "Flexible work proved people want control of their time." },
+      { label: "CREATOR ECONOMY", sub: "Millions now earn by sharing what they love." },
+      { label: "SOCIAL COMMERCE", sub: "Buying moved to feeds, stories, and trusted voices." },
+    ],
     motionPreset: "ken-burns-glow",
     requiresDisclosure: false,
   },
@@ -377,13 +428,19 @@ export const SLIDES: Slide[] = [
     heroVideoSrc: "/concepts/animated/sp-stack-03-four-stacks_animated.mp4",
     accent: "multi",
     eyebrow: "The Super Patch Full Stack",
-    headline: "One Company. Four Stacks. Infinite Potential.",
+    headline: "One Company. Four Stacks. Ten Income Streams. Infinite Potential.",
     body: "We are building a full-stack human performance ecosystem: Product delivers outcomes, Brand & Marketing creates demand, Income opens opportunity, and Personal Development builds leaders. Each layer strengthens the others — not a catalog, a system.",
     annotations: [
-      { text: "PRODUCT", xPct: 17.12, yPct: 81.15, sizePct: 4.07, role: "label" },
-      { text: "BRAND", xPct: 38.44, yPct: 81.15, sizePct: 4.07, role: "label" },
-      { text: "INCOME", xPct: 60.97, yPct: 81.15, sizePct: 4.07, role: "label" },
-      { text: "PEOPLE", xPct: 82.85, yPct: 81.15, sizePct: 4.07, role: "label" },
+      { text: "PRODUCT STACK", xPct: 17.12, yPct: 48, sizePct: 3.2, role: "label" },
+      { text: "BRAND & MARKETING", xPct: 38.44, yPct: 48, sizePct: 3.2, role: "label" },
+      { text: "INCOME STACK", xPct: 60.97, yPct: 48, sizePct: 3.2, role: "label" },
+      { text: "PERSONAL DEVELOPMENT", xPct: 82.85, yPct: 48, sizePct: 3.2, role: "label" },
+    ],
+    chips: [
+      { label: "PRODUCT STACK", sub: "VTT patches and wellness solutions that deliver outcomes." },
+      { label: "BRAND & MARKETING", sub: "Global visibility and credibility that create demand." },
+      { label: "INCOME STACK", sub: "Ten streams that reward every stage of building." },
+      { label: "PERSONAL DEVELOPMENT", sub: "Training and community that build leaders." },
     ],
     flywheelArc: "all",
     motionPreset: "pillars-sequence",
@@ -402,43 +459,103 @@ export const SLIDES: Slide[] = [
     },
     heroVideoSrc: "/concepts/animated/sp-stack-04-flywheel_animated.mp4",
     accent: "multi",
-    eyebrow: "The Flywheel Effect",
+    eyebrow: "Why the Full Stack Wins",
     headline: "Each Stack Reinforces the Others",
     body: "Better products strengthen the brand. A stronger brand accelerates customers. Greater awareness expands income. Greater income attracts leaders. Better leaders build community. Stronger communities fund innovation. The result is a self-reinforcing ecosystem built to last.",
     annotations: [
       { text: "PRODUCT", xPct: 20.21, yPct: 34.77, sizePct: 5.97, role: "label" },
       { text: "BRAND", xPct: 80.63, yPct: 34.72, sizePct: 5.83, role: "label" },
-      { text: "PEOPLE", xPct: 19.73, yPct: 71.09, sizePct: 5.97, role: "label" },
-      { text: "INCOME", xPct: 80.76, yPct: 71.14, sizePct: 5.83, role: "label" },
+      { text: "PEOPLE", xPct: 19.73, yPct: 48, sizePct: 5.97, role: "label" },
+      { text: "INCOME", xPct: 80.76, yPct: 48, sizePct: 5.83, role: "label" },
+    ],
+    chips: [
+      { label: "PRODUCTS CREATE CUSTOMERS", sub: "Real results turn buyers into raving fans." },
+      { label: "MARKETING CREATES DEMAND", sub: "Visibility and credibility bring customers to you." },
+      { label: "INCOME CREATES OPPORTUNITY", sub: "Ten streams turn activity into earnings." },
+      { label: "DEVELOPMENT CREATES LEADERS", sub: "Better people build stronger communities." },
     ],
     flywheelArc: "all",
     motionPreset: "flywheel-scrub",
     requiresDisclosure: false,
   },
   {
-    id: "05-ecosystem",
-    conceptSrc: "/concepts/clean/sp-stack-05-ecosystem.png",
-    hero: {
-      src: "/concepts/animated/sp-stack-05-ecosystem_animated.mp4",
-      width: 1920,
-      height: 1080,
-      annotationsBaked: false,
-    },
-    heroVideoSrc: "/concepts/animated/sp-stack-05-ecosystem_animated.mp4",
-    accent: "violet",
-    eyebrow: "Why It Compounds",
-    headline: "Exponential Value Across the Ecosystem",
-    body: "Rather than competing with single-product wellness companies, Super Patch connects health outcomes, economic opportunity, leadership, and community. Every major initiative should strengthen one or more stacks — the more stacks touched, the greater the long-term value.",
-    onScreenBody:
-      "Health outcomes, opportunity, and leadership in one company. Super Patch connects wellness results with economic opportunity and leadership development so initiatives can strengthen more than one stack for the long term.",
-    presenterNotes:
-      "Objection: Do I have to recruit? Answer: Everyone starts at Stack 1 retail. Leadership stacks unlock as you help others. Cost/kits: point to official materials. Always: Income Disclosure.",
-    flywheelArc: "all",
+    id: "05-product",
+    conceptSrc: "/concepts/clean/sp-stack-05-product.png",
+    accent: "green",
+    eyebrow: "Product Stack",
+    headline: "Better products. Better results. Raving customers.",
+    body: "World-class VTT™ patches and innovative wellness solutions that deliver real results. Proprietary technology, backed by science, more than fifteen targeted solutions, trusted by millions. Better products create raving customers — and customers start the Income Stack.",
+    annotations: [
+      { text: "PROPRIETARY TECHNOLOGY", xPct: 20, yPct: 28, sizePct: 2.8, role: "label" },
+      { text: "BACKED BY SCIENCE", xPct: 20, yPct: 36, sizePct: 2.8, role: "label" },
+      { text: "15+ SOLUTIONS", xPct: 20, yPct: 44, sizePct: 2.8, role: "label" },
+      { text: "TRUSTED BY MILLIONS", xPct: 20, yPct: 52, sizePct: 2.8, role: "label" },
+    ],
+    chips: [
+      { label: "PROPRIETARY TECHNOLOGY", sub: "Vibrotactile trigger technology found nowhere else." },
+      { label: "BACKED BY SCIENCE", sub: "Research-driven design behind every patch." },
+      { label: "15+ SOLUTIONS", sub: "Targeted patches for sleep, energy, focus, and more." },
+      { label: "TRUSTED BY MILLIONS", sub: "Customers worldwide feel the difference daily." },
+    ],
+    flywheelArc: "product",
     motionPreset: "node-mesh",
+    requiresDisclosure: false,
+    presenterNotes:
+      "Product trust: point to official Super Patch materials for outcomes — do not invent clinical claims on this slide.",
+  },
+  {
+    id: "06-brand",
+    conceptSrc: "/concepts/clean/sp-stack-06-brand.png",
+    accent: "blue",
+    eyebrow: "Brand & Marketing Stack",
+    headline: "Massive visibility. Powerful credibility. Relentless momentum.",
+    body: "Super Patch shows up where trust is built: global media and PR, top creators, retail and digital channels, healthcare professionals, and pro sports. Massive visibility. Powerful credibility. Relentless momentum. That visibility creates demand.",
+    annotations: [
+      { text: "GLOBAL MEDIA & PR", xPct: 78, yPct: 26, sizePct: 2.6, role: "label" },
+      { text: "TOP CREATORS", xPct: 78, yPct: 32.5, sizePct: 2.6, role: "label" },
+      { text: "RETAIL & DIGITAL", xPct: 78, yPct: 39, sizePct: 2.6, role: "label" },
+      { text: "HEALTHCARE", xPct: 78, yPct: 45.5, sizePct: 2.6, role: "label" },
+      { text: "PRO SPORTS", xPct: 78, yPct: 52, sizePct: 2.6, role: "label" },
+    ],
+    chips: [
+      { label: "GLOBAL MEDIA & PR", sub: "Featured in Forbes and Medical Daily." },
+      { label: "TOP CREATORS", sub: "Influencers like Mind Pump share Super Patch." },
+      { label: "RETAIL & DIGITAL", sub: "Growing retail and e-commerce channels worldwide." },
+      { label: "HEALTHCARE PROFESSIONALS", sub: "Recommended by practitioners on Healthgrades." },
+      { label: "PRO SPORTS", sub: "Covered by SportsTech Today. Worn by elite athletes." },
+    ],
+    flywheelArc: "brand",
+    motionPreset: "ken-burns-glow",
     requiresDisclosure: false,
   },
   {
-    id: "06-ten-layers",
+    id: "07-development",
+    conceptSrc: "/concepts/clean/sp-stack-07-development.png",
+    accent: "violet",
+    eyebrow: "Personal Development Stack",
+    headline: "We don’t just build businesses. We build better people.",
+    body: "Leadership development, sales mastery, communication skills, financial education, mindset and growth, community and support. Grow personally. Lead powerfully. Live fully. Personal development is the stack that turns customers and affiliates into leaders.",
+    annotations: [
+      { text: "LEADERSHIP", xPct: 50, yPct: 32, sizePct: 2.5, role: "label" },
+      { text: "SALES", xPct: 28, yPct: 40, sizePct: 2.5, role: "label" },
+      { text: "COMMUNICATION", xPct: 72, yPct: 40, sizePct: 2.5, role: "label" },
+      { text: "FINANCE", xPct: 16, yPct: 52, sizePct: 2.5, role: "label" },
+      { text: "MINDSET", xPct: 84, yPct: 52, sizePct: 2.5, role: "label" },
+    ],
+    chips: [
+      { label: "LEADERSHIP DEVELOPMENT", sub: "Learn to lead teams that build teams." },
+      { label: "SALES MASTERY", sub: "Share products with confidence and skill." },
+      { label: "COMMUNICATION SKILLS", sub: "Connect, present, and persuade with clarity." },
+      { label: "FINANCIAL EDUCATION", sub: "Understand, manage, and grow what you earn." },
+      { label: "MINDSET & GROWTH", sub: "Build the habits of top performers." },
+      { label: "COMMUNITY & SUPPORT", sub: "You never build alone at Super Patch." },
+    ],
+    flywheelArc: "development",
+    motionPreset: "generation-rings",
+    requiresDisclosure: false,
+  },
+  {
+    id: "08-ten-layers",
     conceptSrc: "/concepts/clean/sp-stack-06-ten-layers.png",
     hero: {
       src: "/concepts/animated/sp-stack-06-ten-layers_animated.mp4",
@@ -449,11 +566,21 @@ export const SLIDES: Slide[] = [
     heroVideoSrc: "/concepts/animated/sp-stack-06-ten-layers_animated.mp4",
     accent: "orange",
     eyebrow: "Income Stack™ — Ten Streams",
-    headline: "Ten Ways. One Path Forward.",
+    headline: "One Opportunity. Ten Income Streams.",
     body: "On the next slides we walk ten named streams: Retail twenty-five percent, Fast Start and Rank Advancement, Team Overrides, Managing Director Depth Bonus, Vice President Override, Generation Bonuses, Executive Leadership Override, CEO Leadership Bonus, Global President Override, and the Global Leadership Pool. We start where everyone starts.",
     onScreenBody:
       "Start with retail. Stack leadership as you grow. Ten named streams follow — retail, Fast Start and ranks, team overrides, MD depth, VP override, generations, executive and CEO bonuses, then Global President override and the Global Leadership Pool.",
     voiceover: "Let's walk them one by one, starting where everyone starts.",
+    annotations: [
+      { text: "1–3 FOUNDATION", xPct: 78, yPct: 28, sizePct: 3.0, role: "label" },
+      { text: "4–7 LEADERSHIP", xPct: 78, yPct: 40, sizePct: 3.0, role: "label" },
+      { text: "8–10 EXECUTIVE", xPct: 78, yPct: 52, sizePct: 3.0, role: "label" },
+    ],
+    chips: [
+      { label: "1-3 FOUNDATION", sub: "Retail commissions, Fast Start bonuses, and team overrides." },
+      { label: "4-7 LEADERSHIP", sub: "Depth bonuses, leg overrides, and generation pay." },
+      { label: "8-10 EXECUTIVE & GLOBAL", sub: "CEO bonuses, global overrides, and the leadership pool." },
+    ],
     flywheelArc: "income",
     motionPreset: "exploded-layers",
     requiresDisclosure: false,
@@ -474,6 +601,9 @@ export const SLIDES: Slide[] = [
     body: "This is where everyone begins. When someone buys through your personal affiliate link, you earn 25% commission on qualifying purchases — paid weekly. One product or several, if they buy through your link, you earn 25% of what they pay.",
     annotations: [
       { text: "25%", xPct: 22.62, yPct: 45.61, sizePct: 30.65, role: "metric" },
+    ],
+    chips: [
+      { label: "25% RETAIL COMMISSIONS", sub: "Earn 25% on every sale through your link, paid weekly." },
     ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
@@ -496,6 +626,10 @@ export const SLIDES: Slide[] = [
     body: "Personally enroll three or more new affiliates in a month with qualifying kits and unlock Fast Start Bonuses from an additional $200 up to $2,000. As your organization hits sales milestones, Rank Advancement Bonuses can reach up to $100,000.",
     annotations: [
       { text: "$2,000", xPct: 81.9, yPct: 32.47, sizePct: 28.35, role: "metric" },
+    ],
+    chips: [
+      { label: "$200-$2,000 FAST START", sub: "Enroll three qualifying affiliates in a month to unlock." },
+      { label: "UP TO $100,000 RABS", sub: "Rank Advancement Bonuses grow with your sales milestones." },
     ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
@@ -523,6 +657,11 @@ export const SLIDES: Slide[] = [
       { text: "4%", xPct: 9.51, yPct: 68.36, sizePct: 4.88, role: "metric" },
       { text: "4%", xPct: 9.51, yPct: 78.61, sizePct: 4.88, role: "metric" },
     ],
+    chips: [
+      { label: "15% ON LEVEL 1", sub: "Earn up to 15% of Bonus Volume on your first level." },
+      { label: "10% ON LEVEL 2", sub: "Earn up to 10% as your team helps others build." },
+      { label: "4% ON LEVELS 3-5", sub: "Depth pays: up to 4% on three more levels." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "root-tiers",
@@ -545,6 +684,9 @@ export const SLIDES: Slide[] = [
     annotations: [
       { text: "2%", xPct: 37.11, yPct: 13.23, sizePct: 6.1, role: "metric" },
     ],
+    chips: [
+      { label: "2% UNLIMITED DEPTH", sub: "Past level 5, down to the next qualified Managing Director." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "depth-rings",
@@ -564,6 +706,9 @@ export const SLIDES: Slide[] = [
     eyebrow: "Stack 5",
     headline: "Vice President Leadership Override",
     body: "As a Vice President, your leadership expands further. Instead of the Managing Director override, you earn 2% of Bonus Volume on every organizational leg down to the next qualified Vice President. The larger your organization becomes, the greater this income grows.",
+    chips: [
+      { label: "2% ON EVERY LEG", sub: "Every leg of your organization, down to the next VP." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "legs-descend",
@@ -583,6 +728,9 @@ export const SLIDES: Slide[] = [
     eyebrow: "Stack 6",
     headline: "Generation Bonuses",
     body: "This is where leadership begins rewarding leadership. As a Vice President and above, you earn 3% Generation Bonuses through up to three generations of Vice Presidents within your organization. Develop leaders who develop leaders — and your income keeps expanding.",
+    chips: [
+      { label: "3% x 3 GENERATIONS", sub: "Leadership rewarding leadership, three VP generations deep." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "development",
     motionPreset: "generation-rings",
@@ -602,6 +750,10 @@ export const SLIDES: Slide[] = [
     eyebrow: "Stacks 7 & 8",
     headline: "Executive Leadership & CEO Leadership Bonus",
     body: "Reach Executive Leadership and earn up to an additional 2% override on Bonus Volume across your qualified affiliate organization — no preset cap. At President or Global President, earn an extra $10,000 to $20,000 every month for top-tier leadership performance.",
+    chips: [
+      { label: "2% EXECUTIVE OVERRIDE", sub: "Across your qualified organization with no preset cap." },
+      { label: "$10K-$20K MONTHLY", sub: "CEO Leadership Bonus at President and Global President." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "summit-reveal",
@@ -621,9 +773,82 @@ export const SLIDES: Slide[] = [
     eyebrow: "Stacks 9 & 10",
     headline: "Global President Override & Global Leadership Pool",
     body: "Global Presidents receive an additional 1% override on Bonus Volume throughout their qualified global organization. Qualified National Vice Presidents and above also participate in the Global 1% Leadership Pool — sharing in worldwide growth they help create.",
+    chips: [
+      { label: "1% GLOBAL OVERRIDE", sub: "On Bonus Volume across your qualified global organization." },
+      { label: "GLOBAL 1% POOL", sub: "Qualified NVPs and above share in worldwide growth." },
+    ],
     disclosure: INCOME_DISCLOSURE,
     flywheelArc: "income",
     motionPreset: "earth-arcs",
+    requiresDisclosure: true,
+  },
+  {
+    id: "17-compounding",
+    conceptSrc: "/concepts/clean/sp-stack-17-compounding.png",
+    accent: "orange",
+    eyebrow: "The Power of Compounding Income",
+    headline: "Every activity. Every layer. Every time.",
+    body: "One customer becomes ten. Ten become more than a hundred. Customers become teams. Teams become leaders. Leaders unlock multiple income streams. The more you build, the more the Income Flywheel grows.",
+    annotations: [
+      { text: "ONE", xPct: 64, yPct: 46, sizePct: 2.8, role: "label" },
+      { text: "100+", xPct: 76, yPct: 38, sizePct: 2.8, role: "label" },
+      { text: "STREAMS", xPct: 85, yPct: 30, sizePct: 2.8, role: "label" },
+    ],
+    chips: [
+      { label: "ONE CUSTOMER", sub: "Every stack starts with a single result." },
+      { label: "TEN CUSTOMERS", sub: "Real results spread by word of mouth." },
+      { label: "100+ CUSTOMERS", sub: "Momentum compounds as your base grows." },
+      { label: "TEAMS", sub: "Customers become affiliates and build with you." },
+      { label: "LEADERS", sub: "Teams develop leaders who develop leaders." },
+      { label: "MULTIPLE INCOME STREAMS", sub: "Every layer adds a new way to earn." },
+    ],
+    flywheelArc: "income",
+    motionPreset: "ken-burns-glow",
+    requiresDisclosure: false,
+  },
+  {
+    id: "18-different",
+    conceptSrc: "/concepts/clean/sp-stack-18-different.png",
+    accent: "multi",
+    eyebrow: "Why Super Patch Is Different",
+    headline: "A true Full Stack company",
+    body: "Proven products people love. A massive brand and marketing engine. Ten ways to earn. Personal development built in. A global vision with unlimited potential. This is a full-stack company — not a single-commission catalog.",
+    chips: [
+      { label: "TRUE FULL STACK", sub: "Product, brand, income, and development in one company." },
+      { label: "PROVEN PRODUCTS", sub: "Wellness people can feel and reorder." },
+      { label: "BRAND ENGINE", sub: "Massive marketing that creates demand for you." },
+      { label: "TEN WAYS TO EARN", sub: "An Income Stack, not a single commission." },
+      { label: "DEVELOPMENT BUILT IN", sub: "Personal growth is part of the plan." },
+      { label: "GLOBAL VISION", sub: "Unlimited potential in a worldwide movement." },
+    ],
+    flywheelArc: "all",
+    motionPreset: "node-mesh",
+    requiresDisclosure: false,
+  },
+  {
+    id: "19-future",
+    conceptSrc: "/concepts/clean/sp-stack-19-future.png",
+    accent: "orange",
+    eyebrow: "Imagine Your Future",
+    headline: "You decide how far you go.",
+    body: "Side income, income replacement, business ownership, financial freedom, or generational wealth — you choose the pace. Your future is created by the actions you take today. Income is not guaranteed. Results vary.",
+    annotations: [
+      { text: "SIDE", xPct: 18, yPct: 48, sizePct: 2.6, role: "label" },
+      { text: "REPLACE", xPct: 34, yPct: 42, sizePct: 2.6, role: "label" },
+      { text: "OWN", xPct: 50, yPct: 36, sizePct: 2.6, role: "label" },
+      { text: "FREEDOM", xPct: 66, yPct: 29, sizePct: 2.6, role: "label" },
+      { text: "WEALTH", xPct: 82, yPct: 22, sizePct: 2.6, role: "label" },
+    ],
+    chips: [
+      { label: "SIDE INCOME", sub: "A few hundred a month changes the math." },
+      { label: "INCOME REPLACEMENT", sub: "Stack streams until they cover your paycheck." },
+      { label: "BUSINESS OWNERSHIP", sub: "Build an organization you are proud to own." },
+      { label: "FINANCIAL FREEDOM", sub: "Your time becomes yours again." },
+      { label: "GENERATIONAL WEALTH", sub: "Build something that outlasts you." },
+    ],
+    disclosure: INCOME_DISCLOSURE,
+    flywheelArc: "income",
+    motionPreset: "horizon-settle",
     requiresDisclosure: true,
   },
   {
@@ -637,9 +862,9 @@ export const SLIDES: Slide[] = [
     },
     heroVideoSrc: "/concepts/animated/sp-stack-15-closing_animated.mp4",
     accent: "red",
-    eyebrow: "One Opportunity. Ten Income Streams.",
-    headline: "Build Customers. Build Leaders. Build Leverage.",
-    body: "Most affiliate programs pay one commission. Super Patch rewards every stage of building — from retail customers to leadership pools. Choose your starting pace, then take the next step with your sponsor.",
+    eyebrow: "Join the Movement",
+    headline: "Better Health. Greater Freedom. Bigger Impact.",
+    body: "We’re building the world’s leading human performance ecosystem—together. One company. Four stacks. Ten income streams. Infinite potential. Take the next step with your sponsor and begin building your stack today.",
     disclosure: INCOME_DISCLOSURE,
     ctaPrimary: "Get your affiliate link",
     ctaSecondary: "Read the Income Disclosure",
@@ -648,3 +873,8 @@ export const SLIDES: Slide[] = [
     requiresDisclosure: true,
   },
 ];
+
+/** Remotion film scenes — the 3D hero-caption opener is web-only. */
+export const FILM_SLIDES: Slide[] = SLIDES.filter(
+  (s) => (s.copyLayout ?? "lower-third") !== "hero-caption",
+);

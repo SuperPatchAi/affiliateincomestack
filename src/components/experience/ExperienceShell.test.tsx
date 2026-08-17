@@ -1,8 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { SLIDES } from "../../data/slides";
-import { shouldShowLiveAnnotations } from "../../remotion/labels";
 import { ExperienceShell } from "./ExperienceShell";
+
+function renderShell() {
+  return render(<ExperienceShell />);
+}
 
 describe("ExperienceShell", () => {
   beforeEach(() => {
@@ -25,10 +28,10 @@ describe("ExperienceShell", () => {
     });
   });
 
-  it("renders 15 ordered semantic scenes with heading hierarchy", () => {
+  it("renders 20 ordered semantic scenes with heading hierarchy", () => {
     const { container } = render(<ExperienceShell />);
     const scenes = container.querySelectorAll("[data-experience-scene]");
-    expect(scenes).toHaveLength(15);
+    expect(scenes).toHaveLength(21);
     expect([...scenes].map((el) => el.getAttribute("data-slide"))).toEqual(
       SLIDES.map((s) => s.id),
     );
@@ -40,7 +43,7 @@ describe("ExperienceShell", () => {
 
   it("keeps narrative copy accessible and marks video decorative", () => {
     const { container } = render(<ExperienceShell />);
-    expect(screen.getByText(SLIDES[0].body)).toBeTruthy();
+    expect(screen.getByText(SLIDES[1].body)).toBeTruthy();
     const videos = container.querySelectorAll("video");
     for (const video of videos) {
       expect(video.getAttribute("aria-hidden")).toBe("true");
@@ -60,24 +63,6 @@ describe("ExperienceShell", () => {
     expect(
       screen.getByRole("link", { name: "Read the Income Disclosure" }),
     ).toBeTruthy();
-  });
-
-  it("keeps distant annotations unmounted and suppresses baked labels", () => {
-    const { container } = render(<ExperienceShell />);
-    expect(
-      container.querySelectorAll(
-        '[data-slide="03-four-stacks"] [data-plate-annotation]',
-      ),
-    ).toHaveLength(0);
-    expect(
-      container.querySelectorAll(
-        '[data-slide="03-four-stacks"] [data-annotation-layer]',
-      ),
-    ).toHaveLength(0);
-    expect(container.querySelectorAll("[data-plate-annotation]")).toHaveLength(0);
-    expect(container.querySelectorAll("[data-annotation-layer]")).toHaveLength(
-      SLIDES.filter(shouldShowLiveAnnotations).length,
-    );
   });
 
   it("marks only the active neighborhood for media and compositing", () => {
@@ -144,49 +129,68 @@ describe("ExperienceShell", () => {
         playedSources.push(this.getAttribute("src") ?? "");
         return Promise.resolve();
       });
-    const { container } = render(<ExperienceShell />);
+    render(<ExperienceShell />);
     expect(play).toHaveBeenCalled();
     for (const source of playedSources) {
       expect(source).toMatch(/\/9x16\//);
     }
-    // Plate labels sit above the scrim / outside the drifting media plane so
-    // cover-crop + scale cannot clip them on mobile.
-    const flywheelLayer = container.querySelector(
-      '[data-slide="04-flywheel"] [data-annotation-layer]',
-    );
-    expect(flywheelLayer).toBeTruthy();
-    expect(flywheelLayer?.closest("[data-scene-plane]")).toBeNull();
   });
 
   it("uses Omni landscape sources by default with WebP posters", () => {
     const { container } = render(<ExperienceShell />);
-    // Title scene is the live 3D hero — no Omni video on slide 01.
+    // Opening scene is the live 3D hero — no Omni video on slide 00.
     const titleHero = container.querySelector(
-      '[data-slide="01-title"] [data-scene-hero3d]',
+      '[data-slide="00-super-stack"] [data-scene-hero3d]',
     );
     expect(titleHero).toBeTruthy();
     expect(
-      container.querySelector('[data-slide="01-title"] video'),
+      container.querySelector('[data-slide="00-super-stack"] video'),
     ).toBeNull();
     expect(
-      container.querySelector('[data-slide="01-title"]')?.getAttribute("data-hero3d"),
+      container.querySelector('[data-slide="00-super-stack"]')?.getAttribute("data-hero3d"),
     ).toBe("true");
     const titlePoster = container.querySelector<HTMLImageElement>(
-      '[data-slide="01-title"] [data-scene-poster]',
+      '[data-slide="00-super-stack"] [data-scene-poster]',
     );
     expect(titlePoster?.getAttribute("src")).toMatch(
-      /\/concepts\/omni-chain\/posters\/16x9\/sp-stack-01-title\.webp$/,
+      /\/concepts\/clean\/sp-stack-18-different\.webp$/,
     );
+    expect(
+      container
+        .querySelector('[data-slide="01-title"] [data-scene-poster]')
+        ?.getAttribute("src"),
+    ).toMatch(/\/concepts\/omni-chain\/posters\/16x9\/sp-stack-01-title\.webp$/);
     // Later scenes still use Omni video (warm window attaches src).
-    const qVideo = container.querySelector<HTMLVideoElement>(
-      '[data-slide="02-question"] video',
+    // 02-world is still-only; assert via poster. Omni video lives on later mapped scenes.
+    const worldPoster = container.querySelector<HTMLImageElement>(
+      '[data-slide="02-world"] [data-scene-poster]',
     );
-    const qPoster = container.querySelector<HTMLImageElement>(
-      '[data-slide="02-question"] [data-scene-poster]',
+    expect(worldPoster?.getAttribute("src") ?? "").toMatch(
+      /sp-stack-02-world/,
     );
-    const qSrc =
-      qVideo?.getAttribute("src") ?? qPoster?.getAttribute("src") ?? "";
-    expect(qSrc).toMatch(/sp-stack-02-the-question/);
+    const stacksVideo = container.querySelector<HTMLVideoElement>(
+      '[data-slide="03-four-stacks"] video',
+    );
+    const stacksPoster = container.querySelector<HTMLImageElement>(
+      '[data-slide="03-four-stacks"] [data-scene-poster]',
+    );
+    const stacksSrc =
+      stacksVideo?.getAttribute("src") ??
+      stacksPoster?.getAttribute("src") ??
+      "";
+    expect(stacksSrc).toMatch(/sp-stack-03-four-stacks/);
+  });
+
+  it("renders the super stack scene as a centered hero caption", () => {
+    const { container } = render(<ExperienceShell />);
+    const scene = container.querySelector('[data-slide="00-super-stack"]')!;
+    expect(scene.querySelector("[data-scene-copy]")).toBeNull();
+    const caption = scene.querySelector("[data-scene-copy-hero]")!;
+    expect(caption).toBeTruthy();
+    const title = caption.querySelector("h1.scene-hero-title")!;
+    const lines = [...title.querySelectorAll("span")].map((s) => s.textContent);
+    expect(lines).toEqual(["The SuperPatch", "Super Stack"]);
+    expect(scene.querySelector(".scene-eyebrow")).toBeNull();
   });
 
   it("keeps the experience title overlay copy on the 3D hero scene", () => {
@@ -195,16 +199,16 @@ describe("ExperienceShell", () => {
       '[data-slide="01-title"] [data-scene-copy]',
     );
     expect(copy?.querySelector("[data-anim-layer='headline']")?.textContent).toMatch(
-      /10 Ways to Build Life-Changing Income/i,
+      /More Than an Affiliate Program\. A Complete Opportunity\./i,
     );
     expect(copy?.querySelector("[data-anim-layer='eyebrow']")).toBeTruthy();
     expect(copy?.querySelector("[data-anim-layer='body']")).toBeTruthy();
   });
 
-  it("exposes a vertical scene navigator with 15 steps", () => {
+  it("exposes a vertical scene navigator with 20 steps", () => {
     render(<ExperienceShell />);
     const nav = screen.getByRole("navigation", { name: /scene navigator/i });
-    expect(nav.querySelectorAll("button")).toHaveLength(15);
+    expect(nav.querySelectorAll("button")).toHaveLength(21);
   });
 
   it("composes each scene as one layered viewport card", () => {
@@ -243,8 +247,10 @@ describe("ExperienceShell", () => {
 
   it("exposes chapter-aware orientation in the chrome", () => {
     render(<ExperienceShell />);
-    expect(screen.getByText("01 / 15")).toBeTruthy();
-    expect(screen.getByText("Foundation")).toBeTruthy();
+    expect(screen.getByText("01 / 21")).toBeTruthy();
+    expect(
+      screen.getByText("Super Stack", { selector: ".experience-chapter-label" }),
+    ).toBeTruthy();
   });
 
   it("does not expose hash placeholder CTA destinations in production scenes", () => {
@@ -254,5 +260,33 @@ describe("ExperienceShell", () => {
     const secondary = closing?.querySelector('[data-cta="secondary"]');
     expect(primary?.getAttribute("href")).toMatch(/^https:\/\//);
     expect(secondary?.getAttribute("href")).toMatch(/^https:\/\//);
+  });
+
+  it("renders the chip stage and static fallback list for chip scenes", () => {
+    const { container } = render(<ExperienceShell />);
+    const scene = container.querySelector('[data-slide="01-title"]')!;
+    expect(scene.querySelectorAll("[data-chip-item]")).toHaveLength(3);
+    const fallback = scene.querySelector("[data-chip-fallback]")!;
+    expect(fallback.textContent).toContain("BETTER HEALTH");
+    expect(
+      container.querySelector('[data-slide="00-super-stack"] [data-chip-stage]'),
+    ).toBeNull();
+  });
+
+  it("no longer renders the plate-annotation overlay on the web", () => {
+    const { container } = render(<ExperienceShell />);
+    expect(container.querySelectorAll("[data-plate-annotation]")).toHaveLength(0);
+  });
+
+  it("pins the income disclosure outside the copy block on chip scenes", () => {
+    const { container } = renderShell();
+    const scene = container.querySelector('[data-slide="07-retail"]')!;
+    const pinned = scene.querySelector("[data-disclosure-pinned]")!;
+    expect(pinned.textContent).toContain("Income is not guaranteed");
+    expect(pinned.closest("[data-scene-copy]")).toBeNull();
+    expect(pinned.getAttribute("data-anim-layer")).toBe("disclosure");
+    // Non-chip scenes keep the disclosure where it was.
+    const closing = container.querySelector('[data-slide="15-closing"]')!;
+    expect(closing.querySelector("[data-disclosure-pinned]")).toBeNull();
   });
 });

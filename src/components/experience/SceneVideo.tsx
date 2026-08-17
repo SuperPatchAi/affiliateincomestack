@@ -36,6 +36,7 @@ export function SceneVideo({
   const [playBlocked, setPlayBlocked] = useState(false);
   const ready = readySource === variant.src;
   const failed = failedSource === variant.src;
+  const stillOnly = !variant.src;
   // Keep the poster up while mobile autoplay is still blocked so early scenes
   // do not flash a paused frame and then look "broken" until a later slide.
   const videoVisible = ready && !(autoplay && playBlocked);
@@ -164,7 +165,11 @@ export function SceneVideo({
       className="scene-media-plane"
       data-scene-media
       data-media-state={
-        failed ? "poster-only" : videoVisible ? "ready" : "loading"
+        stillOnly || failed
+          ? "poster-only"
+          : videoVisible
+            ? "ready"
+            : "loading"
       }
       data-play-blocked={playBlocked ? "true" : "false"}
       aria-hidden="true"
@@ -181,7 +186,7 @@ export function SceneVideo({
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
       />
-      {attachVideo && !failed ? (
+      {attachVideo && !failed && !stillOnly ? (
         <video
           ref={videoRef}
           className="scene-video"

@@ -14,8 +14,13 @@ describe("flywheelPlacement", () => {
   });
 
   it("returns null when flywheelArc is absent (slide 02)", () => {
-    const question = SLIDES.find((s) => s.id === "02-question")!;
-    expect(flywheelPlacement(question)).toBeNull();
+    const world = SLIDES.find((s) => s.id === "02-world")!;
+    expect(flywheelPlacement(world)).toBeNull();
+  });
+
+  it("returns corner for 17-compounding (no hero flywheel on the still)", () => {
+    const compounding = SLIDES.find((s) => s.id === "17-compounding")!;
+    expect(flywheelPlacement(compounding)).toBe("corner");
   });
 });
 

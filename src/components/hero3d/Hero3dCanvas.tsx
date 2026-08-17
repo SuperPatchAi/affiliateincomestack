@@ -6,13 +6,22 @@ import {
 } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { PatchErrorBoundary } from "./patchErrorBoundary";
+import { PatchHeroScene } from "./PatchHeroScene";
 import { PhotorealStackScene } from "./PhotorealStackScene";
+import {
+  PATCH_CAMERA_Y,
+  PATCH_CAMERA_Z,
+  PATCH_TONE_MAPPING_EXPOSURE,
+} from "./patchHero";
 import { qualityTierConfig } from "./qualityTier";
 import {
   readViewportMetrics,
   subscribeViewportMetrics,
   type ViewportMetrics,
 } from "./viewportMetrics";
+
+const NOOP = () => {};
 
 const SERVER_VIEWPORT: ViewportMetrics = {
   width: 390,
@@ -68,16 +77,24 @@ function CanvasSizeSync({
   return null;
 }
 
+type Hero3dVariant = "patch" | "stack";
+
 type Props = {
   width: number;
   height: number;
   reducedMotion: boolean;
   /** Prefer host size over window metrics for quality tier (embedded). */
   embedded?: boolean;
+  variant?: Hero3dVariant;
+  /** Surface R3F / useGLTF throws so the host can unmount the canvas. */
+  onError?: () => void;
+  /** First framed patch frame — host may hide the title poster. */
+  onReady?: () => void;
 };
 
 /**
- * Shared R3F canvas for the photoreal Income Stack hero.
+ * Shared R3F canvas for the title Super Patch (`variant="patch"`)
+ * or the photoreal plate-stack look-dev (`variant="stack"`).
  * Overlay/chrome is owned by the host (experience shell or preview).
  */
 export function Hero3dCanvas({
@@ -85,6 +102,9 @@ export function Hero3dCanvas({
   height,
   reducedMotion,
   embedded = false,
+  variant = "stack",
+  onError,
+  onReady,
 }: Props) {
   const [focusIndex, setFocusIndex] = useState<number | null>(null);
   const windowViewport = useSyncExternalStore(
@@ -123,43 +143,66 @@ export function Hero3dCanvas({
     <div
       className="hero3d-canvas-host"
       data-hero3d-canvas
+      data-hero3d-variant={variant}
       data-quality-tier={config.tier}
-      style={{ width: "100%", height: "100%", touchAction: "none" }}
+      style={{
+        width: "100%",
+        height: "100%",
+        touchAction: variant === "patch" ? "pan-y" : "none",
+      }}
       onPointerLeave={() => setFocusIndex(null)}
     >
       <Canvas
         dpr={[1, config.dprCap]}
-        camera={{
-          position: [1.35, 1.15, 4.2],
-          fov: config.cameraFov,
-          near: 0.05,
-          far: 40,
-        }}
+        camera={
+          variant === "patch"
+            ? { position: [0, PATCH_CAMERA_Y, PATCH_CAMERA_Z], fov: config.cameraFov, near: 0.05, far: 40 }
+            : { position: [1.35, 1.15, 4.2], fov: config.cameraFov, near: 0.05, far: 40 }
+        }
         gl={{
           antialias: config.antialias,
           alpha: false,
           powerPreference: config.powerPreference,
           toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 0.58,
+          toneMappingExposure:
+            variant === "patch" ? PATCH_TONE_MAPPING_EXPOSURE : 0.58,
           preserveDrawingBuffer: true,
         }}
         onCreated={({ gl, scene }) => {
           gl.setClearColor("#000000", 1);
           scene.background = new THREE.Color("#000000");
-          gl.domElement.style.touchAction = "none";
+          gl.domElement.style.touchAction = variant === "patch" ? "pan-y" : "none";
           gl.domElement.style.webkitUserSelect = "none";
           gl.domElement.style.userSelect = "none";
         }}
         style={{ width: "100%", height: "100%", display: "block" }}
-        aria-label="Income Stack cinematic metallic plate preview"
+        role="img"
+        aria-label={
+          variant === "patch"
+            ? "Super Patch title product"
+            : "Income Stack cinematic metallic plate preview"
+        }
       >
         <CanvasSizeSync width={width} height={height} />
-        <PhotorealStackScene
-          focusIndex={focusIndex}
-          config={config}
-          reducedMotion={reducedMotion}
-          onFocusPlate={setFocusIndex}
-        />
+        {variant === "patch" ? (
+          <PatchErrorBoundary onError={onError ?? NOOP}>
+            <PatchHeroScene
+              reducedMotion={reducedMotion}
+              coarsePointer={viewport.coarsePointer}
+              width={width}
+              height={height}
+              fovDeg={config.cameraFov}
+              onReady={onReady}
+            />
+          </PatchErrorBoundary>
+        ) : (
+          <PhotorealStackScene
+            focusIndex={focusIndex}
+            config={config}
+            reducedMotion={reducedMotion}
+            onFocusPlate={setFocusIndex}
+          />
+        )}
       </Canvas>
     </div>
   );

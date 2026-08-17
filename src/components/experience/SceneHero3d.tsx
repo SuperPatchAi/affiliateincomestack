@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Hero3dCanvas } from "../hero3d/Hero3dCanvas";
+import { PatchErrorBoundary } from "../hero3d/patchErrorBoundary";
 import { canUseWebGL } from "./hero3dExperienceSlide";
 
 type Props = {
@@ -11,8 +12,9 @@ type Props = {
 };
 
 /**
- * Title-scene media plane: photoreal 3D stack when WebGL is available,
+ * Title-scene media plane: Super Patch GLB when WebGL is available,
  * Omni poster fallback otherwise. Experience shell owns the copy overlay.
+ * Poster stays at opacity 1 until the patch reports its first framed frame.
  */
 export function SceneHero3d({
   active,
@@ -23,6 +25,8 @@ export function SceneHero3d({
   const hostRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 390, height: 844 });
   const [webgl, setWebgl] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setWebgl(canUseWebGL());
@@ -44,7 +48,17 @@ export function SceneHero3d({
     return () => ro.disconnect();
   }, []);
 
-  const mountCanvas = active && !reducedMotion && webgl;
+  const mountCanvas = active && !reducedMotion && webgl && !failed;
+  const posterHidden = mountCanvas && ready;
+  const handlePatchError = () => {
+    setFailed(true);
+    setReady(false);
+  };
+  const handlePatchReady = () => setReady(true);
+
+  useEffect(() => {
+    if (!mountCanvas) setReady(false);
+  }, [mountCanvas]);
 
   return (
     <div
@@ -61,16 +75,21 @@ export function SceneHero3d({
         draggable={false}
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : "auto"}
-        style={{ opacity: mountCanvas ? 0 : 1 }}
+        style={{ opacity: posterHidden ? 0 : 1 }}
       />
       {mountCanvas ? (
         <div className="scene-hero3d-canvas">
-          <Hero3dCanvas
-            width={size.width}
-            height={size.height}
-            reducedMotion={reducedMotion}
-            embedded
-          />
+          <PatchErrorBoundary onError={handlePatchError}>
+            <Hero3dCanvas
+              width={size.width}
+              height={size.height}
+              reducedMotion={reducedMotion}
+              embedded
+              variant="patch"
+              onError={handlePatchError}
+              onReady={handlePatchReady}
+            />
+          </PatchErrorBoundary>
         </div>
       ) : null}
     </div>

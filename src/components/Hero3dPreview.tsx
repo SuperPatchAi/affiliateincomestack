@@ -130,6 +130,7 @@ export function Hero3dPreview() {
         width={viewport.width}
         height={viewport.height}
         reducedMotion={reducedMotion}
+        variant="stack"
       />
 
       <div className="hero3d-title-scrim" aria-hidden />

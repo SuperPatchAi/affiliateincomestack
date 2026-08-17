@@ -46,7 +46,7 @@ describe("App surface selection", () => {
     expect(
       container.querySelector("[data-title-slide-overlay] [data-anim-layer='headline']")
         ?.textContent,
-    ).toMatch(/10 Ways to Build Life-Changing Income/i);
+    ).toMatch(/More Than an Affiliate Program\. A Complete Opportunity\./i);
     // No flywheel badge above the eyebrow on the 3D hero composite.
     expect(
       container.querySelector("[data-title-slide-overlay] [data-flywheel]"),

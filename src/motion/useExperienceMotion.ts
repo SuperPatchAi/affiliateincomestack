@@ -17,9 +17,18 @@ import {
   resolveWebChoreography,
   sceneDwellEnabled,
   sceneLayerState,
-  sceneScrollHeightVh,
   shouldRefreshScrollTriggerOnResize,
 } from "./experienceMotionConfig";
+import {
+  chipDwellTriggerId,
+  parkDistantChipDwells,
+  resumeNearbyChipDwells,
+} from "./chipDwellParking";
+import {
+  buildDwellSegments,
+  sceneScrollHeightVhForChips,
+} from "./chipSequence";
+import { applyTitlePatchExit } from "./titlePatchExit";
 
 let registered = false;
 
@@ -67,7 +76,7 @@ export function useExperienceMotion({
       if (!enabled) {
         gsap.set(
           root.querySelectorAll(
-            "[data-scene-card], [data-scene-plane], [data-scene-scrim], [data-scene-copy] [data-anim-layer], [data-annotation-layer], [data-stream-index], [data-progress-spine]",
+            "[data-scene-card], [data-scene-plane], [data-scene-scrim], [data-scene-copy] [data-anim-layer], [data-disclosure-pinned], [data-annotation-layer], [data-stream-index], [data-progress-spine]",
           ),
           { clearProps: "all" },
         );
@@ -106,9 +115,6 @@ export function useExperienceMotion({
           const scenes = gsap.utils.toArray<HTMLElement>(
             root.querySelectorAll("[data-experience-scene]"),
           );
-          const scrollHeight = sceneScrollHeightVh({
-            coarsePointer: Boolean(coarsePointer),
-          });
           const viewportHeight = measureSceneViewportHeight();
           let lastActiveIndex = -1;
           const reportActiveIndex = (index: number) => {
@@ -124,11 +130,21 @@ export function useExperienceMotion({
                   lifecycle === "distant" ? "auto" : "transform, opacity";
               }
             });
+            if (resumeNearbyChipDwells(scenes)) {
+              ScrollTrigger.update();
+            }
             onActiveIndex?.(index);
           };
 
           scenes.forEach((scene, index) => {
-            scene.style.height = index === 0 ? "100svh" : `${scrollHeight}svh`;
+            const chipItems = scene.querySelectorAll<HTMLElement>("[data-chip-item]");
+            scene.style.height =
+              index === 0
+                ? "100svh"
+                : `${sceneScrollHeightVhForChips({
+                    coarsePointer: Boolean(coarsePointer),
+                    chipCount: chipItems.length,
+                  })}svh`;
             const card = scene.querySelector<HTMLElement>("[data-scene-card]");
             const plane = scene.querySelector<HTMLElement>("[data-scene-plane]");
             const scrim = scene.querySelector<HTMLElement>("[data-scene-scrim]");
@@ -206,9 +222,14 @@ export function useExperienceMotion({
                   invalidateOnRefresh: true,
                   onEnter: () => gsap.set(card, { visibility: "visible" }),
                   onEnterBack: () => gsap.set(card, { visibility: "visible" }),
-                  onLeaveBack: () => gsap.set(card, { visibility: "hidden" }),
-                  onUpdate: (self) =>
-                    reportActiveIndex(self.progress >= 0.5 ? index : index - 1),
+                  onLeaveBack: () => {
+                    gsap.set(card, { visibility: "hidden" });
+                    applyTitlePatchExit(scenes[0], index, 0);
+                  },
+                  onUpdate: (self) => {
+                    reportActiveIndex(self.progress >= 0.5 ? index : index - 1);
+                    applyTitlePatchExit(scenes[0], index, self.progress);
+                  },
                 },
               });
 
@@ -294,9 +315,14 @@ export function useExperienceMotion({
             }
 
             if (sceneDwellEnabled(index)) {
-              gsap
+              const chipEls = Array.from(
+                scene.querySelectorAll<HTMLElement>("[data-chip-item]"),
+              );
+              const copyBlock = scene.querySelector<HTMLElement>("[data-scene-copy]");
+              const dwell = gsap
                 .timeline({
                   scrollTrigger: {
+                    id: chipDwellTriggerId(scene.id),
                     trigger: scene,
                     start: "top top",
                     end: "bottom bottom",
@@ -316,6 +342,7 @@ export function useExperienceMotion({
                     filter: `brightness(${preset.dwell.mediaDrift.brightness})`,
                     ease: "none",
                     immediateRender: false,
+                    duration: 1,
                   },
                   0,
                 )
@@ -326,9 +353,55 @@ export function useExperienceMotion({
                     ...preset.dwell.scrimDrift,
                     ease: "none",
                     immediateRender: false,
+                    duration: 1,
                   },
                   0,
                 );
+
+              const segments = buildDwellSegments(chipEls.length);
+              if (segments && copyBlock) {
+                scene.dataset.chipsAnimated = "true";
+                gsap.set(chipEls, { opacity: 0 });
+                // Copy reads until READ_HOLD_END, then slides fully off the left edge.
+                dwell.to(
+                  copyBlock,
+                  {
+                    x: () => -(copyBlock.getBoundingClientRect().right + 64),
+                    ease: "power1.in",
+                    immediateRender: false,
+                    duration: segments.copyExit.end - segments.copyExit.start,
+                  },
+                  segments.copyExit.start,
+                );
+                chipEls.forEach((item, chipIndex) => {
+                  const win = segments.chips[chipIndex];
+                  dwell.fromTo(
+                    item,
+                    { opacity: 0, x: 72 },
+                    {
+                      opacity: 1,
+                      x: 0,
+                      ease: "none",
+                      immediateRender: false,
+                      duration: win.enter.end - win.enter.start,
+                    },
+                    win.enter.start,
+                  );
+                  if (win.exit) {
+                    dwell.to(
+                      item,
+                      {
+                        opacity: 0,
+                        x: -72,
+                        ease: "none",
+                        immediateRender: false,
+                        duration: win.exit.end - win.exit.start,
+                      },
+                      win.exit.start,
+                    );
+                  }
+                });
+              }
             }
           });
 
@@ -443,6 +516,8 @@ export function useExperienceMotion({
             for (const scene of scenes) {
               scene.style.removeProperty("height");
               delete scene.dataset.sceneLifecycle;
+              delete scene.dataset.chipsAnimated;
+              delete scene.dataset.chipDwellParked;
               scene
                 .querySelector<HTMLElement>("[data-scene-card]")
                 ?.style.removeProperty("will-change");
@@ -488,13 +563,18 @@ export function scrollToScene(
         );
       }
       gsap.set(
-        scene.querySelectorAll(
-          "[data-annotation-layer], [data-stream-index], [data-progress-spine]",
-        ),
+        scene.querySelectorAll("[data-stream-index], [data-progress-spine]"),
         {
           autoAlpha: index === targetIndex ? 1 : 0,
         },
       );
+      // Chip state is owned by the scrubbed dwell timeline; park everything
+      // hidden and let ScrollTrigger.update() re-apply the correct progress.
+      gsap.set(scene.querySelectorAll("[data-chip-item]"), { opacity: 0, x: 72 });
+      const copyBlock = scene.querySelector<HTMLElement>("[data-scene-copy]");
+      if (copyBlock) {
+        gsap.set(copyBlock, { x: 0 });
+      }
       scene.dataset.sceneLifecycle = resolveSceneLifecycle(index, targetIndex);
       scene.dataset.motionLayerActive =
         resolveSceneLifecycle(index, targetIndex) === "distant"
@@ -508,6 +588,9 @@ export function scrollToScene(
     const el = document.querySelector(target);
     el?.scrollIntoView({ behavior: "auto" });
     ScrollTrigger.update();
+    if (parkDistantChipDwells(scenes)) {
+      ScrollTrigger.update();
+    }
     return;
   }
 
@@ -521,6 +604,9 @@ export function scrollToScene(
     onComplete: () => {
       resetLayers();
       ScrollTrigger.update();
+      if (parkDistantChipDwells(scenes)) {
+        ScrollTrigger.update();
+      }
       windowScrollTween = undefined;
     },
     onInterrupt: () => {

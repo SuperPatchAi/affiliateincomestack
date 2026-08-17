@@ -12,8 +12,8 @@ describe("shouldShowLiveAnnotations", () => {
   it("shows live labels when hero is present but annotations are not baked", () => {
     const title = SLIDES.find((s) => s.id === "01-title")!;
     expect(title.hero?.annotationsBaked).toBe(false);
-    // title has no annotations — still false because empty
-    expect(shouldShowLiveAnnotations(title)).toBe(false);
+    expect(title.annotations?.length).toBeGreaterThan(0);
+    expect(shouldShowLiveAnnotations(title)).toBe(true);
   });
 
   it("shows live labels on still plates with annotations", () => {

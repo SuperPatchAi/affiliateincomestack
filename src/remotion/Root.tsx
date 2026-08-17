@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { IncomeStackFilm } from "./IncomeStackFilm";
-import { SLIDES } from "../data/slides";
+import { FILM_SLIDES } from "../data/slides";
 import {
   FPS,
   HEIGHT,
@@ -13,7 +13,7 @@ export function RemotionRoot() {
     <Composition
       id="IncomeStackFilm"
       component={IncomeStackFilm}
-      durationInFrames={filmDurationInFrames(SLIDES)}
+      durationInFrames={filmDurationInFrames(FILM_SLIDES)}
       fps={FPS}
       width={WIDTH}
       height={HEIGHT}

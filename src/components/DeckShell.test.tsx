@@ -7,7 +7,7 @@ import { shouldShowLiveAnnotations } from "../remotion/labels";
 describe("DeckShell", () => {
   it("renders all slides with on-slide copy", () => {
     const { container } = render(<DeckShell />);
-    expect(container.querySelectorAll("[data-slide]")).toHaveLength(15);
+    expect(container.querySelectorAll("[data-slide]")).toHaveLength(21);
     expect(screen.getByText(SLIDES[0].headline)).toBeTruthy();
     expect(screen.getByText(SLIDES[6].headline)).toBeTruthy();
   });
@@ -15,8 +15,8 @@ describe("DeckShell", () => {
   it("uses fluid layout with contained high-quality concept plates", () => {
     const { container } = render(<DeckShell />);
     const slides = container.querySelectorAll("[data-layout='fluid']");
-    expect(slides).toHaveLength(15);
-    // Every slide ships an animated hero loop; clean PNG is the poster.
+    expect(slides).toHaveLength(21);
+    // Title ships an animated hero loop; clean PNG is the poster.
     const title = container.querySelector<HTMLVideoElement>(
       "[data-slide='01-title'] [data-slide-plate]",
     );
@@ -25,15 +25,18 @@ describe("DeckShell", () => {
       /\/concepts\/animated\/sp-stack-01-title_animated\.mp4$/,
     );
     expect(title?.getAttribute("poster")).toMatch(/\/concepts\/clean\/sp-stack-01-title\.png$/);
-    const question = container.querySelector<HTMLVideoElement>(
-      "[data-slide='02-question'] [data-slide-plate]",
+    // Gap-fill still scenes use concept PNG plates until animated assets land.
+    const world = container.querySelector<HTMLImageElement>(
+      "[data-slide='02-world'] [data-slide-plate]",
     );
-    expect(question?.tagName).toBe("VIDEO");
-    expect(question?.getAttribute("src")).toMatch(
-      /\/concepts\/animated\/sp-stack-02-the-question_animated\.mp4$/,
+    expect(world?.tagName).toBe("IMG");
+    expect(world?.getAttribute("src")).toMatch(
+      /\/concepts\/clean\/sp-stack-02-world\.png$/,
     );
     const videos = container.querySelectorAll("[data-slide] video[data-slide-plate]");
-    expect(videos).toHaveLength(15);
+    expect(videos).toHaveLength(
+      SLIDES.filter((s) => Boolean(s.heroVideoSrc || s.hero?.src)).length,
+    );
   });
 
   it("renders plate annotations as positioned overlay type", () => {

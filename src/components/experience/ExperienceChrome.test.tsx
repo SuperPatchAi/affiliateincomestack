@@ -56,8 +56,8 @@ describe("ExperienceChrome", () => {
         onJumpTo={() => {}}
       />,
     );
-    expect(screen.getByText("07 / 15")).toBeTruthy();
-    expect(screen.getByText("Ten Income Streams")).toBeTruthy();
+    expect(screen.getByText("07 / 21")).toBeTruthy();
+    expect(screen.getByText("Full Stack")).toBeTruthy();
   });
 
   it("uses Premium V2 audio control labels", () => {

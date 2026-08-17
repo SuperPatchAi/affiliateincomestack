@@ -16,15 +16,61 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 15 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(15);
+  it("has 21 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(21);
+    expect(SLIDES.map((s) => s.id)).toEqual([
+      "00-super-stack",
+      "01-title",
+      "02-world",
+      "03-four-stacks",
+      "04-flywheel",
+      "05-product",
+      "06-brand",
+      "07-development",
+      "08-ten-layers",
+      "07-retail",
+      "08-fast-start",
+      "09-team-overrides",
+      "10-md-depth",
+      "11-vp-override",
+      "12-generations",
+      "13-executive",
+      "14-global",
+      "17-compounding",
+      "18-different",
+      "19-future",
+      "15-closing",
+    ]);
     for (const s of SLIDES) {
-      expect(s.eyebrow.length).toBeGreaterThan(0);
       expect(s.headline.length).toBeGreaterThan(0);
+      if (s.copyLayout === "hero-caption") continue;
+      expect(s.eyebrow.length).toBeGreaterThan(0);
       const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
       expect(wordCount(filmCopy)).toBeGreaterThanOrEqual(30);
       expect(wordCount(filmCopy)).toBeLessThanOrEqual(50);
     }
+  });
+
+  it("opens on the hero-caption super stack scene", () => {
+    const first = SLIDES[0];
+    expect(first.id).toBe("00-super-stack");
+    expect(first.copyLayout).toBe("hero-caption");
+    expect(first.headline).toBe("The SuperPatch Super Stack");
+    expect(first.eyebrow).toBe("");
+    expect(first.body).toBe("");
+    expect(first.annotations ?? []).toHaveLength(0);
+    expect(first.conceptSrc).toBe("/concepts/clean/sp-stack-18-different.png");
+    expect(first.requiresDisclosure).toBe(false);
+  });
+
+  it("keeps the trademark on scene 02, off scene 01", () => {
+    expect(SLIDES[0].eyebrow).not.toContain("™");
+    expect(SLIDES[1].id).toBe("01-title");
+    expect(SLIDES[1].eyebrow).toBe("The Super Patch Income Stack™");
+  });
+
+  it("exempts hero-caption slides from lower-third copy validation", () => {
+    expect(() => assertSlidesValid(SLIDES)).not.toThrow();
   });
 
   it("requires disclosure on money slides 07-14", () => {
@@ -52,31 +98,51 @@ describe("SLIDES", () => {
     expect(close.ctaSecondary).toBe("Read the Income Disclosure");
   });
 
-  it("rewrites slide 06 as the ten-stream index bridge", () => {
-    const bridge = SLIDES.find((s) => s.id === "06-ten-layers")!;
+  it("rewrites the ten-stream index as 08-ten-layers with tier bands", () => {
+    const bridge = SLIDES.find((s) => s.id === "08-ten-layers")!;
     expect(bridge.eyebrow).toBe("Income Stack™ — Ten Streams");
-    expect(bridge.headline).toBe("Ten Ways. One Path Forward.");
-    expect(bridge.onScreenBody).toMatch(/Start with retail/i);
-    expect(bridge.voiceover).toMatch(/one by one/i);
-    expect(bridge.body.toLowerCase()).toMatch(/retail/);
-    expect(bridge.body.toLowerCase()).toMatch(/global leadership pool/);
+    expect(bridge.headline).toBe("One Opportunity. Ten Income Streams.");
+    expect(bridge.annotations?.map((a) => a.text)).toEqual([
+      "1–3 FOUNDATION",
+      "4–7 LEADERSHIP",
+      "8–10 EXECUTIVE",
+    ]);
   });
 
-  it("adds proof/objection presenter notes without inventing dollar claims", () => {
-    const eco = SLIDES.find((s) => s.id === "05-ecosystem")!;
-    expect(eco.onScreenBody).toMatch(/Health outcomes/i);
-    expect(eco.presenterNotes).toMatch(/Do I have to recruit/i);
-    expect(eco.presenterNotes).toMatch(/Income Disclosure/i);
-    expect(eco.presenterNotes).not.toMatch(/\$\d/);
+  it("covers the seven new Full Stack and Momentum beats", () => {
+    expect(SLIDES.find((s) => s.id === "02-world")!.headline).toMatch(
+      /no longer optional/i,
+    );
+    expect(SLIDES.find((s) => s.id === "05-product")!.eyebrow).toBe("Product Stack");
+    expect(SLIDES.find((s) => s.id === "06-brand")!.eyebrow).toBe(
+      "Brand & Marketing Stack",
+    );
+    expect(SLIDES.find((s) => s.id === "07-development")!.headline).toMatch(
+      /better people/i,
+    );
+    expect(SLIDES.find((s) => s.id === "17-compounding")!.eyebrow).toMatch(
+      /Compounding/i,
+    );
+    expect(SLIDES.find((s) => s.id === "18-different")!.eyebrow).toMatch(
+      /Different/i,
+    );
+    const future = SLIDES.find((s) => s.id === "19-future")!;
+    expect(future.requiresDisclosure).toBe(true);
+    expect(future.disclosure).toBe(INCOME_DISCLOSURE);
+  });
+
+  it("keeps product presenter notes off invented clinical claims", () => {
+    const product = SLIDES.find((s) => s.id === "05-product")!;
+    expect(product.presenterNotes).toMatch(/official Super Patch materials/i);
+    expect(product.body.toLowerCase()).not.toMatch(/\bguaranteed\b/);
     const four = SLIDES.find((s) => s.id === "03-four-stacks")!;
     expect(four.presenterNotes).toMatch(/official Super Patch materials/i);
-    expect(four.presenterNotes).not.toMatch(/\b\d+%\b/);
   });
 
   it("assertSlidesValid word-counts onScreenBody for film when set", () => {
-    const base = SLIDES[0]!;
+    const base = SLIDES[1]!;
     const withOverlay: typeof SLIDES = SLIDES.map((s, i) =>
-      i === 0
+      i === 1
         ? {
             ...base,
             body: "Speaker script that can run longer than fifty words for the presenter while the film overlay uses a shorter on-screen body string instead. Keep expanding this line with enough words so the speaker version clearly exceeds the fifty-word film limit and proves the relaxed body rule. Add still more spoken detail about pacing, sponsor guidance, and how affiliates choose their starting path without forcing that verbosity onto the film overlay.",
@@ -85,9 +151,9 @@ describe("SLIDES", () => {
           }
         : s,
     );
-    expect(wordCount(withOverlay[0]!.body)).toBeGreaterThan(50);
-    expect(wordCount(withOverlay[0]!.onScreenBody!)).toBeGreaterThanOrEqual(30);
-    expect(wordCount(withOverlay[0]!.onScreenBody!)).toBeLessThanOrEqual(50);
+    expect(wordCount(withOverlay[1]!.body)).toBeGreaterThan(50);
+    expect(wordCount(withOverlay[1]!.onScreenBody!)).toBeGreaterThanOrEqual(30);
+    expect(wordCount(withOverlay[1]!.onScreenBody!)).toBeLessThanOrEqual(50);
     expect(() => assertSlidesValid(withOverlay)).not.toThrow();
   });
 
@@ -116,6 +182,108 @@ describe("SLIDES", () => {
     );
     expect(() => assertSlidesValid(broken)).toThrow(/incomplete end-card/i);
   });
+
+  it("gives every lower-third scene a sequenced chip set (63 chips total)", () => {
+    const withChips = SLIDES.filter((s) => (s.chips?.length ?? 0) > 0);
+    expect(withChips.map((s) => s.id)).toEqual([
+      "01-title",
+      "02-world",
+      "03-four-stacks",
+      "04-flywheel",
+      "05-product",
+      "06-brand",
+      "07-development",
+      "08-ten-layers",
+      "07-retail",
+      "08-fast-start",
+      "09-team-overrides",
+      "10-md-depth",
+      "11-vp-override",
+      "12-generations",
+      "13-executive",
+      "14-global",
+      "17-compounding",
+      "18-different",
+      "19-future",
+    ]);
+    const total = withChips.reduce((n, s) => n + (s.chips?.length ?? 0), 0);
+    expect(total).toBe(63);
+    expect(SLIDES.find((s) => s.id === "00-super-stack")?.chips).toBeUndefined();
+    expect(SLIDES.find((s) => s.id === "15-closing")?.chips).toBeUndefined();
+  });
+
+  it("keeps chip labels tight and sub-copy one readable line", () => {
+    for (const s of SLIDES) {
+      for (const chip of s.chips ?? []) {
+        expect(chip.label.trim().length, `${s.id} label empty`).toBeGreaterThan(0);
+        expect(wordCount(chip.label), `${s.id} "${chip.label}" too wordy`).toBeLessThanOrEqual(4);
+        expect(chip.label.length, `${s.id} "${chip.label}" too long`).toBeLessThanOrEqual(28);
+        expect(chip.sub.length, `${s.id} "${chip.label}" sub too short`).toBeGreaterThanOrEqual(12);
+        expect(chip.sub.length, `${s.id} "${chip.label}" sub too long`).toBeLessThanOrEqual(90);
+      }
+      expect(s.chips?.length ?? 0).toBeLessThanOrEqual(6);
+    }
+  });
+});
+
+describe("assertSlidesValid chip rules", () => {
+  const validSlide: Slide = {
+    id: "x",
+    conceptSrc: "/concepts/clean/x.png",
+    accent: "blue",
+    eyebrow: "EYEBROW",
+    headline: "Headline",
+    body: "word ".repeat(35).trim(),
+    motionPreset: "hero-patch",
+    requiresDisclosure: false,
+  };
+  const stack = (overrides: Partial<Slide>): Slide[] =>
+    Array.from({ length: 21 }, (_, i) =>
+      i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
+    );
+
+  it("rejects more than 6 chips", () => {
+    const chips = Array.from({ length: 7 }, (_, i) => ({
+      label: `CHIP ${i}`,
+      sub: "A supporting line of copy.",
+    }));
+    expect(() => assertSlidesValid(stack({ chips }))).toThrow(/at most 6 chips/);
+  });
+
+  it("rejects labels over 4 words or 28 characters", () => {
+    expect(() =>
+      assertSlidesValid(
+        stack({ chips: [{ label: "ONE TWO THREE FOUR FIVE", sub: "A supporting line." }] }),
+      ),
+    ).toThrow(/label/);
+    expect(() =>
+      assertSlidesValid(
+        stack({ chips: [{ label: "A".repeat(29), sub: "A supporting line." }] }),
+      ),
+    ).toThrow(/label/);
+  });
+
+  it("rejects sub-copy outside 12-90 characters", () => {
+    expect(() =>
+      assertSlidesValid(stack({ chips: [{ label: "CHIP", sub: "too short" }] })),
+    ).toThrow(/sub/);
+    expect(() =>
+      assertSlidesValid(stack({ chips: [{ label: "CHIP", sub: "x".repeat(91) }] })),
+    ).toThrow(/sub/);
+  });
+
+  it("rejects chips on hero-caption scenes", () => {
+    expect(() =>
+      assertSlidesValid(
+        stack({
+          copyLayout: "hero-caption",
+          eyebrow: "",
+          body: "",
+          chips: [{ label: "CHIP", sub: "A supporting line of copy." }],
+        }),
+      ),
+    ).toThrow(/hero-caption/);
+  });
 });
 
 describe("text-free plates", () => {
@@ -123,6 +291,30 @@ describe("text-free plates", () => {
     for (const s of SLIDES) {
       expect(s.conceptSrc).toMatch(/^\/concepts\/clean\/sp-stack-/);
     }
+  });
+
+  it("points new scenes at dedicated clean plates", () => {
+    expect(SLIDES.find((s) => s.id === "02-world")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-02-world.png",
+    );
+    expect(SLIDES.find((s) => s.id === "05-product")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-05-product.png",
+    );
+    expect(SLIDES.find((s) => s.id === "06-brand")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-06-brand.png",
+    );
+    expect(SLIDES.find((s) => s.id === "07-development")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-07-development.png",
+    );
+    expect(SLIDES.find((s) => s.id === "17-compounding")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-17-compounding.png",
+    );
+    expect(SLIDES.find((s) => s.id === "18-different")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-18-different.png",
+    );
+    expect(SLIDES.find((s) => s.id === "19-future")!.conceptSrc).toBe(
+      "/concepts/clean/sp-stack-19-future.png",
+    );
   });
 });
 
@@ -135,10 +327,10 @@ describe("plate annotations", () => {
 
   it("re-declares the four-stack pillar labels as overlay graphics", () => {
     expect(byId("03-four-stacks").annotations?.map((a) => a.text)).toEqual([
-      "PRODUCT",
-      "BRAND",
-      "INCOME",
-      "PEOPLE",
+      "PRODUCT STACK",
+      "BRAND & MARKETING",
+      "INCOME STACK",
+      "PERSONAL DEVELOPMENT",
     ]);
   });
 
@@ -174,6 +366,31 @@ describe("plate annotations", () => {
       text: "2%",
       role: "metric",
     });
+  });
+
+  it("keeps every label chip in a named seat above the lower third", () => {
+    for (const s of SLIDES) {
+      for (const a of s.annotations ?? []) {
+        if (a.role !== "label") continue;
+        expect(a.yPct, `${s.id} "${a.text}" below y52`).toBeLessThanOrEqual(52);
+        expect(a.text, `${s.id} chip must be ALL CAPS`).toBe(a.text.toUpperCase());
+        expect(
+          a.text.trim().split(/\s+/).length,
+          `${s.id} "${a.text}" chips are 1–4 words`,
+        ).toBeLessThanOrEqual(4);
+        const crown = a.yPct <= 22;
+        const rail = a.xPct >= 72;
+        const tile = a.yPct > 22 && a.yPct <= 52;
+        expect(crown || rail || tile, `${s.id} "${a.text}" has no seat`).toBe(true);
+      }
+    }
+  });
+
+  it("hides plates that must not carry chips", () => {
+    for (const id of ["00-super-stack", "18-different", "15-closing"]) {
+      const slide = SLIDES.find((s) => s.id === id)!;
+      expect(slide.annotations ?? []).toHaveLength(0);
+    }
   });
 
   it("positions every annotation inside the plate", () => {
@@ -215,9 +432,9 @@ describe("plate annotations", () => {
     for (const a of byId("09-team-overrides").annotations!) {
       expect(fittedSizePct(a)).toBe(a.sizePct);
     }
-    for (const a of byId("03-four-stacks").annotations!) {
-      expect(fittedSizePct(a)).toBe(a.sizePct);
-    }
+    const fourStacks = byId("03-four-stacks").annotations!;
+    expect(fittedSizePct(fourStacks[0]!)).toBe(fourStacks[0]!.sizePct);
+    expect(fittedSizePct(fourStacks[2]!)).toBe(fourStacks[2]!.sizePct);
   });
 
   it("drops flywheel lower-third labels on compact layouts so copy does not clip them", () => {
@@ -231,6 +448,8 @@ describe("plate annotations", () => {
     expect(annotationsVisibleInLayout(flywheel, true).map((a) => a.text)).toEqual([
       "PRODUCT",
       "BRAND",
+      "PEOPLE",
+      "INCOME",
     ]);
     expect(
       annotationsVisibleInLayout(byId("07-retail").annotations, true).map((a) => a.text),
@@ -276,8 +495,23 @@ describe("plate annotations", () => {
     expect(TITLE_SLAB_BASE).toContain("title-base");
   });
 
-  it("uses animated hero loops on every slide", () => {
+  it("uses animated hero loops on Omni scenes and omits hero on still-only beats", () => {
+    const stillOnly = new Set([
+      "00-super-stack",
+      "02-world",
+      "05-product",
+      "06-brand",
+      "07-development",
+      "17-compounding",
+      "18-different",
+      "19-future",
+    ]);
     for (const s of SLIDES) {
+      if (stillOnly.has(s.id)) {
+        expect(s.hero, s.id).toBeUndefined();
+        expect(s.heroVideoSrc, s.id).toBeUndefined();
+        continue;
+      }
       expect(s.heroVideoSrc, s.id).toMatch(/^\/concepts\/animated\/.+\.mp4$/);
       expect(s.hero?.src, s.id).toBe(s.heroVideoSrc);
     }

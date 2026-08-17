@@ -73,9 +73,9 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
 }
 
-/** Scene indices 7–14 (0-based 6–13): after Foundation scene 6, before closing. */
+/** Scene indices 9–20 (0-based 8–19): after Full Stack ends at index 7, before closing. */
 function shouldShowAffiliateCta(activeIndex: number): boolean {
-  return activeIndex >= 6 && activeIndex <= 13;
+  return activeIndex >= 8 && activeIndex <= 19;
 }
 
 function ScrollExploreCue({ compact }: { compact: boolean }) {

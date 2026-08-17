@@ -1,6 +1,6 @@
 # Super Patch Income Stack™ — Animated Deck
 
-Default surface: **3D scroll experience** (`ExperienceShell`) — fifteen full-viewport Omni video layers that cover one another on scroll, with live HTML typography, GSAP ScrollTrigger, and a vertical scene navigator.
+Default surface: **3D scroll experience** (`ExperienceShell`) — twenty-one full-viewport scenes that cover one another on scroll, opening on `00-super-stack` (interactive Super Patch GLB + hero caption). Live HTML typography, GSAP ScrollTrigger, and a vertical scene navigator. Remotion `FILM_SLIDES` filters out the hero-caption opener, so the film stays a 20-scene cut.
 
 Legacy fallback: **fluid document deck** (`DeckShell`) via `?view=legacy` — high-quality concept plates in aspect-aware frames with live type and per-slide GSAP entrances.
 
@@ -12,6 +12,7 @@ Every plate/video is **text-free**. All type — headlines, body, diagram labels
 |-------|----------|
 | Architecture | Layered DOM + CSS perspective + GSAP ScrollTrigger (no Three.js / R3F) |
 | Spec | `docs/superpowers/specs/2026-08-07-income-stack-3d-experience-design.md` |
+| Gap fill | `docs/superpowers/specs/2026-08-14-income-stack-gap-fill-design.md` |
 | Media map | `src/data/experienceMedia.ts` |
 | Landscape | `public/concepts/omni-chain/16x9/*_omni.mp4` |
 | Portrait | `public/concepts/omni-chain/9x16/*_omni.mp4` |
@@ -22,11 +23,12 @@ Every plate/video is **text-free**. All type — headlines, body, diagram labels
 | Performance | Poster LCP; CLS < 0.1; INP < 200 ms; ≤3 attached videos |
 | Baseline | `docs/baselines/3d-experience/2026-08-07-pre-experience.md` |
 
-Premium V2 groups the story into **Foundation (01–06)**, **Ten Income
-Streams (07–14)**, and **Action (15)**. Chrome reports the active chapter and
-continuous scroll progress; every scene resolves its `motionPreset` into a
-rotation-free handoff and dwell beat. Desktop navigation keeps 44 px pointer
-targets with restrained markers, while compact viewports use a scene selector.
+Premium V2 groups the story into **Super Stack (01)**, **Full Stack (02–08)**,
+**Ten Income Streams (09–17)**, **Momentum (18–20)**, and **Action (21)**.
+Chrome reports the active chapter and continuous scroll progress; every scene
+resolves its `motionPreset` into a rotation-free handoff and dwell beat.
+Desktop navigation keeps 44 px pointer targets with restrained markers, while
+compact viewports use a scene selector.
 
 Production conversion links are opt-in configuration. Both values must be
 valid HTTPS URLs or the affiliate prompts remain hidden—partial pairs and hash
@@ -37,7 +39,7 @@ VITE_AFFILIATE_URL="<verified HTTPS affiliate URL>"
 VITE_INCOME_DISCLOSURE_URL="<verified HTTPS disclosure URL>"
 ```
 
-Scene 04 and scene 14 intentionally retain their Omni visuals without duplicate
+Scene 05 (`04-flywheel`) and scene 17 (`14-global`) intentionally retain their Omni visuals without duplicate
 web hero/recap diagrams. The existing media plus live progress treatment already
 communicate the flywheel and completed-stack recap; Remotion output is unchanged.
 
@@ -88,10 +90,10 @@ Open on a phone-width viewport (~390px) and scroll.
 
 ## Cinematic 3D hero (title scene)
 
-Default experience slide `01-title` uses the interactive photoreal stack
-(`SceneHero3d`) in place of the Omni video. The experience shell keeps the
-same title overlay (eyebrow / headline / body). Standalone preview remains at
-`?view=hero3d`.
+Default experience slide `00-super-stack` uses the interactive Super Patch
+(`SceneHero3d` / `PatchHeroScene`) with a centered hero caption
+(`THE SUPERPATCH` / `SUPER STACK`). Scene `01-title` is the 10-slab lockup
+with the cinematic lower third. Standalone preview remains at `?view=hero3d`.
 
 Mobile / iOS notes:
 

@@ -1,5 +1,5 @@
-/** Title scene uses the interactive photoreal stack instead of Omni video. */
-export const HERO3D_EXPERIENCE_SLIDE_ID = "01-title";
+/** Opening scene uses the interactive Super Patch GLB instead of Omni video. */
+export const HERO3D_EXPERIENCE_SLIDE_ID = "00-super-stack";
 
 export function isHero3dExperienceSlide(slideId: string): boolean {
   return slideId === HERO3D_EXPERIENCE_SLIDE_ID;

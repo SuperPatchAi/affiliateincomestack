@@ -2,7 +2,7 @@ import { AbsoluteFill } from "remotion";
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { loadFont } from "@remotion/google-fonts/Montserrat";
-import { SLIDES } from "../data/slides";
+import { FILM_SLIDES } from "../data/slides";
 import { SlideScene } from "./components/SlideScene";
 import { TRANSITION_FRAMES, clipFrames } from "./timeline";
 import { COLORS } from "./theme";
@@ -25,7 +25,7 @@ export function IncomeStackFilm() {
       }}
     >
       <TransitionSeries>
-        {SLIDES.flatMap((slide, i) => {
+        {FILM_SLIDES.flatMap((slide, i) => {
           const sequence = (
             <TransitionSeries.Sequence
               key={slide.id}
@@ -34,7 +34,7 @@ export function IncomeStackFilm() {
               <SlideScene slide={slide} />
             </TransitionSeries.Sequence>
           );
-          if (i === SLIDES.length - 1) return [sequence];
+          if (i === FILM_SLIDES.length - 1) return [sequence];
           return [
             sequence,
             <TransitionSeries.Transition

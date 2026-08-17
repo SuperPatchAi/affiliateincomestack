@@ -6,6 +6,7 @@ import {
   RECAP_WINDOW_SEC,
   activeStacksForSlide,
   isIncomeStreamSlide,
+  isStreamIndexSlide,
   slideIdSet,
 } from "./streamIndex";
 
@@ -34,10 +35,12 @@ describe("INCOME_STREAMS", () => {
   });
 
   it("marks income stream slides 07–14 only", () => {
-    expect(isIncomeStreamSlide("06-ten-layers")).toBe(false);
+    expect(isIncomeStreamSlide("08-ten-layers")).toBe(false);
     expect(isIncomeStreamSlide("07-retail")).toBe(true);
     expect(isIncomeStreamSlide("14-global")).toBe(true);
     expect(isIncomeStreamSlide("15-closing")).toBe(false);
+    expect(isStreamIndexSlide("08-ten-layers")).toBe(true);
+    expect(isStreamIndexSlide("06-ten-layers")).toBe(false);
   });
 
   it("defines recap copy and window for option A", () => {
