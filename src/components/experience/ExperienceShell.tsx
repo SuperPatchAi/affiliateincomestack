@@ -233,7 +233,7 @@ export function ExperienceShell() {
       <header className="experience-top">
         <img
           className="experience-brand"
-          src="/brand/superpatch-company-horizontal-white.svg"
+          src="/brand/superpatch-horizontal-wordmark.png"
           alt="The Super Patch Company"
         />
         <p className="experience-meta">Income Stack™</p>

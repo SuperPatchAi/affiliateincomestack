@@ -1,5 +1,7 @@
 .experience-shell {
   --scene-rail: clamp(1rem, 3vw, 2.5rem);
+  --scene-gutter: clamp(24px, 7vw, 112px);
+  --scene-inset-left: calc(var(--scene-gutter) + var(--safe-left));
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -45,7 +47,7 @@
 .experience-top {
   position: fixed;
   top: calc(clamp(20px, 3vw, 40px) + var(--safe-top));
-  left: calc(clamp(20px, 4vw, 64px) + var(--safe-left));
+  left: var(--scene-inset-left);
   right: calc(clamp(20px, 4vw, 64px) + var(--safe-right));
   z-index: 40;
   display: flex;
@@ -58,6 +60,7 @@
   display: block;
   width: clamp(132px, 13vw, 184px);
   height: auto;
+  filter: brightness(0) invert(1);
 }
 
 .experience-meta {
@@ -402,7 +405,7 @@
 
 .scene-plane {
   position: absolute;
-  inset: -6%;
+  inset: 0;
   overflow: hidden;
   container-type: size;
   transform-origin: center center;
@@ -501,6 +504,12 @@
   display: block;
 }
 
+/* Title plate has almost no headroom — pin the top so cover does not crop her head. */
+.experience-scene[data-slide="01-title"] .scene-poster,
+.experience-scene[data-slide="01-title"] .scene-video {
+  object-position: center top;
+}
+
 .scene-video {
   z-index: 1;
   opacity: 0;
@@ -569,7 +578,7 @@
 
 .scene-copy {
   position: absolute;
-  left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));
+  left: var(--scene-inset-left);
   bottom: calc(clamp(52px, 8vh, 104px) + var(--safe-bottom));
   z-index: 3;
   width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
@@ -635,6 +644,7 @@
   line-height: 0.96;
   letter-spacing: -0.035em;
   font-weight: 900;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 
@@ -658,7 +668,7 @@
    so it pins to the bottom edge outside [data-scene-copy]. */
 .scene-disclosure-pinned {
   position: absolute;
-  left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));
+  left: var(--scene-inset-left);
   bottom: calc(clamp(14px, 2.2vh, 26px) + var(--safe-bottom));
   z-index: 4;
   max-width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
@@ -668,7 +678,7 @@
    grid-stacked; the chip auto-cycle advances them as each omni clip ends. */
 .chip-stage {
   position: absolute;
-  left: calc(clamp(24px, 7vw, 112px) + var(--safe-left));
+  left: var(--scene-inset-left);
   bottom: calc(clamp(52px, 8vh, 104px) + var(--safe-bottom));
   z-index: 3;
   width: min(680px, calc(100vw - clamp(76px, 17vw, 250px)));
@@ -690,14 +700,6 @@
   opacity: 0;
 }
 
-.chip-stage-count {
-  margin: 0;
-  color: var(--sp-fine);
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  font-weight: 900;
-}
-
 .chip-stage-label {
   margin: 0;
   font-family: var(--font-display);
@@ -706,7 +708,7 @@
   letter-spacing: -0.02em;
   font-weight: 900;
   text-transform: uppercase;
-  color: var(--slide-accent-text, var(--slide-accent));
+  color: var(--sp-text);
   text-wrap: balance;
 }
 
@@ -715,7 +717,7 @@
   max-width: 44ch;
   color: var(--sp-white);
   font-size: clamp(1.02rem, 1.3vw, 1.25rem);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -733,7 +735,7 @@
 }
 
 .scene-chip-list strong {
-  color: var(--slide-accent-text, var(--slide-accent));
+  color: var(--sp-text);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-right: 0.4em;
@@ -826,9 +828,12 @@
 }
 
 @media (max-width: 900px), (orientation: portrait) {
+  .experience-shell {
+    --scene-gutter: clamp(20px, 6vw, 34px);
+  }
+
   .experience-top {
     top: calc(18px + var(--safe-top));
-    left: calc(18px + var(--safe-left));
     right: calc(18px + var(--safe-right));
   }
 
@@ -872,7 +877,7 @@
   }
 
   .scene-plane {
-    inset: -4%;
+    inset: 0;
   }
 
   .scene-scrim {
@@ -887,7 +892,6 @@
   }
 
   .scene-copy {
-    left: calc(clamp(20px, 6vw, 34px) + var(--safe-left));
     right: calc(clamp(42px, 12vw, 64px) + var(--safe-right));
     bottom: calc(clamp(76px, 10vh, 112px) + var(--safe-bottom));
     width: auto;
@@ -938,9 +942,12 @@
 }
 
 @media (max-height: 520px) {
+  .experience-shell {
+    --scene-gutter: 34px;
+  }
+
   .experience-top {
     top: calc(10px + var(--safe-top));
-    left: calc(18px + var(--safe-left));
     right: calc(18px + var(--safe-right));
   }
 
@@ -963,7 +970,6 @@
   }
 
   .scene-copy {
-    left: calc(34px + var(--safe-left));
     right: auto;
     bottom: calc(18px + var(--safe-bottom));
     width: min(64vw, 560px);

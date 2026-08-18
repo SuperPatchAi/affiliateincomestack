@@ -383,16 +383,34 @@ describe("chip media wiring leftovers", () => {
 });
 
 describe("plate retakes", () => {
-  it("covers the four off-style plates plus the world and four-stacks hero retakes", () => {
+  it("covers the four off-style plates plus the world, four-stacks, and flywheel hero retakes", () => {
     expect(PLATE_RETAKES.map((r) => r.plateFile).sort()).toEqual([
       "sp-stack-01-title.png",
       "sp-stack-02-world.png",
       "sp-stack-03-four-stacks.png",
+      "sp-stack-04-flywheel.png",
       "sp-stack-13-executive.png",
       "sp-stack-15-closing.png",
       "sp-stack-18-different.png",
       "sp-stack-19-future.png",
     ]);
+  });
+
+  it("tells the flywheel hero as a daylight Catalan castell, not a living room or diagram", () => {
+    const flywheel = PLATE_RETAKES.find(
+      (r) => r.plateFile === "sp-stack-04-flywheel.png",
+    );
+    expect(flywheel).toBeDefined();
+    expect(flywheel!.slideId).toBe("04-flywheel");
+    expect(flywheel!.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
+    expect(flywheel!.subject).toMatch(/castell|pinya|pilar/i);
+    expect(flywheel!.subject).toMatch(/plaza|square/i);
+    expect(flywheel!.subject).toMatch(/coral|cobalt|yellow|orange|green/i);
+    expect(flywheel!.subject).toMatch(/shirt|sash|trouser/i);
+    expect(flywheel!.subject.toLowerCase()).not.toMatch(
+      /living.room|roundabout|generator|neon|wireframe|pack|pouch|diagram/,
+    );
+    expect(flywheel!.accent.toLowerCase()).not.toMatch(/neon|night/);
   });
 
   it("tells the title hero as a daylight SuperPatch life, not a neon stack", () => {

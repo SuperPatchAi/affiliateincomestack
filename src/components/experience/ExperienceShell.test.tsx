@@ -1,7 +1,14 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { SLIDES } from "../../data/slides";
 import { ExperienceShell } from "./ExperienceShell";
+
+const experienceCss = readFileSync(
+  resolve(import.meta.dirname, "experience.css"),
+  "utf8",
+);
 
 function renderShell() {
   return render(<ExperienceShell />);
@@ -31,7 +38,7 @@ describe("ExperienceShell", () => {
   it("renders 20 ordered semantic scenes with heading hierarchy", () => {
     const { container } = render(<ExperienceShell />);
     const scenes = container.querySelectorAll("[data-experience-scene]");
-    expect(scenes).toHaveLength(21);
+    expect(scenes).toHaveLength(20);
     expect([...scenes].map((el) => el.getAttribute("data-slide"))).toEqual(
       SLIDES.map((s) => s.id),
     );
@@ -138,19 +145,14 @@ describe("ExperienceShell", () => {
 
   it("uses Omni landscape sources by default with WebP posters", () => {
     const { container } = render(<ExperienceShell />);
-    // Opening scene is the live 3D hero — no Omni video on slide 00.
-    const titleHero = container.querySelector(
-      '[data-slide="00-super-stack"] [data-scene-hero3d]',
-    );
-    expect(titleHero).toBeTruthy();
     expect(
-      container.querySelector('[data-slide="00-super-stack"] video'),
+      container.querySelector('[data-slide="00-super-stack"]'),
     ).toBeNull();
     expect(
-      container.querySelector('[data-slide="00-super-stack"]')?.getAttribute("data-hero3d"),
-    ).toBe("true");
+      container.querySelector('[data-slide="01-title"]')?.getAttribute("data-hero3d"),
+    ).toBe("false");
     expect(
-      container.querySelector('[data-slide="00-super-stack"] [data-scene-poster]'),
+      container.querySelector('[data-slide="01-title"] [data-scene-hero3d]'),
     ).toBeNull();
     expect(
       container.querySelector('[data-slide="05-product"]')?.getAttribute("data-hero3d"),
@@ -187,19 +189,7 @@ describe("ExperienceShell", () => {
     expect(stacksSrc).toMatch(/sp-stack-03-four-stacks/);
   });
 
-  it("renders the super stack scene as a centered hero caption", () => {
-    const { container } = render(<ExperienceShell />);
-    const scene = container.querySelector('[data-slide="00-super-stack"]')!;
-    expect(scene.querySelector("[data-scene-copy]")).toBeNull();
-    const caption = scene.querySelector("[data-scene-copy-hero]")!;
-    expect(caption).toBeTruthy();
-    const title = caption.querySelector("h1.scene-hero-title")!;
-    const lines = [...title.querySelectorAll("span")].map((s) => s.textContent);
-    expect(lines).toEqual(["The SuperPatch", "Super Stack"]);
-    expect(scene.querySelector(".scene-eyebrow")).toBeNull();
-  });
-
-  it("keeps the experience title overlay copy on the 3D hero scene", () => {
+  it("keeps the complete-opportunity copy on the opening title scene", () => {
     const { container } = render(<ExperienceShell />);
     const copy = container.querySelector(
       '[data-slide="01-title"] [data-scene-copy]',
@@ -214,7 +204,7 @@ describe("ExperienceShell", () => {
   it("exposes a vertical scene navigator with 20 steps", () => {
     render(<ExperienceShell />);
     const nav = screen.getByRole("navigation", { name: /scene navigator/i });
-    expect(nav.querySelectorAll("button")).toHaveLength(21);
+    expect(nav.querySelectorAll("button")).toHaveLength(20);
   });
 
   it("composes each scene as one layered viewport card", () => {
@@ -245,7 +235,33 @@ describe("ExperienceShell", () => {
     });
 
     expect(mark.getAttribute("src")).toBe(
-      "/brand/superpatch-company-horizontal-white.svg",
+      "/brand/superpatch-horizontal-wordmark.png",
+    );
+    expect(mark.className).toContain("experience-brand");
+    expect(experienceCss).toMatch(
+      /\.experience-brand\s*\{[^}]*filter:\s*brightness\(0\)\s+invert\(1\)/,
+    );
+  });
+
+  it("aligns the brand mark to the same left gutter as scene copy", () => {
+    expect(experienceCss).toMatch(/--scene-inset-left:/);
+    for (const selector of [
+      ".experience-top",
+      ".scene-copy",
+      ".chip-stage",
+      ".scene-disclosure-pinned",
+    ]) {
+      expect(experienceCss).toMatch(
+        new RegExp(
+          `${selector.replace(".", "\\.")}\\s*\\{[^}]*left:\\s*var\\(--scene-inset-left\\)`,
+        ),
+      );
+    }
+    expect(experienceCss).not.toMatch(
+      /\.experience-top\s*\{[^}]*right:\s*var\(--scene-inset-right\)/,
+    );
+    expect(experienceCss).toMatch(
+      /\.experience-top\s*\{[^}]*right:\s*calc\(clamp\(20px, 4vw, 64px\) \+ var\(--safe-right\)\)/,
     );
   });
 
@@ -259,9 +275,9 @@ describe("ExperienceShell", () => {
 
   it("exposes chapter-aware orientation in the chrome", () => {
     render(<ExperienceShell />);
-    expect(screen.getByText("01 / 21")).toBeTruthy();
+    expect(screen.getByText("01 / 20")).toBeTruthy();
     expect(
-      screen.getByText("Super Stack", { selector: ".experience-chapter-label" }),
+      screen.getByText("Full Stack", { selector: ".experience-chapter-label" }),
     ).toBeTruthy();
   });
 
@@ -280,9 +296,6 @@ describe("ExperienceShell", () => {
     expect(scene.querySelectorAll("[data-chip-item]")).toHaveLength(3);
     const fallback = scene.querySelector("[data-chip-fallback]")!;
     expect(fallback.textContent).toContain("BETTER HEALTH");
-    expect(
-      container.querySelector('[data-slide="00-super-stack"] [data-chip-stage]'),
-    ).toBeNull();
   });
 
   it("no longer renders the plate-annotation overlay on the web", () => {

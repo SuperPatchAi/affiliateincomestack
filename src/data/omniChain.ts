@@ -19,6 +19,7 @@ export const OMNI_PHOTOREAL_LOCK =
   "Stay in this one scene for the entire clip. No cuts, no morph, " +
   "no jump to another place, no flashing, no warp, no mid-video scene change. " +
   "Subtle human motion only — small natural gestures, cloth, hair, breath. " +
+  "Each person keeps the same face, hair, body, and clothing. No identity change. " +
   "Do not re-describe the setting, lighting, or wardrobe. Refer to people as the subject or they.";
 
 export const OMNI_CONSTRUCT_LOCK =
@@ -66,9 +67,10 @@ export const OMNI_PLATES: OmniPlate[] = [
     id: "04",
     slug: "flywheel",
     plateFile: "sp-stack-04-flywheel.png",
-    accent: "multi neon",
+    photoreal: true,
+    accent: "coral, cobalt, sunflower yellow, and living green in late-morning plaza light",
     motion:
-      "a circular flywheel rotates once while energy arcs travel between quadrants; settle loop-ready at a calm mid-rotation pose",
+      "The castell is frozen as a rigid structure. Nobody climbs. Nobody is added or removed. Do not turn a woman into a man or a man into a woman. Do not change anyone's age, face, hair, or clothing. Do not merge two people into one or split one person into two. Each person stays in the same place in the tower and pinya and keeps the same face from first frame to last. Only micro motion: a breath, a grip tighten, a tiny sway of the whole tower together. The camera holds a slow, almost still drift.",
   },
   {
     id: "05",

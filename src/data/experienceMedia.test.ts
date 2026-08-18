@@ -21,13 +21,13 @@ function fileMd5(publicPath: string): string {
 }
 
 describe("experienceMedia", () => {
-  it("maps exactly 21 unique scenes that match SLIDES order", () => {
+  it("maps exactly 20 unique scenes that match SLIDES order", () => {
     expect(EXPERIENCE_MEDIA).toHaveLength(SLIDES.length);
-    expect(EXPERIENCE_MEDIA).toHaveLength(21);
+    expect(EXPERIENCE_MEDIA).toHaveLength(20);
     expect(EXPERIENCE_MEDIA.map((m) => m.slideId)).toEqual(
       SLIDES.map((s) => s.id),
     );
-    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(21);
+    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(20);
   });
 
   it("provides Omni mp4s for motion scenes and empty src for still-only rows", () => {
@@ -66,16 +66,21 @@ describe("experienceMedia", () => {
     ).toEqual(["15-closing"]);
   });
 
-  it("plays 01-title and 02-world as photoreal Omni plates", () => {
+  it("plays 01-title, 02-world, and 04-flywheel as photoreal Omni plates", () => {
     const title = experienceMediaForSlide("01-title");
     const world = experienceMediaForSlide("02-world");
+    const flywheel = experienceMediaForSlide("04-flywheel");
     expect(title?.stillOnly).toBeFalsy();
     expect(world?.stillOnly).toBeFalsy();
+    expect(flywheel?.stillOnly).toBeFalsy();
     expect(title?.landscape.src).toBe(
       "/concepts/omni-chain/16x9/sp-stack-01-title_omni.mp4",
     );
     expect(world?.landscape.src).toBe(
       "/concepts/omni-chain/16x9/sp-stack-02-world_omni.mp4",
+    );
+    expect(flywheel?.landscape.src).toBe(
+      "/concepts/omni-chain/16x9/sp-stack-04-flywheel_omni.mp4",
     );
   });
 
@@ -84,9 +89,9 @@ describe("experienceMedia", () => {
     expect(stacks).toBeTruthy();
     expect(resolveExperienceSrc(stacks!, "landscape").src).toContain("/16x9/");
     expect(resolveExperienceSrc(stacks!, "portrait").src).toContain("/9x16/");
-    expect(mediaWindow(0, 21)).toEqual([0, 1]);
-    expect(mediaWindow(7, 21)).toEqual([6, 7, 8]);
-    expect(mediaWindow(20, 21)).toEqual([19, 20]);
+    expect(mediaWindow(0, 20)).toEqual([0, 1]);
+    expect(mediaWindow(7, 20)).toEqual([6, 7, 8]);
+    expect(mediaWindow(19, 20)).toEqual([18, 19]);
   });
 
   it("points public paths at files that exist on disk", () => {
@@ -105,13 +110,8 @@ describe("experienceMedia", () => {
     }
   });
 
-  it("serves the super stack scene as a still-only poster row", () => {
-    const superStack = experienceMediaForSlide("00-super-stack");
-    expect(superStack?.stillOnly).toBe(true);
-    expect(superStack?.landscape.poster).toBe(
-      "/concepts/clean/sp-stack-18-different.webp",
-    );
-    expect(superStack?.landscape.src).toBe("");
+  it("does not serve a super-stack opener", () => {
+    expect(experienceMediaForSlide("00-super-stack")).toBeUndefined();
   });
 
   it("treats an empty src as still-only poster media", () => {

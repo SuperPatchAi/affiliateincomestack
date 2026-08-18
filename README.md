@@ -1,6 +1,6 @@
 # Super Patch Income Stack™ — Animated Deck
 
-Default surface: **3D scroll experience** (`ExperienceShell`) — twenty-one full-viewport scenes that cover one another on scroll, opening on `00-super-stack` (interactive Super Patch GLB + hero caption). Live HTML typography, GSAP ScrollTrigger, and a vertical scene navigator. Remotion `FILM_SLIDES` filters out the hero-caption opener, so the film stays a 20-scene cut.
+Default surface: **3D scroll experience** (`ExperienceShell`) — twenty full-viewport scenes that cover one another on scroll, opening on `01-title` (“More Than an Affiliate Program. A Complete Opportunity.”). Live HTML typography, GSAP ScrollTrigger, and a vertical scene navigator. Remotion `FILM_SLIDES` matches the same 20-scene cut.
 
 Legacy fallback: **fluid document deck** (`DeckShell`) via `?view=legacy` — high-quality concept plates in aspect-aware frames with live type and per-slide GSAP entrances.
 
@@ -23,8 +23,8 @@ Every plate/video is **text-free**. All type — headlines, body, diagram labels
 | Performance | Poster LCP; CLS < 0.1; INP < 200 ms; ≤3 attached videos |
 | Baseline | `docs/baselines/3d-experience/2026-08-07-pre-experience.md` |
 
-Premium V2 groups the story into **Super Stack (01)**, **Full Stack (02–08)**,
-**Ten Income Streams (09–17)**, **Momentum (18–20)**, and **Action (21)**.
+Premium V2 groups the story into **Full Stack (01–07)**,
+**Ten Income Streams (08–16)**, **Momentum (17–19)**, and **Action (20)**.
 Chrome reports the active chapter and continuous scroll progress; every scene
 resolves its `motionPreset` into a rotation-free handoff and dwell beat.
 Desktop navigation keeps 44 px pointer targets with restrained markers, while
@@ -88,12 +88,11 @@ npm test
 
 Open on a phone-width viewport (~390px) and scroll.
 
-## Cinematic 3D hero (title scene)
+## Cinematic 3D hero (Product Stack)
 
-Default experience slide `00-super-stack` uses the interactive Super Patch
-(`SceneHero3d` / `PatchHeroScene`) with a centered hero caption
-(`THE SUPERPATCH` / `SUPER STACK`). Scene `01-title` is the 10-slab lockup
-with the cinematic lower third. Standalone preview remains at `?view=hero3d`.
+The opening scene is `01-title` with the cinematic lower third. The live 3D
+patch (`SceneHero3d` / `PatchHeroScene`) stays on Product Stack (`05-product`).
+Standalone preview remains at `?view=hero3d`.
 
 Mobile / iOS notes:
 

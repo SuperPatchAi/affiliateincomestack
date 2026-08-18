@@ -16,10 +16,9 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 21 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(21);
+  it("has 20 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(20);
     expect(SLIDES.map((s) => s.id)).toEqual([
-      "00-super-stack",
       "01-title",
       "02-world",
       "03-four-stacks",
@@ -51,22 +50,20 @@ describe("SLIDES", () => {
     }
   });
 
-  it("opens on the hero-caption super stack scene", () => {
+  it("opens on the complete-opportunity title scene", () => {
     const first = SLIDES[0];
-    expect(first.id).toBe("00-super-stack");
-    expect(first.copyLayout).toBe("hero-caption");
-    expect(first.headline).toBe("The SuperPatch Super Stack");
-    expect(first.eyebrow).toBe("");
-    expect(first.body).toBe("");
-    expect(first.annotations ?? []).toHaveLength(0);
-    expect(first.conceptSrc).toBe("/concepts/clean/sp-stack-18-different.png");
+    expect(first.id).toBe("01-title");
+    expect(first.copyLayout).toBeUndefined();
+    expect(first.headline).toBe(
+      "More Than an Affiliate Program. A Complete Opportunity.",
+    );
+    expect(first.eyebrow).toBe("The Super Patch Income Stack™");
     expect(first.requiresDisclosure).toBe(false);
   });
 
-  it("keeps the trademark on scene 02, off scene 01", () => {
-    expect(SLIDES[0].eyebrow).not.toContain("™");
-    expect(SLIDES[1].id).toBe("01-title");
-    expect(SLIDES[1].eyebrow).toBe("The Super Patch Income Stack™");
+  it("keeps the trademark on the opening title scene", () => {
+    expect(SLIDES[0].id).toBe("01-title");
+    expect(SLIDES[0].eyebrow).toBe("The Super Patch Income Stack™");
   });
 
   it("exempts hero-caption slides from lower-third copy validation", () => {
@@ -208,7 +205,7 @@ describe("SLIDES", () => {
     ]);
     const total = withChips.reduce((n, s) => n + (s.chips?.length ?? 0), 0);
     expect(total).toBe(63);
-    expect(SLIDES.find((s) => s.id === "00-super-stack")?.chips).toBeUndefined();
+    expect(SLIDES.find((s) => s.id === "00-super-stack")).toBeUndefined();
     expect(SLIDES.find((s) => s.id === "15-closing")?.chips).toBeUndefined();
   });
 
@@ -238,7 +235,7 @@ describe("assertSlidesValid chip rules", () => {
     requiresDisclosure: false,
   };
   const stack = (overrides: Partial<Slide>): Slide[] =>
-    Array.from({ length: 21 }, (_, i) =>
+    Array.from({ length: 20 }, (_, i) =>
       i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
     );
 
@@ -387,7 +384,7 @@ describe("plate annotations", () => {
   });
 
   it("hides plates that must not carry chips", () => {
-    for (const id of ["00-super-stack", "18-different", "15-closing"]) {
+    for (const id of ["18-different", "15-closing"]) {
       const slide = SLIDES.find((s) => s.id === id)!;
       expect(slide.annotations ?? []).toHaveLength(0);
     }
@@ -497,7 +494,6 @@ describe("plate annotations", () => {
 
   it("uses animated hero loops on Omni scenes and omits hero on still-only beats", () => {
     const stillOnly = new Set([
-      "00-super-stack",
       "02-world",
       "05-product",
       "06-brand",

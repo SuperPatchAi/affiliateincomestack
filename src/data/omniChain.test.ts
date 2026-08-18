@@ -21,17 +21,25 @@ describe("omniChain", () => {
     expect(prompt).toContain(OMNI_TEXT_BAN);
     expect(prompt.toLowerCase()).toContain("ambient");
     expect(prompt.toLowerCase()).not.toContain("on-screen text saying");
-    expect(prompt).toContain("circular flywheel");
+    expect(prompt).toMatch(/castell|pinya/i);
+    expect(prompt).toMatch(/same face/i);
+    expect(prompt).toMatch(/do not turn a woman into a man/i);
+    expect(prompt).toMatch(/nobody climbs|do not climb|frozen|rigid/i);
+    expect(prompt).not.toMatch(/circular flywheel|energy arcs|multi neon/i);
   });
 
-  it("prompts 01 and 02 as photoreal motion-only, not neon stack warps", () => {
+  it("prompts 01, 02, and 04 as photoreal motion-only, not neon stack warps", () => {
     const title = OMNI_PLATES.find((p) => p.id === "01")!;
     const world = OMNI_PLATES.find((p) => p.id === "02")!;
+    const flywheel = OMNI_PLATES.find((p) => p.id === "04")!;
     expect(title.photoreal).toBe(true);
     expect(world.photoreal).toBe(true);
+    expect(flywheel.photoreal).toBe(true);
     expect(world.slug).toBe("world");
     expect(world.plateFile).toBe("sp-stack-02-world.png");
-    for (const plate of [title, world]) {
+    expect(flywheel.slug).toBe("flywheel");
+    expect(flywheel.plateFile).toBe("sp-stack-04-flywheel.png");
+    for (const plate of [title, world, flywheel]) {
       const prompt = buildOmniPrompt(plate);
       expect(prompt).toMatch(/motion only/i);
       expect(prompt).toContain(plate.motion);

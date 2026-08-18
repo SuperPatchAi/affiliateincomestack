@@ -230,6 +230,22 @@
       "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/9x16/sp-stack-03-four-stacks.png",
       "aspect": "9:16",
       "generatedAt": "2026-08-18T03:49:46.927Z"
+    },
+    "retake:16x9/sp-stack-04-flywheel.png": {
+      "prompt": "Cinematic photorealistic daylight city photograph: a bright airy metropolis in late-morning sun, warm stone and glass, pale sky, open shade on the street. Shot like a premium Apple x Nike commercial on anamorphic lenses: shallow depth of field, natural skin with laugh lines, no neon, no rain, no night. Keep the hero subject centered with quieter edges reserved for later interface overlays. Every sign, screen, and billboard is a blank soft shape or distant bokeh — no readable characters anywhere in the scene. Accent lighting: coral, cobalt, sunflower yellow, orange, and living green in late-morning plaza light. A late-morning photograph in a sunlit European town plaza: one Catalan castell rising from a dense pinya of people who brace each other with locked arms and shoulders. The tower is mid-build — a coral-shirted column of white trousers and black sashes climbing a living pilar, the top floor not yet placed. Other teams in the base wear cobalt, sunflower-yellow, orange, and living-green shirts so the crowd is mixed color, not one beige uniform. Stone facades, pale sky, unmarked shirts and sashes. Adult faces readable in open shade. Quiet lower-left for later type. Exactly one head, two arms, and two legs on every person; five fingers on every visible hand. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/16x9/sp-stack-04-flywheel.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T20:23:33.057Z"
+    },
+    "retake:9x16/sp-stack-04-flywheel.png": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/16x9/sp-stack-04-flywheel.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/9x16/sp-stack-04-flywheel.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T20:25:38.674Z"
     }
   }
 }

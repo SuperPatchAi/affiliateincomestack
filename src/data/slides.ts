@@ -243,8 +243,8 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 21) {
-    throw new Error(`Expected 21 slides, got ${slides.length}`);
+  if (slides.length !== 20) {
+    throw new Error(`Expected 20 slides, got ${slides.length}`);
   }
   for (const s of slides) {
     const heroCaption = s.copyLayout === "hero-caption";
@@ -317,7 +317,6 @@ export function assertSlidesValid(slides: Slide[]): void {
 }
 
 export type ExperienceChapterId =
-  | "super-stack"
   | "full-stack"
   | "ten-income-streams"
   | "momentum"
@@ -330,13 +329,12 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Super Stack layout chapter groupings — scenes 01, 02–08, 09–17, 18–20, 21. */
+/** Chapter groupings after dropping the 3D logo opener — scenes 01–07, 08–16, 17–19, 20. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  { id: "super-stack", label: "Super Stack", sceneStart: 0, sceneEnd: 0 },
-  { id: "full-stack", label: "Full Stack", sceneStart: 1, sceneEnd: 7 },
-  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 8, sceneEnd: 16 },
-  { id: "momentum", label: "Momentum", sceneStart: 17, sceneEnd: 19 },
-  { id: "action", label: "Action", sceneStart: 20, sceneEnd: 20 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 6 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 7, sceneEnd: 15 },
+  { id: "momentum", label: "Momentum", sceneStart: 16, sceneEnd: 18 },
+  { id: "action", label: "Action", sceneStart: 19, sceneEnd: 19 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -355,17 +353,6 @@ export function formatSceneCounter(index: number): string {
 }
 
 export const SLIDES: Slide[] = [
-  {
-    id: "00-super-stack",
-    conceptSrc: "/concepts/clean/sp-stack-18-different.png",
-    accent: "blue",
-    eyebrow: "",
-    headline: "The SuperPatch Super Stack",
-    body: "",
-    copyLayout: "hero-caption",
-    motionPreset: "hero-patch",
-    requiresDisclosure: false,
-  },
   {
     id: "01-title",
     conceptSrc: "/concepts/clean/sp-stack-01-title.png",

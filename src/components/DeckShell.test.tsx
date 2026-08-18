@@ -7,7 +7,7 @@ import { shouldShowLiveAnnotations } from "../remotion/labels";
 describe("DeckShell", () => {
   it("renders all slides with on-slide copy", () => {
     const { container } = render(<DeckShell />);
-    expect(container.querySelectorAll("[data-slide]")).toHaveLength(21);
+    expect(container.querySelectorAll("[data-slide]")).toHaveLength(20);
     expect(screen.getByText(SLIDES[0].headline)).toBeTruthy();
     expect(screen.getByText(SLIDES[6].headline)).toBeTruthy();
   });
@@ -15,7 +15,7 @@ describe("DeckShell", () => {
   it("uses fluid layout with contained high-quality concept plates", () => {
     const { container } = render(<DeckShell />);
     const slides = container.querySelectorAll("[data-layout='fluid']");
-    expect(slides).toHaveLength(21);
+    expect(slides).toHaveLength(20);
     // Title ships an animated hero loop; clean PNG is the poster.
     const title = container.querySelector<HTMLVideoElement>(
       "[data-slide='01-title'] [data-slide-plate]",

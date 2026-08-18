@@ -38,7 +38,6 @@ const SLIDE_TO_OMNI_SLUG: Record<string, string> = {
 };
 
 const STILL_ONLY_IDS = new Set([
-  "00-super-stack",
   "05-product",
   "06-brand",
   "07-development",
@@ -80,10 +79,7 @@ function variantFor(
 
 export const EXPERIENCE_MEDIA: ExperienceMedia[] = SLIDES.map((slide) => {
   if (STILL_ONLY_IDS.has(slide.id)) {
-    const poster =
-      slide.id === "00-super-stack"
-        ? "/concepts/clean/sp-stack-18-different.webp"
-        : slide.conceptSrc;
+    const poster = slide.conceptSrc;
     return {
       slideId: slide.id,
       stillOnly: true,

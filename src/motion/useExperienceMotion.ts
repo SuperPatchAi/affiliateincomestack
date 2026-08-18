@@ -16,6 +16,8 @@ import {
   resolveSceneLifecycle,
   resolveWebChoreography,
   sceneDwellEnabled,
+  dwellMediaFromForScene,
+  dwellScrimFromForScene,
   sceneLayerState,
   sceneScrollHeightVh,
   shouldRefreshScrollTriggerOnResize,
@@ -581,7 +583,7 @@ export function useExperienceMotion({
                 .fromTo(
                   plane,
                   {
-                    ...preset.dwell.mediaFrom,
+                    ...dwellMediaFromForScene(index, preset),
                     filter: "brightness(1)",
                   },
                   {
@@ -596,7 +598,7 @@ export function useExperienceMotion({
                 )
                 .fromTo(
                   scrim,
-                  { ...preset.dwell.scrimFrom, opacity: 1 },
+                  { ...dwellScrimFromForScene(index, preset), opacity: 1 },
                   {
                     ...preset.dwell.scrimDrift,
                     ease: "none",

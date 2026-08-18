@@ -9,23 +9,20 @@ import {
 } from "./hero3dExperienceSlide";
 
 describe("hero3dExperienceSlide", () => {
-  it("targets the title opener and the product scene for the live 3D hero", () => {
-    expect(HERO3D_EXPERIENCE_SLIDE_ID).toBe("00-super-stack");
-    expect(isHero3dExperienceSlide("00-super-stack")).toBe(true);
+  it("targets only Product Stack for the live 3D hero", () => {
+    expect(HERO3D_EXPERIENCE_SLIDE_ID).toBe("05-product");
     expect(isHero3dExperienceSlide("05-product")).toBe(true);
+    expect(isHero3dExperienceSlide("00-super-stack")).toBe(false);
     expect(isHero3dExperienceSlide("01-title")).toBe(false);
     expect(isHero3dExperienceSlide("06-brand")).toBe(false);
   });
 
-  it("uses the logo GLB on the title opener and the 3D patch on Product Stack", () => {
-    expect(hero3dModelUrl("00-super-stack")).toBe("/models/superpatch_logo.glb");
+  it("uses the 3D patch on Product Stack", () => {
     expect(hero3dModelUrl("05-product")).toBe("/models/superpatch-title.glb");
   });
 
-  it("scales only the title logo 20 percent on compact and plays the cinematic intro there", () => {
-    expect(hero3dCompactScaleMul("00-super-stack")).toBeCloseTo(1.2);
+  it("does not scale or play a cinematic intro on Product Stack", () => {
     expect(hero3dCompactScaleMul("05-product")).toBe(1);
-    expect(hero3dPlaysCinematicIntro("00-super-stack")).toBe(true);
     expect(hero3dPlaysCinematicIntro("05-product")).toBe(false);
   });
 

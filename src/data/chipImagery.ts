@@ -1067,6 +1067,17 @@ export const PLATE_RETAKES: PlateRetakeSpec[] = [
       "Water moves against the hull. People cross the terrace. The camera holds a slow, almost still elevated drift.",
   },
   {
+    plateFile: "sp-stack-04-flywheel.png",
+    slideId: "04-flywheel",
+    accent:
+      "coral, cobalt, sunflower yellow, orange, and living green in late-morning plaza light",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    subject:
+      "A late-morning photograph in a sunlit European town plaza: one Catalan castell rising from a dense pinya of people who brace each other with locked arms and shoulders. The tower is mid-build — a coral-shirted column of white trousers and black sashes climbing a living pilar, the top floor not yet placed. Other teams in the base wear cobalt, sunflower-yellow, orange, and living-green shirts so the crowd is mixed color, not one beige uniform. Stone facades, pale sky, unmarked shirts and sashes. Adult faces readable in open shade. Quiet lower-left for later type. Exactly one head, two arms, and two legs on every person; five fingers on every visible hand.",
+    motion:
+      "The castell is frozen as a rigid structure. Nobody climbs. Nobody is added or removed. Do not turn a woman into a man or a man into a woman. Do not change anyone's age, face, hair, or clothing. Do not merge two people into one or split one person into two. Each person stays in the same place in the tower and pinya and keeps the same face from first frame to last. Only micro motion: a breath, a grip tighten, a tiny sway of the whole tower together. The camera holds a slow, almost still drift.",
+  },
+  {
     plateFile: "sp-stack-13-executive.png",
     slideId: "13-executive",
     accent: "warm amber orange",

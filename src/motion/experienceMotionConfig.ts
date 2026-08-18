@@ -144,6 +144,23 @@ export function sceneDwellEnabled(_index: number): boolean {
   return true;
 }
 
+/** Opener has no incoming handoff, so dwell must start on the full plate. */
+export function dwellMediaFromForScene(
+  index: number,
+  choreography: WebChoreography,
+): { yPercent: number; scale: number } {
+  if (index === 0) return { yPercent: 0, scale: 1 };
+  return choreography.dwell.mediaFrom;
+}
+
+export function dwellScrimFromForScene(
+  index: number,
+  choreography: WebChoreography,
+): { yPercent: number; scale: number } {
+  if (index === 0) return { yPercent: 0, scale: 1 };
+  return choreography.dwell.scrimFrom;
+}
+
 export function buildOutgoingTweenVars(): {
   scale: number;
   opacity: number;

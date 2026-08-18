@@ -118,6 +118,23 @@ describe("Premium V2 web choreography", () => {
     expect(MotionConfig.sceneDwellEnabled(14)).toBe(true);
   });
 
+  it("starts the opener dwell on a full unshifted frame so the title plate is not cropped", () => {
+    const choreography = MotionConfig.resolveWebChoreography(
+      SLIDES[0].motionPreset,
+    );
+    expect(MotionConfig.dwellMediaFromForScene(0, choreography)).toEqual({
+      yPercent: 0,
+      scale: 1,
+    });
+    expect(MotionConfig.dwellScrimFromForScene(0, choreography)).toEqual({
+      yPercent: 0,
+      scale: 1,
+    });
+    expect(MotionConfig.dwellMediaFromForScene(1, choreography)).toEqual(
+      choreography.dwell.mediaFrom,
+    );
+  });
+
   it("ignores coarse height-only resize jitter while refreshing on orientation", () => {
     expect(
       MotionConfig.shouldRefreshScrollTriggerOnResize({

@@ -1,33 +1,22 @@
 {
   "model": "gemini-omni-flash-preview",
-  "generatedAt": "2026-08-18T03:59:41.974Z",
+  "generatedAt": "2026-08-18T20:27:09.632Z",
   "aspects": [
-    "16:9",
     "9:16"
   ],
   "results": [
     {
-      "id": "03",
-      "aspect": "16:9",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-03-four-stacks_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-03-four-stacks_last.png",
-      "interaction_id": "v1_ChdjdGlEYXZETkc5dUctOFlQdExmQjRBNBIXY3RpRGF2RE5HOXVHLThZUHRMZkI0QTQ",
-      "cost_usd": 0.8,
-      "duration_seconds": 47.61
-    },
-    {
-      "id": "03",
+      "id": "04",
       "aspect": "9:16",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-03-four-stacks_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-03-four-stacks_last.png",
-      "interaction_id": "v1_ChdwdGlEYXB5R0FiNmQxTWtQN2MtdHNBNBIXcHRpRGFweUdBYjZkMU1rUDdjLXRzQTQ",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-04-flywheel_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-04-flywheel_last.png",
+      "interaction_id": "v1_ChdGY0NFYXNxTU5JeU1qckVQeE9XLWtRbxIXRmNDRWFzcU1OSXlNanJFUHhPVy1rUW8",
       "cost_usd": 0.8,
-      "duration_seconds": 50.36
+      "duration_seconds": 48.51
     }
   ],
-  "okCount": 2,
+  "okCount": 1,
   "failCount": 0,
-  "cost_usd_sum": 1.6
+  "cost_usd_sum": 0.8
 }

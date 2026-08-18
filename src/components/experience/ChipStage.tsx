@@ -1,7 +1,5 @@
 import type { SequencedChip } from "../../data/slides";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 /**
  * Grid-stacked chip items for the scroll-driven sequence. Purely decorative:
  * the motion hook fades items in/out; screen readers get the static
@@ -17,9 +15,6 @@ export function ChipStage({ chips }: { chips: SequencedChip[] }) {
           data-chip-item
           data-chip-index={index}
         >
-          <p className="chip-stage-count">
-            {pad(index + 1)} / {pad(chips.length)}
-          </p>
           <p className="chip-stage-label">{chip.label}</p>
           <p className="chip-stage-sub">{chip.sub}</p>
         </div>
