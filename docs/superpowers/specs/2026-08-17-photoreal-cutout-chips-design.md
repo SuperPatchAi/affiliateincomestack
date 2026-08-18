@@ -15,7 +15,7 @@ Chip backdrops today are full neon night-city scenes (Tron / rain / cyan-magenta
 - **Subject:** one vivid picture people already have in their heads — not a labeled collage. Freedom’s yacht / crashing waves is the *method*, not the only register, and not the 02 set.
 - **02 register:** documentary-vivid people (commuter, rider, creator, trusted sale), recast so every frame is sunlit and kind.
 - **Isolation:** each still is one hero subject on a clean bright void so the background can be erased and the figure layered.
-- **Motion:** limited. Ken Burns + parallax zoom-through between chips. No Omni / warp clips.
+- **Motion:** stills only — no Omni / warp clips. Ken Burns and parallax are the base layer, not the whole kit. Chip motion is built from the community GSAP / canvas / Remotion skills listed below.
 - **Anatomy:** hard gate. Exactly two arms, two legs, one head. Five fingers per visible hand. No extra limbs or appendages. Reject and regenerate on failure.
 - **Hero copy:** still only advances on scroll. Chips still auto-advance on a timer once the user has scrolled past the scene top. Final chip still auto-scrolls to the next scene.
 
@@ -51,15 +51,37 @@ No readable text, logos, UI, or badge lettering. Badge and phone screens are bla
 
 ## Motion (02 only)
 
-Existing `chipAutoCycle` stays: scroll-gated `beginChips()`, then auto-advance, final chip completes to the next scene.
+Existing `chipAutoCycle` stays: scroll-gated `beginChips()`, then auto-advance, final chip completes to the next scene. Because there is no video, each beat uses the fallback dwell (`CHIP_FALLBACK_DWELL_MS`, 6s).
 
-Because there is no video, each beat uses the fallback dwell (`CHIP_FALLBACK_DWELL_MS`, 6s). During a beat:
+Ken Burns and parallax are **required but not sufficient**. Motion is assembled from `skills/community` — the same GSAP / canvas / Remotion kit already in this repo — so a chip change feels like a directed beat, not a slow zoom on a still.
 
-1. Active cutout is largest, center-weighted, Ken Burns (slow scale 1.00 → 1.08 and a few percent of drift).
-2. Previous cutouts stay in the stack, smaller and further back (opacity ~0.35, scale ~0.72, slight Y offset) so the scene has depth.
-3. On advance: a 400–600ms zoom-through (scale up + fade) on the outgoing cutout, then it parks in the back layer while the next cutout eases forward.
+### Skills in play
 
-No second animation system. GSAP on the cutout nodes only. `prefers-reduced-motion` shows the static cutout with no Ken Burns and instant swaps.
+| Skill | What it does on 02 |
+|---|---|
+| **gsap-scrolltrigger** | Hero copy still only yields on scroll. Parked (back-stack) cutouts get a light scrubbed depth drift while the scene is pinned. |
+| **gsap-core / gsap-timeline** | One named timeline per chip beat (`enter`, `hold`, `exit`). Overwrite-safe; kill on `stop()`. |
+| **gsap-plugins Flip** | Capture the live cutout, then Flip it into the back-stack seat (smaller, offset). Real layout morph — not a fake `scale` on the same center. Incoming cutout Flips from off-axis into the hero seat. |
+| **gsap-plugins MotionPath** | Exit travels a shallow forward arc (the “fast-forward” the user asked for) as it leaves the hero seat. One path, one direction, ~500ms. |
+| **gsap-plugins SplitText** | Chip label + sub enter by words (already used on headlines). Outgoing chip text exits the opposite way. |
+| **gsap-plugins CustomEase + CustomWiggle** | Warm custom ease on Flip/path. Hold-state Ken Burns uses a tiny CustomWiggle on x/y so the drift feels alive, not linear. |
+| **canvas-procedural-animation** | One shared overlay: dust motes + sun haze in open shade. Bright only — no rain, no snow, no night particles. Opacity ≤ 0.25. Pause when the scene is inactive. |
+| **remotion-best-practices / transitions** | Web deck does not mount Remotion. If the 02 film beat is rebuilt later, match the same Flip + fade language with `TransitionSeries` (`fade` + a warm light overlay). Out of the first web slice. |
+
+### Beat (one chip)
+
+1. **Enter (~0.6s):** Flip from a start state just off-axis + 8% small; MotionPath is not used on enter. SplitText words stagger in (0.03s). Canvas haze holds.
+2. **Hold (rest of the 6s):** Ken Burns scale 1.00 → 1.08 plus CustomWiggle drift. Back-stack cutouts parallax at 0.3× that drift (ScrollTrigger scrub while the scene is active).
+3. **Exit (~0.5s):** MotionPath arc through the camera (scale 1.08 → 1.25, then Flip into the back-stack seat at ~0.72 / opacity 0.35). Chip text SplitText-exits. Next enter starts 120ms before this ends (crossfade).
+
+Final chip: hold Ken Burns until `completeSequence` scrolls to scene 03 (existing ScrollToPlugin).
+
+### Constraints
+
+- Still images only. No Omni, Wan, or Kling clips on this branch.
+- Anatomy must stay readable: no motion that shears or warps the figure (no CSS `skew`, no mesh warp).
+- `prefers-reduced-motion`: static cutout, instant chip swap, canvas overlay off, no Flip/path/wiggle.
+- One GSAP context per scene (`useGSAP` / `gsap.context`), reverted on cleanup — per **gsap-react**.
 
 ## Generation
 
@@ -78,7 +100,7 @@ No second animation system. GSAP on the cutout nodes only. `prefers-reduced-moti
 ## Out of scope
 
 - Regenerating title chips (Better Health / Greater Freedom / Bigger Impact).
-- Omni / Kling video, warp transitions, night-city retakes.
+- Omni / Kling / Wan video, warp transitions, night-city retakes. Remotion film rebuild of 02 is a follow-up, not this slice.
 - Changing chip copy, scene height, or the scroll-gated hero rule.
 - Other slides’ chips.
 
@@ -87,13 +109,14 @@ No second animation system. GSAP on the cutout nodes only. `prefers-reduced-moti
 1. Four 02 cutouts exist in 16:9 and 9:16, bright and airy, no neon.
 2. Each frame is one subject; background is gone (alpha) or a clean bright void.
 3. Every accepted frame passes the anatomy count.
-4. On 02, scrolling past the hero starts the chip cycle; cutouts Ken Burns and stack; no neon video plays.
+4. On 02, scrolling past the hero starts the chip cycle. Each beat Flips in, Ken Burns + wiggle on hold, MotionPath-arcs out into the back stack, and chip type SplitText-staggers. Dust-mote canvas is visible and bright. No neon video plays.
 5. Final 02 chip still auto-scrolls to scene 03.
-6. Reduced-motion users see still cutouts and chip text, no zoom.
+6. Reduced-motion users see still cutouts and chip text, no Flip, path, wiggle, or canvas.
 
 ## Tests (TDD)
 
 - Cutout spec helpers: path, prompt contains palette + anatomy locks, 02 slugs in order.
 - `chipCutoutForSlide("02-world")` returns four entries; title still uses video backdrops.
-- Cycle + motion: enterChip applies Ken Burns class/vars to the active cutout; previous cutouts receive back-layer vars; reduced-motion skips transforms.
+- Cycle + motion: `enterChip` starts the enter timeline (Flip + SplitText); `exitChip` starts the MotionPath → Flip park; reduced-motion skips Flip/path/wiggle/canvas.
+- Canvas overlay mounts only when the scene is active and motion is allowed.
 - Existing `chipAutoCycle` tests stay green (scroll gate, fallback dwell, completeSequence).
