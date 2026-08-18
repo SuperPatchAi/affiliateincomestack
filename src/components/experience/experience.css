@@ -446,6 +446,38 @@
   object-fit: cover;
 }
 
+.chip-cutouts {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.chip-cutout {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  will-change: transform, opacity;
+}
+
+.chip-cutout img {
+  max-height: 78%;
+  max-width: 70%;
+  object-fit: contain;
+  filter: drop-shadow(0 28px 48px rgba(40, 24, 8, 0.18));
+}
+
+.dust-haze {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .scene-hero3d-canvas {
   z-index: 1;
 }

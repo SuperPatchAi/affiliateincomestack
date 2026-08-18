@@ -10,10 +10,12 @@ import {
   isIncomeStreamSlide,
   isStreamIndexSlide,
 } from "../../data/streamIndex";
-import { chipMediaForSlide } from "../../data/chipImagery";
+import { chipCutoutForSlide, chipMediaForSlide } from "../../data/chipImagery";
 import type { SceneLifecycle } from "../../motion/experienceMotionConfig";
 import { ChipBackdrops } from "./ChipBackdrops";
+import { ChipCutouts } from "./ChipCutouts";
 import { ChipStage } from "./ChipStage";
+import { DustHazeCanvas } from "./DustHazeCanvas";
 import type { ProductionCtaLinks } from "./ctaLinks";
 import { SceneHero3d } from "./SceneHero3d";
 import {
@@ -65,7 +67,15 @@ export function ExperienceScene({
   const body = slide.onScreenBody?.trim() ? slide.onScreenBody : slide.body;
   const hero3d = isHero3dExperienceSlide(slide.id);
   const pinDisclosure = Boolean(slide.chips?.length && slide.disclosure);
-  const chipMedia = slide.chips?.length ? chipMediaForSlide(slide.id, aspect) : [];
+  const cutouts = slide.chips?.length
+    ? chipCutoutForSlide(slide.id, aspect)
+    : [];
+  const chipMedia =
+    cutouts.length > 0
+      ? []
+      : slide.chips?.length
+        ? chipMediaForSlide(slide.id, aspect)
+        : [];
 
   return (
     <section
@@ -108,6 +118,12 @@ export function ExperienceScene({
                 priority={index === 0}
               />
             )}
+            {cutouts.length > 0 ? <ChipCutouts entries={cutouts} /> : null}
+            {cutouts.length > 0 ? (
+              <DustHazeCanvas
+                active={!reduceMotion && lifecycle === "active"}
+              />
+            ) : null}
             {!reduceMotion && chipMedia.length > 0 ? (
               <ChipBackdrops entries={chipMedia} attachVideo={attachVideo} />
             ) : null}
