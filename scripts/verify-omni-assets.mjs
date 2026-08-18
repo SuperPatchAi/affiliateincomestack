@@ -12,7 +12,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 const PLATES = [
   ["01", "title"],
-  ["02", "the-question"],
+  ["02", "world"],
   ["03", "four-stacks"],
   ["04", "flywheel"],
   ["05", "ecosystem"],

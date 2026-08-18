@@ -52,9 +52,8 @@ export const CHIP_STYLE_ANCHOR =
   "or symbol-like details anywhere in the scene.";
 
 /**
- * Real-world style anchor shared by the photoreal scenes (01-title, 02-world):
- * cinematic photography of a neon night city instead of the abstract Tron
- * void, still strictly text-free.
+ * Legacy night-city look, kept for plate retakes that still want neon.
+ * Live chips on 01-title and 02-world use DAYLIGHT_CITY_STYLE_ANCHOR.
  */
 export const NEON_CITY_STYLE_ANCHOR =
   "Cinematic photorealistic night-city photograph: a rain-slicked metropolis " +
@@ -68,9 +67,29 @@ export const NEON_CITY_STYLE_ANCHOR =
   "no readable characters anywhere in the scene.";
 
 /**
- * Bright isolated-subject stills for the cutout experiment (02-world).
- * Anatomy and daylight are hard gates — extra limbs fail QC.
+ * Same city-scale photoreal as the neon plates, but late-morning sun:
+ * glass, stone, sky, and skin — no neon tubes, no night rain.
  */
+export const DAYLIGHT_CITY_STYLE_ANCHOR =
+  "Cinematic photorealistic daylight city photograph: a bright airy metropolis " +
+  "in late-morning sun, warm stone and glass, pale sky, open shade on the street. " +
+  "Shot like a premium Apple x Nike commercial on anamorphic lenses: shallow " +
+  "depth of field, natural skin with laugh lines, no neon, no rain, no night. " +
+  "Keep the hero subject centered with quieter edges reserved for later " +
+  "interface overlays. Every sign, screen, and billboard is a blank soft shape " +
+  "or distant bokeh — no readable characters anywhere in the scene.";
+
+/**
+ * Golden-hour beach still for Greater Freedom — warm, open, no city night.
+ */
+export const SUNSET_BEACH_STYLE_ANCHOR =
+  "Cinematic photorealistic golden-hour photograph on an open beach: " +
+  "warm sunset over the water, long soft shadows, honey light on skin and wet sand. " +
+  "Shot like a premium Apple x Nike commercial on anamorphic lenses: shallow " +
+  "depth of field, natural skin with laugh lines. No neon, no rain, no city night. " +
+  "Keep the hero subject centered with quieter edges reserved for later " +
+  "interface overlays. The shore is unmarked — no readable characters anywhere in the scene.";
+
 export const CUTOUT_STYLE_ANCHOR =
   "Bright airy photoreal photograph on a clean warm-white void, late-morning " +
   "window light, soft open shade, natural skin with laugh lines and pores, " +
@@ -108,7 +127,7 @@ export function buildPortraitRecomposePrompt(spec: ChipImageSpec): string {
     "Keep the exact same scene, subject, lighting, palette, and photographic style.",
     "One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge —",
     "no black bars, no borders, no split panels, no collage.",
-    "Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter, darker, and softer.",
+    "Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer.",
     OMNI_TEXT_BAN,
   ].join(" ");
 }
@@ -163,10 +182,13 @@ export const CHIP_MEDIA_READY_SLIDES: readonly string[] = [
  * Slides listed in CHIP_MEDIA_READY_SLIDES but not here run stills-only:
  * the poster shows and the chip cycle advances on its fallback timer.
  */
-export const CHIP_VIDEO_READY_SLIDES: readonly string[] = [];
+export const CHIP_VIDEO_READY_SLIDES: readonly string[] = [
+  "01-title",
+  "02-world",
+];
 
 /** Slides that use isolated cutout stills instead of omni / neon backdrops. */
-export const CHIP_CUTOUT_SLIDES: readonly string[] = ["02-world"];
+export const CHIP_CUTOUT_SLIDES: readonly string[] = [];
 
 export type ChipCutoutEntry = {
   slug: string;
@@ -214,31 +236,54 @@ export function chipMediaForSlide(
 }
 
 /**
- * Omni motion prompt for a chip still. The clip awakens, performs the chip's
- * own motion, then either accelerates into a light-warp that hands off to the
- * next chip (scroll fast-forward) or settles back for a clean loop.
+ * Omni motion prompt for a chip still.
+ *
+ * Photoreal chips chain naturally: the first clip stays in its own scene;
+ * later clips start on the previous last frame (<FIRST_FRAME>) and arrive
+ * at this chip's still (<IMAGE_REF_1>). Abstract Tron chips still warp
+ * toward the next accent, or settle on the final beat.
  */
+/**
+ * Gemini Omni / Veo I2V lock — official guidance:
+ * prompt for motion only, one scene per short clip, general terms for people,
+ * direct a slow camera. Do not re-describe the still or chain A-then-B events.
+ */
+export const CHIP_MOTION_ONLY_LOCK =
+  "Image-to-video: prompt for motion only. The attached still is the first frame. " +
+  "Stay in this one scene for the entire clip. No cuts, no morph, " +
+  "no jump to another place, no flashing, no warp, no mid-video scene change. " +
+  "Subtle human motion only — small natural gestures, cloth, hair, breath. " +
+  "Do not re-describe the setting, lighting, or wardrobe. Refer to people as the subject or they.";
+
 export function buildChipMotionPrompt(
   spec: ChipImageSpec,
   next: ChipImageSpec | null,
+  _prev: ChipImageSpec | null = null,
 ): string {
+  if (spec.setting) {
+    return [
+      "In a single continuous shot with no scene cuts. <FIRST_FRAME> Animate only the attached still.",
+      CHIP_MOTION_ONLY_LOCK,
+      `Slow, subtle motion: ${spec.motion}`,
+      "Slow dolly or gentle handheld drift. The subject moves like a real unhurried person.",
+      "Hold the same composition through the last frame. No settle warp and no morph at the end.",
+      OMNI_TEXT_BAN,
+    ].join(" ");
+  }
+
+  const setting = `Dark void with ${spec.accent} accent lighting on a dark reflective floor.`;
   const exit = next
     ? `[6-8s] Accelerate everything into a forward warp of streaking light — ` +
       `the whole scene rushes past the camera as if fast-forwarding to the next moment, ` +
       `light trails shifting toward ${next.accent} as the frame fills with motion blur.`
     : `[6-8s] Ease every element back toward the opening composition so the clip loops cleanly, ` +
       `letting the scene settle to rest.`;
-  const setting =
-    spec.setting ??
-    `Dark void with ${spec.accent} accent lighting on a dark reflective floor.`;
-  const aesthetic = spec.setting
-    ? "Premium Apple x Nike commercial film aesthetic — large scale, cinematic, photoreal motion."
-    : "Apple x Nike x McKinsey cinematic presentation aesthetic — large scale, premium, abstract motion.";
+
   return [
     "In a single continuous shot with no scene cuts.",
-    `<FIRST_FRAME> Animate this ${spec.setting ? "cinematic photoreal still" : "premium keynote motion graphic still"}.`,
+    "<FIRST_FRAME> Animate this premium keynote motion graphic still.",
     setting,
-    aesthetic,
+    "Apple x Nike x McKinsey cinematic presentation aesthetic — large scale, premium, abstract motion.",
     "[0-2s] Awaken the composition with a restrained camera drift.",
     `[2-6s] ${spec.motion} Keep primary motion in the center sixty percent of the frame; quieter edges for later interface overlays.`,
     exit,
@@ -247,93 +292,99 @@ export function buildChipMotionPrompt(
 }
 
 export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
-  // 01-title — Health / Freedom / Impact, real people in the neon city
+  // 01-title — Health / Freedom / Impact, same beats as the neon plates minus neon
   {
     slideId: "01-title",
     chipIndex: 0,
     slug: "better-health",
-    accent: "cool cyan rim light against warm amber street glow",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
+    accent: "warm sun on skin and pale asphalt",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting: "A sunlit downtown avenue in late morning, pale sky above.",
     subject:
-      "A lone runner in sleek athletic gear sprints across a rain-slicked city crosswalk at night, caught mid-stride, body reading as a crisp silhouette rimmed in cyan light. Amber and magenta neon reflections ripple across the wet asphalt beneath each step, and the street behind dissolves into soft glowing bokeh.",
+      "A lone runner in sleek athletic gear sprints across a dry city crosswalk, caught mid-stride, sun on their face and laugh lines visible. Stone and glass towers recede behind them in soft open shade. The street is bright and dry, with quiet traffic bokeh and no signboards.",
     motion:
-      "The runner strides through the crosswalk as neon reflections ripple across the wet asphalt beneath each footfall.",
+      "The subject keeps a natural running stride, fabric and hair moving with each step, while the camera makes a slow tracking drift.",
   },
   {
     slideId: "01-title",
     chipIndex: 1,
     slug: "greater-freedom",
-    accent: "violet and cyan skyline glow under a deep dark sky",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A high rooftop terrace at night above a vast glowing neon metropolis.",
+    accent: "honey sunset on wet sand and open water",
+    style: SUNSET_BEACH_STYLE_ANCHOR,
+    setting: "An open beach at sunset, warm sky over calm water.",
     subject:
-      "A person stands relaxed at the railing of a high rooftop terrace at night, back to camera, jacket stirring in the wind, gazing out over a vast metropolis that stretches to the horizon in fields of cyan, magenta, and amber light. The sky above stays deep, dark, and open.",
+      "One person walks barefoot along the wet sand at the waterline, in profile, gazing at a wide sunset over the sea. Soft honey light on their face, a light jacket stirring in the breeze, empty beach stretching toward the horizon. No buildings, no boats in the foreground.",
+    portraitSubject:
+      "A tall vertical photograph of one person walking barefoot along the wet sand at the waterline, in profile, gazing at a wide sunset over the sea. Warm sky fills the upper frame, wet sand and shallow water the lower, empty beach toward the horizon.",
     motion:
-      "The jacket stirs in the wind while the sea of city lights shimmers softly far below.",
+      "The subject walks unhurried along the waterline. Hair and jacket stir in a light breeze. The camera makes a slow lateral drift.",
   },
   {
     slideId: "01-title",
     chipIndex: 2,
     slug: "bigger-impact",
-    accent: "warm amber crowd glow amid vivid mixed neon",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A great rain-slicked city intersection at night, seen from high above.",
+    accent: "late-morning sun on pale stone and open sky",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting: "A sunlit rooftop terrace in late morning, pale sky above.",
     subject:
-      "Seen from high above, a great city intersection at night fills with people crossing in every direction, their umbrellas catching the surrounding neon so each one glows a different color — a spreading field of small colored lights moving together across the rain-slicked crossing, mirrored in the wet asphalt. The surrounding towers carry no signboards or billboards at all: their facades glow purely with bare neon tubes, colored strip lights, and blurred lit windows.",
+      "A small circle of people stands together on a bright rooftop terrace, mid-conversation, cups of coffee or water in hand, faces readable in high even late-morning daylight. The sun is high and white; shadows are short and pale. Pale stone paving, a low glass rail, and a city of stone and glass behind them under a pale blue-white sky. Blank walls and windows, no signboards.",
+    portraitSubject:
+      "A tall vertical photograph of a small circle of people on a bright rooftop terrace, mid-conversation, cups in hand, faces readable. Pale blue-white sky fills the upper frame, the city of stone and glass falls away below the rail. High even late-morning daylight, short pale shadows.",
     motion:
-      "The crowd flows through the crossing as the glowing umbrella colors drift and mingle across the wet asphalt.",
+      "They share a small natural laugh. Hair and clothes stir in a light breeze. The camera holds a slow, quiet drift.",
   },
 
-  // 02-world — bright isolated cutouts, one subject per chip
+  // 02-world — daylight cityscapes, same beats as the neon plates minus neon
   {
     slideId: "02-world",
     chipIndex: 0,
     slug: "traditional-jobs",
-    accent: "warm window daylight on pale cotton",
-    style: CUTOUT_STYLE_ANCHOR,
-    setting: "A clean warm-white photographic void in late-morning sun.",
+    accent: "warm sun on glass and pale stone",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting: "A sunlit downtown avenue in late morning, pale sky above.",
     subject:
-      "One man, waist-up, pale oxford shirt, mid-laugh, both hands on a paper coffee cup, a blank badge on a lanyard. Soft sun on his face, laugh lines visible. No other people.",
-    motion: "He holds the cup steady as soft sun drifts across his face.",
+      "A towering glass office block fills the frame, shot from street level looking up: a vast grid of sunlit windows, tiny figures at desks. Below, a bright avenue with soft traffic bokeh and a few pedestrians in open shade.",
+    motion:
+      "Window reflections drift slowly. A few pedestrians walk at an easy pace. The camera holds a gentle upward drift.",
   },
   {
     slideId: "02-world",
     chipIndex: 1,
     slug: "gig-economy",
-    accent: "open daylight and pale sky",
-    style: CUTOUT_STYLE_ANCHOR,
-    setting: "A clean warm-white photographic void in late-morning sun.",
+    accent: "open daylight on cream paint and pale sky",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting: "A sunlit city side street in late morning, pale sky above.",
     subject:
-      "One rider standing beside a cream scooter, visor up, easy smile, one hand on the seat, a courier bag on his back, both feet on the ground. Open daylight. No other people.",
-    motion: "A light breeze lifts his shirt while he stands beside the scooter.",
+      "A delivery rider on a cream scooter moves along a bright city side street, courier bag on his back, visor up, easy smile. Stone and glass buildings recede in soft daylight. The street has no signboards — only windows, sky, and warm asphalt.",
+    motion:
+      "The subject rolls forward at an easy pace. The camera follows with a slow, stable tracking move.",
   },
   {
     slideId: "02-world",
     chipIndex: 2,
     slug: "creator-economy",
-    accent: "morning window light on white stone",
-    style: CUTOUT_STYLE_ANCHOR,
-    setting: "A clean warm-white photographic void in late-morning sun.",
+    accent: "morning window light against a bright city view",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting:
+      "A bright apartment studio with a floor-to-ceiling window over a sunlit city.",
     subject:
-      "One woman seated at a white kitchen island, mid-laugh, both hands visible near a phone on a tiny tripod. A houseplant at the edge. Morning window light. No other people.",
-    motion: "She leans toward the phone as window light shifts across the island.",
+      "A creator sits at a pale desk near a tall window, both hands near a phone on a tiny tripod, mid-laugh. Beyond the glass a sunlit city stretches in pale stone and glass. Screens are blank soft shapes.",
+    motion:
+      "The subject breathes and shifts slightly at the desk. Soft window light moves. The camera holds a slow, quiet drift.",
   },
   {
     slideId: "02-world",
     chipIndex: 3,
     slug: "social-commerce",
-    accent: "sun on skin and pale wood",
-    style: CUTOUT_STYLE_ANCHOR,
-    setting: "A clean warm-white photographic void in late-morning sun.",
+    accent: "sun on skin, pale wood, and a city sidewalk",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    setting: "An outdoor cafe on a sunlit city sidewalk in late morning.",
     subject:
-      "Tight crop of two friends at an outdoor cafe table, four hands around one small product, coffee cups only, sun on faces.",
+      "Two friends at an outdoor cafe table on a city sidewalk, four hands around one small product, coffee cups only, sun on faces. Behind them the street recedes in stone and glass, pedestrians soft in open shade.",
     portraitSubject:
-      "A tall vertical crop of two friends at an outdoor cafe table, four hands around one small product, coffee cups only, sun on faces, warm-white void above and below.",
-    motion: "Hands turn the product as sun moves across the table.",
+      "A tall vertical photograph of two friends at an outdoor cafe table on a city sidewalk, four hands around one small product, coffee cups only, sun on faces. The street and pale sky rise above them in stone and glass.",
+    motion:
+      "Hands turn the product slowly. The subjects share a small natural laugh. The camera holds a gentle close drift.",
   },
 
   // 03-four-stacks — one pillar per chip (multi)
@@ -878,14 +929,24 @@ export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
 /** The four photographic plates that break the Tron arc, remade in deck style. */
 export const PLATE_RETAKES: PlateRetakeSpec[] = [
   {
+    plateFile: "sp-stack-01-title.png",
+    slideId: "01-title",
+    accent: "warm sun on skin and a pale city sky",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
+    subject:
+      "A sunlit late-morning photograph of one person standing at a wide window or open terrace, a small wellness patch on their upper arm, looking out over an airy city of pale stone and glass. Warm skin, laugh lines, open shade. The feeling is better health, greater freedom, and a bigger life ahead — one quiet human moment, not a collage. No stacked graphics and no signage.",
+    motion:
+      "The subject breathes and the breeze stirs their clothes. The camera holds a slow, almost still push-in.",
+  },
+  {
     plateFile: "sp-stack-02-world.png",
     slideId: "02-world",
-    accent: "vivid mixed neon — cyan, magenta, amber, violet — over deep night blacks",
-    style: NEON_CITY_STYLE_ANCHOR,
+    accent: "warm sun on glass, pale stone, and open streets",
+    style: DAYLIGHT_CITY_STYLE_ANCHOR,
     subject:
-      "A sweeping aerial view from high above a vast real metropolis at night after rain: one great avenue of white and amber headlight trails flows in from the foreground, then splits and branches into many glowing routes that spread through the neon grid of the city, each branch taking on its own color as it weaves between towers lit cyan, magenta, amber, and violet. Wet streets and glass facades mirror every light. The skyline recedes to a softly glowing horizon under a dark clear sky, and the upper band of the frame stays quiet and dark.",
+      "A sweeping aerial view from high above a vast real metropolis in late-morning sun: one great avenue of pale traffic bokeh flows in from the foreground, then splits and branches into many sunlit routes that spread through a city of warm stone and glass, each branch catching its own open shade as it weaves between towers. Sunlit windows and pale streets recede to a bright horizon under a clear sky, and the upper band of the frame stays quiet and soft.",
     motion:
-      "Traffic light-trails stream along the great avenue, split at the branch point, and flow outward through the neon grid while window lights flicker softly across the towers.",
+      "Traffic streams along the great avenue, splits at the branch point, and flows outward through the sunlit grid while window reflections drift softly across the towers.",
   },
   {
     plateFile: "sp-stack-13-executive.png",

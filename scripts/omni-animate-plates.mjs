@@ -221,10 +221,10 @@ async function generateAspect(aspect, plates, apiKey, { forceAll, nums }) {
         prompt: plate.prompt,
         aspect,
         outputPath: outPath,
-        bridgeRef: prevBridge,
+        bridgeRef: plate.photoreal ? null : prevBridge,
       });
       extractLastFrame(outPath, bridgePath);
-      prevBridge = bridgePath;
+      if (!plate.photoreal) prevBridge = bridgePath;
       results.push({
         id: plate.id,
         aspect,

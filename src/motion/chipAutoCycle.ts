@@ -12,6 +12,8 @@
 
 /** Copy slide-out duration; the first chip enters when it completes. */
 export const CHIP_COPY_EXIT_MS = 700;
+/** ScrollTrigger start: copy holds until the user has scrolled into the scene. */
+export const CHIP_SCROLL_GATE_START = "top+=30% top";
 /** Per-chip dwell when no video is available to time the beat. */
 export const CHIP_FALLBACK_DWELL_MS = 6000;
 
@@ -19,11 +21,15 @@ export type ChipCycleHandlers = {
   /** Slide the headline copy off screen. Called once per run. */
   exitCopy: () => void;
   /**
-   * Show chip `index` (text + backdrop) and start its video.
-   * Return false when no video can play so the cycle falls back to a timer.
+   * Start chip `index` video/backdrop first; overlay text follows after
+   * the transition. Return false when no video can play so the cycle
+   * falls back to a timer.
    */
-  enterChip: (index: number, opts: { loop: boolean }) => boolean;
-  /** Hide chip `index`; crossfades under the next chip's enter. */
+  enterChip: (index: number, opts: { loop: boolean; handoff: boolean }) => boolean;
+  /**
+   * Hide chip `index`. On a chip-to-chip handoff the outgoing last frame
+   * stays up until the next backdrop is covering — do not fade both out.
+   */
   exitChip: (index: number) => void;
   /** Restore copy, hide all chips, stop all videos. */
   reset: () => void;
@@ -89,11 +95,13 @@ export function createChipAutoCycle(options: {
   };
 
   const enter = (index: number) => {
+    const handoff = current >= 0;
     current = index;
     const isLast = index === chipCount - 1;
     // Without a completion target the last clip loops as an idle state.
     const hasVideo = handlers.enterChip(index, {
       loop: isLast && !canComplete,
+      handoff,
     });
     if (!hasVideo) {
       if (!isLast) schedule(fallbackChipMs, advance);

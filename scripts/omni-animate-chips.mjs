@@ -2,10 +2,10 @@
 /**
  * Batch Gemini Omni Flash image-to-video for the chip backdrops.
  *
- * Each chip still becomes an ~8s clip: awaken -> the chip's own motion ->
- * a forward light-warp that fast-forwards into the next chip (or a clean
- * loop settle on the last chip of a slide). The last frame of each clip is
- * extracted as a bridge reference so palette and lighting stay continuous.
+ * Each chip still becomes an ~8s clip. Photoreal chips chain naturally:
+ * clip 1 stays in its own scene; later clips use the previous last frame
+ * as <FIRST_FRAME> and this chip's still as the destination <IMAGE_REF_1>.
+ * Abstract chips still warp toward the next accent.
  *
  * Usage (from the app root):
  *   node scripts/omni-animate-chips.mjs 01-title                 # one slide, 16:9
@@ -79,7 +79,15 @@ function extractLastFrame(videoPath, bridgePath) {
   }
 }
 
-function runOmni({ apiKey, stillPath, prompt, aspect, outputPath, bridgeRef }) {
+function runOmni({
+  apiKey,
+  stillPath,
+  prompt,
+  aspect,
+  outputPath,
+  bridgeRef,
+  chainFromPrevious = false,
+}) {
   const code = `
 import json, os, sys
 from pathlib import Path
@@ -89,13 +97,18 @@ os.environ["GOOGLE_API_KEY"] = ${JSON.stringify(apiKey)}
 from tools.video.gemini_omni_video import GeminiOmniVideo
 
 tool = GeminiOmniVideo()
-refs = [${JSON.stringify(stillPath)}]
-prompt = ${JSON.stringify(prompt)}
 bridge = ${JSON.stringify(bridgeRef || "")}
-if bridge:
-    refs.append(bridge)
-    # refs[0]=chip still (<FIRST_FRAME>), refs[1]=prior last frame (<IMAGE_REF_1>)
-    prompt = prompt + " Match the palette and lighting mood of <IMAGE_REF_1> only. Do not continue the previous camera move; this is a new scroll beat."
+chain = ${chainFromPrevious ? "True" : "False"}
+prompt = ${JSON.stringify(prompt)}
+if chain and bridge:
+    # refs[0]=previous last frame (<FIRST_FRAME>), refs[1]=this still (<IMAGE_REF_1>)
+    refs = [${JSON.stringify(bridgeRef)}, ${JSON.stringify(stillPath)}]
+else:
+    refs = [${JSON.stringify(stillPath)}]
+    if bridge:
+        refs.append(bridge)
+        # Abstract chips: still is first frame; prior last frame is palette only.
+        prompt = prompt + " Match the palette and lighting mood of <IMAGE_REF_1> only. Do not continue the previous camera move; this is a new scroll beat."
 
 result = tool.execute({
     "prompt": prompt,
@@ -198,15 +211,19 @@ async function main() {
     let prevSlide = null;
     for (let i = 0; i < specs.length; i++) {
       const spec = specs[i];
-      // The warp exit targets the next chip in the same slide's sequence.
       const next =
         i + 1 < specs.length && specs[i + 1].slideId === spec.slideId
           ? specs[i + 1]
           : null;
+      const prev =
+        i > 0 && specs[i - 1].slideId === spec.slideId ? specs[i - 1] : null;
       if (spec.slideId !== prevSlide) {
-        prevBridge = null; // new slide, new sequence — fresh palette chain
+        prevBridge = null; // new slide, new sequence
         prevSlide = spec.slideId;
       }
+      // Photoreal clips stay in one scene (Gemini I2V: motion only).
+      // Do not chain last-frame travel — that caused mid-clip morphs.
+      const chainFromPrevious = false;
 
       const stillRel = chipImagePath(spec, aspect);
       const stillPath = join(APP, "public", stillRel);
@@ -234,7 +251,7 @@ async function main() {
         continue;
       }
 
-      const prompt = buildChipMotionPrompt(spec, next);
+      const prompt = buildChipMotionPrompt(spec, next, prev);
       console.log(`\n=== Omni chip ${aspect} ${spec.slideId}/${spec.slug} ===`);
       try {
         const result = await runOmni({
@@ -244,6 +261,7 @@ async function main() {
           aspect,
           outputPath: outPath,
           bridgeRef: prevBridge,
+          chainFromPrevious,
         });
         extractLastFrame(outPath, bridgePath);
         prevBridge = bridgePath;

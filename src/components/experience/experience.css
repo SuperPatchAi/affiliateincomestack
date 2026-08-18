@@ -446,6 +446,14 @@
   object-fit: cover;
 }
 
+/* After the first title chip is fully opaque, keep the 3D stack hidden
+   so chip-to-chip swaps cannot flash the income-stack animation. */
+.experience-scene[data-hero3d="true"][data-chip-cover="true"] [data-scene-hero3d] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .chip-cutouts {
   position: absolute;
   inset: 0;

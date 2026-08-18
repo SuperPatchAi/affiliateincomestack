@@ -1,162 +1,53 @@
 {
   "model": "gemini-omni-flash-preview",
-  "generatedAt": "2026-08-07T14:20:57.535Z",
+  "generatedAt": "2026-08-18T02:47:33.542Z",
   "aspects": [
+    "16:9",
     "9:16"
   ],
   "results": [
     {
       "id": "01",
+      "aspect": "16:9",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-01-title_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-01-title_last.png",
+      "interaction_id": "v1_ChdJOGVEYXUtRUY3NmkxTWtQeFp2SnNRNBIXSThlRGF1LUVGNzZpMU1rUHhadkpzUTQ",
+      "cost_usd": 0.8,
+      "duration_seconds": 52.03
+    },
+    {
+      "id": "02",
+      "aspect": "16:9",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-02-world_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-02-world_last.png",
+      "interaction_id": "v1_ChdVc2VEYXI2bkNPRElfdU1Qdl9iVzhRaxIXVXNlRGFyNm5DT0RJX3VNUHZfYlc4UWs",
+      "cost_usd": 0.8,
+      "duration_seconds": 46.2
+    },
+    {
+      "id": "01",
       "aspect": "9:16",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-01-title_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-01-title_last.png",
-      "interaction_id": "v1_ChdMT2QxYXNPYkM1R3kxTWtQX2FMMTBRURIXTE9kMWFzT2JDNUd5MU1rUF9hTDEwUVE",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-01-title_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-01-title_last.png",
+      "interaction_id": "v1_ChdqTWVEYXRpVklwRzlfdU1QXzdLODRBVRIXak1lRGF0aVZJcEc5X3VNUF83Szg0QVU",
       "cost_usd": 0.8,
-      "duration_seconds": 43.34
+      "duration_seconds": 57.9
     },
     {
       "id": "02",
       "aspect": "9:16",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-02-the-question_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-02-the-question_last.png",
-      "interaction_id": "v1_ChdXT2QxYXB6RU04eWgxTWtQNy1iaWdBURIXV09kMWFwekVNOHloMU1rUDctYmlnQVE",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-02-world_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-02-world_last.png",
+      "interaction_id": "v1_Chd2Y2VEYXFDVU5iU3MxTWtQOTlEZzZRVRIXdmNlRGFxQ1VOYlNzMU1rUDk5RGc2UVU",
       "cost_usd": 0.8,
-      "duration_seconds": 44.68
-    },
-    {
-      "id": "03",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-03-four-stacks_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-03-four-stacks_last.png",
-      "interaction_id": "v1_ChdudWQxYW9DQkJlU0NfdU1QcVlPXzhRURIXbnVkMWFvQ0JCZVNDX3VNUHFZT184UVE",
-      "cost_usd": 0.8,
-      "duration_seconds": 69.63
-    },
-    {
-      "id": "04",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-04-flywheel_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-04-flywheel_last.png",
-      "interaction_id": "v1_Chd6T2QxYXRpZ0JMbkctOFlQNEplWmdRSRIXek9kMWF0aWdCTG5HLThZUDRKZVpnUUk",
-      "cost_usd": 0.8,
-      "duration_seconds": 45.22
-    },
-    {
-      "id": "05",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-05-ecosystem_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-05-ecosystem_last.png",
-      "interaction_id": "v1_Chc5ZWQxYXVLOE9QVzZfdU1QcHAzeTBBcxIXOWVkMWF1SzhPUFc2X3VNUHBwM3kwQXM",
-      "cost_usd": 0.8,
-      "duration_seconds": 41.75
-    },
-    {
-      "id": "06",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-06-ten-layers_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-06-ten-layers_last.png",
-      "interaction_id": "v1_ChdKZWgxYXRmVkRmT25fdU1QbTdtNDhBZxIXSmVoMWF0ZlZEZk9uX3VNUG03bTQ4QWc",
-      "cost_usd": 0.8,
-      "duration_seconds": 47.09
-    },
-    {
-      "id": "07",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-07-retail_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-07-retail_last.png",
-      "interaction_id": "v1_ChdVZWgxYXFpSkJmSFBfdU1QNDV6cDZBVRIXVWVoMWFxaUpCZkhQX3VNUDQ1enA2QVU",
-      "cost_usd": 0.8,
-      "duration_seconds": 43.44
-    },
-    {
-      "id": "08",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-08-fast-start_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-08-fast-start_last.png",
-      "interaction_id": "v1_ChdlLWgxYXFtdUpleWI5TW9QeGFLNG9RZxIXZS1oMWFxbXVKZXliOU1vUHhhSzRvUWc",
-      "cost_usd": 0.8,
-      "duration_seconds": 42.3
-    },
-    {
-      "id": "09",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-09-team-overrides_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-09-team-overrides_last.png",
-      "interaction_id": "v1_ChdvLWgxYXZpNUZjSDVqckVQa0pmMDZBRRIXby1oMWF2aTVGY0g1anJFUGtKZjA2QUU",
-      "cost_usd": 0.8,
-      "duration_seconds": 39.87
-    },
-    {
-      "id": "10",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-10-unlimited-depth_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-10-unlimited-depth_last.png",
-      "interaction_id": "v1_ChcwT2gxYXBDQ0lLMlItOFlQaGNYazhRVRIXME9oMWFwQ0NJSzJSLThZUGhjWGs4UVU",
-      "cost_usd": 0.8,
-      "duration_seconds": 44.97
-    },
-    {
-      "id": "11",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-11-vp-override_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-11-vp-override_last.png",
-      "interaction_id": "v1_ChdfT2gxYXFlNkhLR2E5TW9Qczg3WjhRdxIXX09oMWFxZTZIS0dhOU1vUHM4N1o4UXc",
-      "cost_usd": 0.8,
-      "duration_seconds": 43.78
-    },
-    {
-      "id": "12",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-12-generations_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-12-generations_last.png",
-      "interaction_id": "v1_ChdLT2wxYXMtbExldVMxTWtQbWRLa3VBURIXS09sMWFzLWxMZXVTMU1rUG1kS2t1QVE",
-      "cost_usd": 0.8,
-      "duration_seconds": 43.95
-    },
-    {
-      "id": "13",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-13-executive_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-13-executive_last.png",
-      "interaction_id": "v1_ChdVdWwxYXNySE5vbW8xTWtQd1p1QmdBURIXVXVsMWFzckhOb21vMU1rUHdadUJnQVE",
-      "cost_usd": 0.8,
-      "duration_seconds": 41.72
-    },
-    {
-      "id": "14",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-14-global-pool_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-14-global-pool_last.png",
-      "interaction_id": "v1_ChdsT2wxYXBhMEg1V2MxTWtQODRYdnlBURIXbE9sMWFwYTBINVdjMU1rUDg0WHZ5QVE",
-      "cost_usd": 0.8,
-      "duration_seconds": 65.68
-    },
-    {
-      "id": "15",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/9x16/sp-stack-15-closing_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/apps/superpatch-income-stack/public/concepts/omni-chain/bridges/9x16/sp-stack-15-closing_last.png",
-      "interaction_id": "v1_Chd3dWwxYXNubEVKdnZfdU1QeFkzSDBBYxIXd3VsMWFzbmxFSnZ2X3VNUHhZM0gwQWM",
-      "cost_usd": 0.8,
-      "duration_seconds": 44.96
+      "duration_seconds": 49.17
     }
   ],
-  "okCount": 15,
+  "okCount": 4,
   "failCount": 0,
-  "cost_usd_sum": 12.000000000000002
+  "cost_usd_sum": 3.2
 }

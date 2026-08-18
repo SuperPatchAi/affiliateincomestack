@@ -35,6 +35,7 @@ const API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
  * The world plate is photoreal (own style anchor) and renders without refs.
  */
 const RETAKE_REFS = {
+  "sp-stack-01-title.png": [],
   "sp-stack-02-world.png": [],
   "sp-stack-13-executive.png": ["sp-stack-08-fast-start.png", "sp-stack-07-development.png"],
   "sp-stack-19-future.png": ["sp-stack-08-fast-start.png", "sp-stack-06-ten-layers.png"],

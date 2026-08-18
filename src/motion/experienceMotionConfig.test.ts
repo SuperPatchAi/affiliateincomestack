@@ -112,8 +112,8 @@ describe("Premium V2 web choreography", () => {
     ).toBeLessThanOrEqual(180);
   });
 
-  it("skips the zero-distance first-scene dwell range", () => {
-    expect(MotionConfig.sceneDwellEnabled(0)).toBe(false);
+  it("gives the title opener a dwell so it does not fly off on first scroll", () => {
+    expect(MotionConfig.sceneDwellEnabled(0)).toBe(true);
     expect(MotionConfig.sceneDwellEnabled(1)).toBe(true);
     expect(MotionConfig.sceneDwellEnabled(14)).toBe(true);
   });

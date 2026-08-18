@@ -27,9 +27,18 @@ import {
 } from "./chipDwellParking";
 import {
   CHIP_COPY_EXIT_MS,
+  CHIP_SCROLL_GATE_START,
   createChipAutoCycle,
   type ChipAutoCycle,
 } from "./chipAutoCycle";
+import {
+  CHIP_BACKDROP_HANDOFF_HOLD_MS,
+  chipBackdropEnterOpacity,
+  chipOverlayEnterDelayMs,
+  chipVideoTickAction,
+  freezeVideoLastFrame,
+  shouldCoverSceneHero3d,
+} from "./chipBackdropHandoff";
 import {
   applyCutoutEnter,
   applyCutoutExit,
@@ -53,9 +62,9 @@ let windowScrollTween: gsap.core.Tween | undefined;
 type SceneChipCycle = { cycle: ChipAutoCycle; dispose: () => void };
 
 /**
- * Bind the video-timed chip cycle to a scene's DOM. Copy exit, chip text
- * crossfades, backdrop fades, and playback are all keyed to each omni clip's
- * `ended` event — the clip's warp finale is the transition cue, not scroll.
+ * Bind the video-timed chip cycle to a scene's DOM. Copy exit, chip text,
+ * backdrop fades, and playback are keyed to each omni clip, cut short of
+ * the settle/glitch tail. Overlay text waits until the incoming travel lands.
  * When `onSequenceComplete` is given, the final clip's ending fires it
  * (auto-scroll to the next scene); otherwise the final clip loops in place.
  */
@@ -90,6 +99,20 @@ function buildSceneChipCycle(
     }
   };
 
+  const coverHero3dIfNeeded = (backdropFullyOpaque: boolean) => {
+    if (
+      shouldCoverSceneHero3d({
+        hasHero3d: scene.dataset.hero3d === "true",
+        backdropFullyOpaque,
+      })
+    ) {
+      scene.dataset.chipCover = "true";
+    }
+  };
+
+  let outgoingHold: gsap.core.Tween | undefined;
+  const loopFlags = videos.map(() => false);
+
   const cycle = createChipAutoCycle({
     chipCount: chipEls.length,
     handlers: {
@@ -101,39 +124,64 @@ function buildSceneChipCycle(
           overwrite: "auto",
         });
       },
-      enterChip(index, { loop }) {
+      enterChip(index, { loop, handoff }) {
         if (cutouts[index]) {
           applyCutoutEnter(cutouts[index], chipEls[index], { reduceMotion });
           return false;
         }
+        const backdrop = backdrops[index];
+        if (backdrop) {
+          const enter = chipBackdropEnterOpacity(handoff);
+          if (enter.duration === 0) {
+            gsap.killTweensOf(backdrop);
+            gsap.set(backdrop, { opacity: enter.to });
+            coverHero3dIfNeeded(true);
+          } else {
+            gsap.fromTo(
+              backdrop,
+              { opacity: enter.from ?? 0 },
+              {
+                opacity: enter.to,
+                duration: enter.duration,
+                ease: "none",
+                overwrite: "auto",
+                onComplete: () => coverHero3dIfNeeded(true),
+              },
+            );
+          }
+        }
+        const video = videos[index] ?? null;
+        const hasVideo = Boolean(
+          video && (video.getAttribute("src") || video.currentSrc),
+        );
+        if (hasVideo && video) {
+          loopFlags[index] = loop;
+          video.loop = false;
+          video.muted = true;
+          if (!handoff) {
+            try {
+              video.currentTime = 0;
+            } catch {
+              // First play; element decides the start position.
+            }
+          }
+          void video.play()?.catch(() => {
+            // Autoplay denied: the poster still holds; cycle stays on this beat.
+          });
+        }
         gsap.fromTo(
           chipEls[index],
           { opacity: 0, x: 72 },
-          { opacity: 1, x: 0, duration: 0.6, ease: "power2.out", overwrite: "auto" },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.6,
+            delay: chipOverlayEnterDelayMs({ handoff }) / 1000,
+            ease: "power2.out",
+            overwrite: "auto",
+          },
         );
-        const backdrop = backdrops[index];
-        if (backdrop) {
-          gsap.fromTo(
-            backdrop,
-            { opacity: 0 },
-            { opacity: 1, duration: 0.8, ease: "none", overwrite: "auto" },
-          );
-        }
-        const video = videos[index] ?? null;
-        if (!video || (!video.getAttribute("src") && !video.currentSrc)) {
-          return false;
-        }
-        video.loop = loop;
-        video.muted = true;
-        try {
-          video.currentTime = 0;
-        } catch {
-          // First play; element decides the start position.
-        }
-        void video.play()?.catch(() => {
-          // Autoplay denied: the poster still holds; cycle stays on this beat.
-        });
-        return true;
+        return hasVideo;
       },
       exitChip(index) {
         if (cutouts[index]) {
@@ -150,20 +198,33 @@ function buildSceneChipCycle(
           ease: "power2.in",
           overwrite: "auto",
         });
+        const video = videos[index] ?? null;
+        if (video) {
+          try {
+            freezeVideoLastFrame(video);
+          } catch {
+            video.pause();
+          }
+        }
         const backdrop = backdrops[index];
+        outgoingHold?.kill();
         if (backdrop) {
-          gsap.to(backdrop, {
-            opacity: 0,
-            duration: 0.8,
-            ease: "none",
-            overwrite: "auto",
-            onComplete: () => stopVideo(videos[index] ?? null),
-          });
+          outgoingHold = gsap.delayedCall(
+            CHIP_BACKDROP_HANDOFF_HOLD_MS / 1000,
+            () => {
+              gsap.set(backdrop, { opacity: 0 });
+              stopVideo(video);
+            },
+          );
         } else {
-          stopVideo(videos[index] ?? null);
+          stopVideo(video);
         }
       },
       reset() {
+        outgoingHold?.kill();
+        outgoingHold = undefined;
+        loopFlags.fill(false);
+        delete scene.dataset.chipCover;
         gsap.killTweensOf([copyBlock, ...chipEls, ...backdrops, ...cutouts]);
         gsap.set(copyBlock, { x: 0 });
         if (cutouts.length > 0) {
@@ -182,9 +243,30 @@ function buildSceneChipCycle(
 
   const listeners = videos.map((video, index) => {
     if (!video) return null;
+    const onTimeUpdate = () => {
+      const action = chipVideoTickAction({
+        currentTime: video.currentTime,
+        duration: video.duration,
+        loop: loopFlags[index],
+      });
+      if (action === "none") return;
+      if (action === "loop") {
+        try {
+          video.currentTime = 0;
+        } catch {
+          // Seek not ready; native ended will still fire as a fallback.
+        }
+        void video.play()?.catch(() => {
+          // Autoplay denied: poster holds.
+        });
+        return;
+      }
+      cycle.handleVideoEnded(index);
+    };
     const onEnded = () => cycle.handleVideoEnded(index);
+    video.addEventListener("timeupdate", onTimeUpdate);
     video.addEventListener("ended", onEnded);
-    return { video, onEnded };
+    return { video, onTimeUpdate, onEnded };
   });
 
   return {
@@ -192,7 +274,9 @@ function buildSceneChipCycle(
     dispose() {
       cycle.stop();
       for (const entry of listeners) {
-        entry?.video.removeEventListener("ended", entry.onEnded);
+        if (!entry) continue;
+        entry.video.removeEventListener("timeupdate", entry.onTimeUpdate);
+        entry.video.removeEventListener("ended", entry.onEnded);
       }
     },
   };
@@ -300,12 +384,11 @@ export function useExperienceMotion({
           };
 
           scenes.forEach((scene, index) => {
-            scene.style.height =
-              index === 0
-                ? "100svh"
-                : `${sceneScrollHeightVh({
-                    coarsePointer: Boolean(coarsePointer),
-                  })}svh`;
+            scene.style.height = sceneDwellEnabled(index)
+              ? `${sceneScrollHeightVh({
+                  coarsePointer: Boolean(coarsePointer),
+                })}svh`
+              : "100svh";
             const card = scene.querySelector<HTMLElement>("[data-scene-card]");
             const plane = scene.querySelector<HTMLElement>("[data-scene-plane]");
             const scrim = scene.querySelector<HTMLElement>("[data-scene-scrim]");
@@ -557,7 +640,7 @@ export function useExperienceMotion({
               // so the final-chip auto-scroll passing through is harmless.
               ScrollTrigger.create({
                 trigger: scene,
-                start: "top top-=160",
+                start: CHIP_SCROLL_GATE_START,
                 end: "bottom bottom",
                 onUpdate: () => chipCycle.cycle.beginChips(),
                 onEnter: () => chipCycle.cycle.beginChips(),

@@ -6,7 +6,16 @@ export type OmniPlate = {
   plateFile: string;
   accent: string;
   motion: string;
+  /** Daylight photograph — prompt for motion only, no neon stack language. */
+  photoreal?: boolean;
 };
+
+export const OMNI_PHOTOREAL_LOCK =
+  "Image-to-video: prompt for motion only. The attached still is the first frame. " +
+  "Stay in this one scene for the entire clip. No cuts, no morph, " +
+  "no jump to another place, no flashing, no warp, no mid-video scene change. " +
+  "Subtle human motion only — small natural gestures, cloth, hair, breath. " +
+  "Do not re-describe the setting, lighting, or wardrobe. Refer to people as the subject or they.";
 
 export const OMNI_TEXT_BAN =
   "Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.";
@@ -16,17 +25,19 @@ export const OMNI_PLATES: OmniPlate[] = [
     id: "01",
     slug: "title",
     plateFile: "sp-stack-01-title.png",
-    accent: "neon blue",
+    photoreal: true,
+    accent: "late-morning sun on skin and pale stone",
     motion:
-      "ten luminous slabs stack upward with soft parallax depth; slow cinematic push-in; settle into a stacked resting composition by the end",
+      "The subject breathes. Hair and clothes stir in a light breeze. Distant traffic drifts. The camera holds a slow, almost still push-in.",
   },
   {
     id: "02",
-    slug: "the-question",
-    plateFile: "sp-stack-02-the-question.png",
-    accent: "cool steel blue",
+    slug: "world",
+    plateFile: "sp-stack-02-world.png",
+    photoreal: true,
+    accent: "late-morning sun on glass and pale stone",
     motion:
-      "a single thin income line fractures and dims as void expands around it; settle on the broken single-stream graphic",
+      "Light streaks along the avenue keep a slow flow. Window reflections drift. The camera holds a slow, almost still aerial drift.",
   },
   {
     id: "03",
@@ -154,6 +165,17 @@ export function omniBridgePath(id: string, aspect: OmniAspect): string {
 }
 
 export function buildOmniPrompt(plate: OmniPlate): string {
+  if (plate.photoreal) {
+    return [
+      "In a single continuous shot with no scene cuts. <FIRST_FRAME> Animate only the attached still.",
+      OMNI_PHOTOREAL_LOCK,
+      `Slow, subtle motion: ${plate.motion}`,
+      "Slow dolly or gentle handheld drift.",
+      "Hold the same composition through the last frame. No settle warp and no morph at the end.",
+      OMNI_TEXT_BAN,
+    ].join(" ");
+  }
+
   return [
     "In a single continuous shot with no scene cuts.",
     `<FIRST_FRAME> Animate this premium keynote motion graphic still.`,

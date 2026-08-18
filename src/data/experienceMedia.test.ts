@@ -66,11 +66,24 @@ describe("experienceMedia", () => {
     ).toEqual(["15-closing"]);
   });
 
-  it("resolves aspect-specific sources and keeps a three-scene media window", () => {
+  it("plays 01-title and 02-world as photoreal Omni plates", () => {
     const title = experienceMediaForSlide("01-title");
-    expect(title).toBeTruthy();
-    expect(resolveExperienceSrc(title!, "landscape").src).toContain("/16x9/");
-    expect(resolveExperienceSrc(title!, "portrait").src).toContain("/9x16/");
+    const world = experienceMediaForSlide("02-world");
+    expect(title?.stillOnly).toBeFalsy();
+    expect(world?.stillOnly).toBeFalsy();
+    expect(title?.landscape.src).toBe(
+      "/concepts/omni-chain/16x9/sp-stack-01-title_omni.mp4",
+    );
+    expect(world?.landscape.src).toBe(
+      "/concepts/omni-chain/16x9/sp-stack-02-world_omni.mp4",
+    );
+  });
+
+  it("resolves aspect-specific sources and keeps a three-scene media window", () => {
+    const stacks = experienceMediaForSlide("03-four-stacks");
+    expect(stacks).toBeTruthy();
+    expect(resolveExperienceSrc(stacks!, "landscape").src).toContain("/16x9/");
+    expect(resolveExperienceSrc(stacks!, "portrait").src).toContain("/9x16/");
     expect(mediaWindow(0, 21)).toEqual([0, 1]);
     expect(mediaWindow(7, 21)).toEqual([6, 7, 8]);
     expect(mediaWindow(20, 21)).toEqual([19, 20]);

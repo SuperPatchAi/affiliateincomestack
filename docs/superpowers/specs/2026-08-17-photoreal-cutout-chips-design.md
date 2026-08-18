@@ -3,7 +3,7 @@
 **Date:** 2026-08-17
 **Branch:** `feat/photoreal-cutout-chips`
 **App:** SuperPatch Affiliate Income Stack (this repo)
-**Status:** Locked for slide `02-world`. Title-chip metaphors (Freedom / Health / Impact) use the same method later; they are out of this plan.
+**Status:** `01-title` and `02-world` chips are **full-bleed daylight cityscapes** (same compositions as the neon plates, minus night/rain/neon). Isolated cutouts stay in code unused (`CHIP_CUTOUT_SLIDES = []`).
 
 ## Problem
 
@@ -90,6 +90,19 @@ Final chip: hold Ken Burns until `completeSequence` scrolls to scene 03 (existin
 - Prompt stack: palette lock + anatomy lock + the chip’s one-sentence subject + text ban.
 - Output: PNG still, then a cutout PNG with alpha (background erase). The layered UI uses the alpha asset; the full still is the fallback poster.
 - First batch: the four `02-world` chips only, both aspects.
+
+## Title chip handoff (01)
+
+Chip-to-chip on `01-title` must stay covered. Do **not** crossfade two backdrops through 0.5 — that flashes the income-stack 3D under `z-index: 1`.
+
+- First chip: fade in over the 3D (`CHIP_BACKDROP_FIRST_ENTER_MS`). When it is fully opaque, set `data-chip-cover` so `[data-scene-hero3d]` is hidden.
+- Later chips: `handoff: true` — snap the next backdrop to opacity 1 (poster covers immediately). Freeze the outgoing clip on its last frame and hold it ~160ms, then hide it. Do not rewind the outgoing video until it is hidden.
+- Chip overlay (count / label / sub) waits until the video has taken over: first chip after the 0.8s fade, later chips after `CHIP_OVERLAY_AFTER_HANDOFF_MS`. Outgoing overlay exits immediately so the new scene plays before the next label slides in.
+- Playback cuts `CHIP_VIDEO_TAIL_TRIM_SEC` (1.1s) before the true end so the settle/glitch tail never shows. Advance and freeze use that earlier frame.
+- Omni I2V (Gemini best practice): one scene per clip, prompt for motion only, subtle human + slow camera. Do not chain last-frame travel between different places.
+- Scene 0 has the same dwell as later scenes so the opener cannot fly off on first scroll. Chip copy waits for `CHIP_SCROLL_GATE_START` (`top+=30% top`).
+- `01-title` hero is a still-only daylight plate (`sp-stack-01-title.png`), not the old neon-stack Omni.
+- `reset()` clears `data-chip-cover` so the 3D can show again if the scene restarts.
 
 ## Wiring
 

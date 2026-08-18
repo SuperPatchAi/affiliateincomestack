@@ -22,6 +22,7 @@ export type ExperienceMedia = {
 /** Omni plate slug keyed by slide id — plate filenames differ from a few slide ids. */
 const SLIDE_TO_OMNI_SLUG: Record<string, string> = {
   "01-title": "title",
+  "02-world": "world",
   "03-four-stacks": "four-stacks",
   "04-flywheel": "flywheel",
   "08-ten-layers": "ten-layers",
@@ -38,7 +39,6 @@ const SLIDE_TO_OMNI_SLUG: Record<string, string> = {
 
 const STILL_ONLY_IDS = new Set([
   "00-super-stack",
-  "02-world",
   "05-product",
   "06-brand",
   "07-development",

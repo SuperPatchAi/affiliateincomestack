@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CHIP_COPY_EXIT_MS,
   CHIP_FALLBACK_DWELL_MS,
+  CHIP_SCROLL_GATE_START,
   createChipAutoCycle,
   type ChipCycleHandlers,
 } from "./chipAutoCycle";
@@ -24,6 +25,11 @@ function begin(cycle: ReturnType<typeof createChipAutoCycle>) {
 }
 
 describe("createChipAutoCycle", () => {
+  it("requires a deeper scroll into the scene before copy flies off", () => {
+    expect(CHIP_SCROLL_GATE_START).toMatch(/top\+=/);
+    expect(CHIP_SCROLL_GATE_START).not.toMatch(/top-=/);
+  });
+
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
@@ -49,7 +55,10 @@ describe("createChipAutoCycle", () => {
     expect(handlers.enterChip).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(CHIP_COPY_EXIT_MS);
-    expect(handlers.enterChip).toHaveBeenCalledWith(0, { loop: false });
+    expect(handlers.enterChip).toHaveBeenCalledWith(0, {
+      loop: false,
+      handoff: false,
+    });
     expect(cycle.currentChip()).toBe(0);
   });
 
@@ -79,11 +88,34 @@ describe("createChipAutoCycle", () => {
 
     cycle.handleVideoEnded(0);
     expect(handlers.exitChip).toHaveBeenCalledWith(0);
-    expect(handlers.enterChip).toHaveBeenCalledWith(1, { loop: false });
+    expect(handlers.enterChip).toHaveBeenCalledWith(1, {
+      loop: false,
+      handoff: true,
+    });
 
     cycle.handleVideoEnded(1);
     expect(handlers.exitChip).toHaveBeenCalledWith(1);
-    expect(handlers.enterChip).toHaveBeenCalledWith(2, { loop: true });
+    expect(handlers.enterChip).toHaveBeenCalledWith(2, {
+      loop: true,
+      handoff: true,
+    });
+  });
+
+  it("marks only chip-to-chip enters as a covered handoff", () => {
+    const handlers = makeHandlers();
+    const cycle = createChipAutoCycle({ chipCount: 3, handlers });
+    begin(cycle);
+
+    expect(handlers.enterChip).toHaveBeenLastCalledWith(0, {
+      loop: false,
+      handoff: false,
+    });
+
+    cycle.handleVideoEnded(0);
+    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, {
+      loop: false,
+      handoff: true,
+    });
   });
 
   it("loops the final chip instead of advancing", () => {
@@ -92,7 +124,10 @@ describe("createChipAutoCycle", () => {
     begin(cycle);
     cycle.handleVideoEnded(0);
 
-    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, { loop: true });
+    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, {
+      loop: true,
+      handoff: true,
+    });
     cycle.handleVideoEnded(1);
     // Last chip holds: no further exits or enters.
     expect(handlers.exitChip).toHaveBeenCalledTimes(1);
@@ -119,7 +154,10 @@ describe("createChipAutoCycle", () => {
 
     vi.advanceTimersByTime(CHIP_FALLBACK_DWELL_MS);
     expect(handlers.exitChip).toHaveBeenCalledWith(0);
-    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, { loop: true });
+    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, {
+      loop: true,
+      handoff: true,
+    });
     // Last chip without video just holds — no more timers pending.
     vi.advanceTimersByTime(CHIP_FALLBACK_DWELL_MS * 3);
     expect(handlers.enterChip).toHaveBeenCalledTimes(2);
@@ -149,7 +187,10 @@ describe("createChipAutoCycle", () => {
     begin(cycle);
     cycle.handleVideoEnded(0);
 
-    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, { loop: false });
+    expect(handlers.enterChip).toHaveBeenLastCalledWith(1, {
+      loop: false,
+      handoff: true,
+    });
     expect(completeSequence).not.toHaveBeenCalled();
 
     cycle.handleVideoEnded(1);
@@ -194,7 +235,10 @@ describe("createChipAutoCycle", () => {
     vi.advanceTimersByTime(CHIP_COPY_EXIT_MS);
     expect(handlers.exitCopy).toHaveBeenCalledOnce();
     expect(handlers.enterChip).toHaveBeenCalledOnce();
-    expect(handlers.enterChip).toHaveBeenCalledWith(0, { loop: true });
+    expect(handlers.enterChip).toHaveBeenCalledWith(0, {
+      loop: true,
+      handoff: false,
+    });
 
     cycle.stop();
     cycle.start();

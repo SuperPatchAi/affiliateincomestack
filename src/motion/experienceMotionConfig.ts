@@ -139,9 +139,9 @@ export function sceneScrollHeightVh(options: { coarsePointer: boolean }): number
   return options.coarsePointer ? 135 : 165;
 }
 
-/** Scene zero stays exactly one viewport tall, so it has no scrub-safe dwell range. */
-export function sceneDwellEnabled(index: number): boolean {
-  return index > 0;
+/** Every scene including the opener gets a dwell so the title cannot fly off on first scroll. */
+export function sceneDwellEnabled(_index: number): boolean {
+  return true;
 }
 
 export function buildOutgoingTweenVars(): {

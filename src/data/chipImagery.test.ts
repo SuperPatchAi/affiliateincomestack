@@ -7,7 +7,8 @@ import {
   CHIP_MEDIA_READY_SLIDES,
   CHIP_STYLE_ANCHOR,
   CHIP_VIDEO_READY_SLIDES,
-  CUTOUT_STYLE_ANCHOR,
+  DAYLIGHT_CITY_STYLE_ANCHOR,
+  SUNSET_BEACH_STYLE_ANCHOR,
   PLATE_RETAKES,
   NEON_CITY_STYLE_ANCHOR,
   buildChipImagePrompt,
@@ -91,44 +92,55 @@ describe("chip image specs", () => {
     }
   });
 
-  it("grounds every title chip in a real-world neon-city scene", () => {
+  it("grounds every title chip in a daylight cityscape with no neon", () => {
     const titleSpecs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === "01-title");
     expect(titleSpecs).toHaveLength(3);
     for (const spec of titleSpecs) {
-      expect(spec.style, spec.slug).toBe(NEON_CITY_STYLE_ANCHOR);
-      expect(spec.setting, spec.slug).toMatch(/neon|city|rooftop/i);
+      const prompt = buildChipImagePrompt(spec);
+      expect(prompt).toContain(spec.style);
+      expect(spec.subject.toLowerCase()).not.toMatch(/neon/);
+      expect(spec.setting?.toLowerCase()).not.toMatch(/neon|night/);
     }
     const [health, freedom, impact] = titleSpecs;
+    expect(health.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
+    expect(freedom.style).toBe(SUNSET_BEACH_STYLE_ANCHOR);
+    expect(impact.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
     expect(health.subject).toMatch(/runner|sprint/i);
-    expect(freedom.subject).toMatch(/rooftop|railing/i);
-    expect(impact.subject).toMatch(/crowd|people|crossing/i);
+    expect(freedom.subject).toMatch(/beach|sunset/i);
+    expect(impact.subject).toMatch(/people/i);
   });
 
-  it("locks 02-world specs to the bright cutout anchor", () => {
+  it("tells bigger-impact as a late-morning rooftop circle, not an aerial crowd", () => {
+    const impact = CHIP_IMAGE_SPECS.find((s) => s.slug === "bigger-impact")!;
+    expect(impact.setting).toMatch(/rooftop|terrace/i);
+    expect(impact.setting).toMatch(/late morning/i);
+    expect(impact.subject).toMatch(/rooftop|terrace/i);
+    expect(impact.subject).not.toMatch(
+      /aerial|straight down|crossing|patch|golden hour|sunset/i,
+    );
+    expect(impact.setting).not.toMatch(/golden hour|sunset|night/i);
+    expect(impact.motion).toMatch(/\b(the subject|they)\b/i);
+    expect(impact.motion).not.toMatch(/people below|aerial|patch/i);
+    expect(`${impact.subject} ${impact.setting} ${impact.motion}`).not.toMatch(
+      /patch/i,
+    );
+  });
+
+  it("grounds every world chip in a daylight cityscape with no neon", () => {
     const specs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === "02-world");
     expect(specs).toHaveLength(4);
     for (const spec of specs) {
-      expect(spec.style).toBe(CUTOUT_STYLE_ANCHOR);
+      expect(spec.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
       const prompt = buildChipImagePrompt(spec);
-      expect(prompt).toContain(CUTOUT_STYLE_ANCHOR);
-      expect(prompt).toMatch(/two arms/i);
-      expect(prompt).toMatch(/five fingers/i);
-      expect(spec.subject.toLowerCase()).not.toMatch(/neon|rain-slicked/);
-      expect(spec.setting?.toLowerCase()).not.toMatch(/neon|rain/);
+      expect(prompt).toContain(DAYLIGHT_CITY_STYLE_ANCHOR);
+      expect(spec.subject.toLowerCase()).not.toMatch(/neon/);
+      expect(spec.setting?.toLowerCase()).not.toMatch(/neon|night/);
     }
-  });
-
-  it("tells each 02 chip as one sunlit subject", () => {
-    const bySlug = Object.fromEntries(
-      CHIP_IMAGE_SPECS.filter((s) => s.slideId === "02-world").map((s) => [
-        s.slug,
-        s,
-      ]),
-    );
-    expect(bySlug["traditional-jobs"].subject).toMatch(/coffee cup/i);
-    expect(bySlug["gig-economy"].subject).toMatch(/standing beside/i);
-    expect(bySlug["creator-economy"].subject).toMatch(/tripod/i);
-    expect(bySlug["social-commerce"].subject).toMatch(/product/i);
+    const [jobs, gig, creator, social] = specs;
+    expect(jobs.subject).toMatch(/office|tower|glass/i);
+    expect(gig.subject).toMatch(/rider|scooter/i);
+    expect(creator.subject).toMatch(/window|city/i);
+    expect(social.subject).toMatch(/cafe|street|table/i);
   });
 
   it("uses the portrait subject override when rendering 9:16", () => {
@@ -160,6 +172,15 @@ describe("chip image specs", () => {
     expect(NEON_CITY_STYLE_ANCHOR).toMatch(/no readable characters/i);
     expect(NEON_CITY_STYLE_ANCHOR).toMatch(/center/i);
   });
+
+  it("keeps the daylight city photoreal, sunlit, and free of readable signage", () => {
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/photoreal/i);
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/daylight/i);
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/late-morning/i);
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).not.toMatch(/rain-slicked|after dark/);
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/no readable characters/i);
+    expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/center/i);
+  });
 });
 
 describe("chip motion prompts (omni)", () => {
@@ -174,16 +195,52 @@ describe("chip motion prompts (omni)", () => {
   });
 
   it("warps toward the next chip's scene when one follows", () => {
-    const [first, second] = CHIP_IMAGE_SPECS;
-    const prompt = buildChipMotionPrompt(first, second);
+    const tron = CHIP_IMAGE_SPECS.filter((s) => !s.setting);
+    expect(tron.length).toBeGreaterThan(1);
+    const prompt = buildChipMotionPrompt(tron[0], tron[1]);
     expect(prompt).toMatch(/warp|accelerat/i);
-    expect(prompt).toContain(second.accent);
+    expect(prompt).toContain(tron[1].accent);
+  });
+
+  it("keeps a photoreal first clip inside its own scene", () => {
+    const health = CHIP_IMAGE_SPECS.find((s) => s.slug === "better-health")!;
+    const freedom = CHIP_IMAGE_SPECS.find((s) => s.slug === "greater-freedom")!;
+    const prompt = buildChipMotionPrompt(health, freedom);
+    expect(prompt).toContain(health.motion);
+    expect(prompt).toMatch(/this one scene|motion only/i);
+    expect(prompt).not.toContain(freedom.accent);
+    expect(prompt).not.toMatch(/beach|sunset/i);
+  });
+
+  it("keeps each photoreal clip in one scene and prompts for subtle motion only", () => {
+    const health = CHIP_IMAGE_SPECS.find((s) => s.slug === "better-health")!;
+    const freedom = CHIP_IMAGE_SPECS.find((s) => s.slug === "greater-freedom")!;
+    const impact = CHIP_IMAGE_SPECS.find((s) => s.slug === "bigger-impact")!;
+    const prompt = buildChipMotionPrompt(freedom, impact, health);
+    expect(prompt).toMatch(/motion only/i);
+    expect(prompt).toMatch(/one scene|single scene|this one scene/i);
+    expect(prompt).toMatch(/subtle/i);
+    expect(prompt).not.toMatch(/last frame of the previous/i);
+    expect(prompt).not.toMatch(/arrive at|travel naturally into|last frame of the previous/i);
+    expect(prompt).not.toMatch(/IMAGE_REF_1/i);
+    expect(prompt).toContain(freedom.motion);
+  });
+
+  it("keeps photoreal chip exits free of neon streak warps", () => {
+    const photoreal = CHIP_IMAGE_SPECS.filter((s) => s.setting);
+    expect(photoreal.length).toBeGreaterThan(1);
+    const next = photoreal[1];
+    for (const spec of photoreal) {
+      const prompt = buildChipMotionPrompt(spec, next, photoreal[0]);
+      expect(prompt, spec.slug).not.toMatch(/neon|streaking light/i);
+    }
   });
 
   it("uses each spec's setting instead of the abstract dark void", () => {
     const world = CHIP_IMAGE_SPECS.find((s) => s.slideId === "02-world")!;
     const worldPrompt = buildChipMotionPrompt(world, null);
-    expect(worldPrompt).toContain(world.setting!);
+    expect(worldPrompt).toContain(world.motion);
+    expect(worldPrompt).toMatch(/motion only/i);
     expect(worldPrompt).not.toMatch(/dark void/i);
     expect(worldPrompt).not.toMatch(/abstract motion/i);
 
@@ -240,27 +297,16 @@ describe("chip media wiring", () => {
     }
   });
 
-  it("omits cutout slides from omni backdrop media", () => {
-    expect(chipMediaForSlide("02-world", "landscape")).toEqual([]);
+  it("serves 02-world as still backdrops, not cutouts", () => {
+    const entries = chipMediaForSlide("02-world", "landscape");
+    expect(entries).toHaveLength(4);
+    expect(chipCutoutForSlide("02-world", "landscape")).toEqual([]);
   });
 });
 
 describe("chip cutout wiring", () => {
-  it("lists 02-world only", () => {
-    expect(CHIP_CUTOUT_SLIDES).toEqual(["02-world"]);
-  });
-
-  it("returns four cutout entries in chip order", () => {
-    const entries = chipCutoutForSlide("02-world", "landscape");
-    expect(entries.map((e) => e.slug)).toEqual([
-      "traditional-jobs",
-      "gig-economy",
-      "creator-economy",
-      "social-commerce",
-    ]);
-    for (const entry of entries) {
-      expect(entry.src).toMatch(/\/02-world\/16x9\/.+\.png$/);
-    }
+  it("has no cutout slides while cityscapes are the 02 treatment", () => {
+    expect(CHIP_CUTOUT_SLIDES).toEqual([]);
   });
 
   it("returns nothing for title or unknown slides", () => {
@@ -291,6 +337,7 @@ describe("chip media wiring leftovers", () => {
 describe("plate retakes", () => {
   it("covers the four off-style plates plus the world hero retake", () => {
     expect(PLATE_RETAKES.map((r) => r.plateFile).sort()).toEqual([
+      "sp-stack-01-title.png",
       "sp-stack-02-world.png",
       "sp-stack-13-executive.png",
       "sp-stack-15-closing.png",
@@ -299,16 +346,29 @@ describe("plate retakes", () => {
     ]);
   });
 
-  it("tells the world hero as a real aerial neon city whose routes branch", () => {
+  it("tells the title hero as a daylight SuperPatch life, not a neon stack", () => {
+    const title = PLATE_RETAKES.find(
+      (r) => r.plateFile === "sp-stack-01-title.png",
+    );
+    expect(title).toBeDefined();
+    expect(title!.slideId).toBe("01-title");
+    expect(title!.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
+    expect(title!.subject).toMatch(/patch|wellness|person|terrace|window/i);
+    expect(title!.subject.toLowerCase()).not.toMatch(/neon|slab|wireframe/);
+  });
+
+  it("tells the world hero as a real aerial daylight city whose routes branch", () => {
     const world = PLATE_RETAKES.find(
       (r) => r.plateFile === "sp-stack-02-world.png",
     );
     expect(world).toBeDefined();
     expect(world!.slideId).toBe("02-world");
-    expect(world!.style).toBe(NEON_CITY_STYLE_ANCHOR);
+    expect(world!.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
     expect(world!.subject).toMatch(/aerial|above/i);
     expect(world!.subject).toMatch(/city|metropolis/i);
     expect(world!.subject).toMatch(/branch/i);
+    expect(world!.subject.toLowerCase()).not.toMatch(/neon/);
+    expect(world!.accent.toLowerCase()).not.toMatch(/neon|night/);
   });
 
   it("locks retake prompts to their style anchor and text ban", () => {
