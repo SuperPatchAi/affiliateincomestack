@@ -37,6 +37,7 @@ const API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
 const RETAKE_REFS = {
   "sp-stack-01-title.png": [],
   "sp-stack-02-world.png": [],
+  "sp-stack-03-four-stacks.png": [],
   "sp-stack-13-executive.png": ["sp-stack-08-fast-start.png", "sp-stack-07-development.png"],
   "sp-stack-19-future.png": ["sp-stack-08-fast-start.png", "sp-stack-06-ten-layers.png"],
   "sp-stack-15-closing.png": ["sp-stack-08-fast-start.png", "sp-stack-12-generations.png"],
@@ -203,11 +204,71 @@ async function main() {
     buildChipImagePrompt,
     buildPlateRetakePrompt,
     buildPlatePatchEditPrompt,
+    buildProductPatchScaleEditPrompt,
     buildPortraitRecomposePrompt,
+    buildHarborConstructionStartPrompt,
     chipImagePath,
   } = imagery;
   const slideById = new Map(slides.SLIDES.map((s) => [s.id, s]));
   const manifest = loadManifest();
+
+  if (argv.includes("--construct-start")) {
+    const prompt = buildHarborConstructionStartPrompt();
+    for (const aspect of aspects) {
+      const scenePath = join(RETAKE_OUT, aspectDir(aspect), "sp-stack-03-four-stacks.png");
+      const fallback = aspect === "16:9" ? join(CLEAN, "sp-stack-03-four-stacks.png") : "";
+      const source = existsSync(scenePath) ? scenePath : fallback;
+      if (!source || !existsSync(source)) {
+        throw new Error(`missing harbor still for ${aspect}: ${scenePath}`);
+      }
+      const outPath = join(
+        RETAKE_OUT,
+        aspectDir(aspect),
+        "sp-stack-03-four-stacks-foundation.png",
+      );
+      if (existsSync(outPath) && !force) {
+        console.log(`skip (exists): ${aspectDir(aspect)}/sp-stack-03-four-stacks-foundation.png`);
+        continue;
+      }
+      console.log(`construct-start: ${aspectDir(aspect)}/sp-stack-03-four-stacks-foundation.png`);
+      await withRetries(() =>
+        generateImage({
+          apiKey,
+          prompt,
+          refPaths: [source],
+          outPath,
+          aspect,
+          styled: true,
+          recompose: true,
+        }),
+      );
+      console.log(`  wrote ${outPath}`);
+    }
+    return;
+  }
+
+  if (argv.includes("--scale-patch")) {
+    const scenePath = join(
+      APP,
+      "public/concepts/chips/03-four-stacks/16x9/product-stack.png",
+    );
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    const prompt = buildProductPatchScaleEditPrompt();
+    console.log("scale-patch: product-stack.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    return;
+  }
 
   if (argv.includes("--patch-edit")) {
     const scenePath = join(CLEAN, "sp-stack-01-title.png");
@@ -244,11 +305,18 @@ async function main() {
           console.log(`skip (exists): ${aspectDir(aspect)}/${retake.plateFile}`);
           continue;
         }
-        const refPaths = (RETAKE_REFS[retake.plateFile] ?? []).map((f) =>
-          join(CLEAN, f),
+        const wideRetake = join(RETAKE_OUT, "16x9", retake.plateFile);
+        const recompose =
+          aspect === "9:16" && existsSync(wideRetake) && Boolean(retake.style);
+        const refPaths = recompose
+          ? [wideRetake]
+          : (RETAKE_REFS[retake.plateFile] ?? []).map((f) => join(CLEAN, f));
+        const prompt = recompose
+          ? buildPortraitRecomposePrompt(retake)
+          : buildPlateRetakePrompt(retake);
+        console.log(
+          `retake: ${aspectDir(aspect)}/${retake.plateFile}${recompose ? " (recompose)" : ""}`,
         );
-        const prompt = buildPlateRetakePrompt(retake);
-        console.log(`retake: ${aspectDir(aspect)}/${retake.plateFile}`);
         await withRetries(() =>
           generateImage({
             apiKey,
@@ -257,6 +325,7 @@ async function main() {
             outPath,
             aspect,
             styled: Boolean(retake.style),
+            recompose,
           }),
         );
         manifest.entries[`retake:${aspectDir(aspect)}/${retake.plateFile}`] = {
@@ -313,9 +382,19 @@ async function main() {
         if (prev && existsSync(prev)) refPaths.push(prev);
       }
 
+      if (
+        spec.slug === "product-stack" &&
+        !recompose &&
+        existsSync(join(APP, "public/concepts/refs/superpatch-freedom.png"))
+      ) {
+        refPaths.push(join(APP, "public/concepts/refs/superpatch-freedom.png"));
+      }
+
       const prompt = recompose
         ? buildPortraitRecomposePrompt(spec)
-        : buildChipImagePrompt(spec, aspect);
+        : spec.slug === "product-stack"
+          ? `${buildChipImagePrompt(spec, aspect)} The last attached image is the SuperPatch product still. Match that exact white rounded-square patch with red repeating marks and a clear fingerprint gel on the forearm. Ignore any watermark or black backdrop. Do not invent a beige oval.`
+          : buildChipImagePrompt(spec, aspect);
       console.log(
         `chip: ${spec.slideId}/${spec.slug} ${aspect} (${refPaths.length} refs${recompose ? ", recompose" : ""})`,
       );

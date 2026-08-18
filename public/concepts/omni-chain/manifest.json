@@ -1,30 +1,30 @@
 {
   "model": "gemini-omni-flash-preview",
-  "generatedAt": "2026-08-18T03:01:59.912Z",
+  "generatedAt": "2026-08-18T03:59:41.974Z",
   "aspects": [
     "16:9",
     "9:16"
   ],
   "results": [
     {
-      "id": "01",
+      "id": "03",
       "aspect": "16:9",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-01-title_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-01-title_last.png",
-      "interaction_id": "v1_Chc4TXFEYXRfUEtldVZfdU1QaDVhYXdRYxIXOE1xRGF0X1BLZXVWX3VNUGg1YWF3UWM",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-03-four-stacks_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-03-four-stacks_last.png",
+      "interaction_id": "v1_ChdjdGlEYXZETkc5dUctOFlQdExmQjRBNBIXY3RpRGF2RE5HOXVHLThZUHRMZkI0QTQ",
       "cost_usd": 0.8,
-      "duration_seconds": 48.75
+      "duration_seconds": 47.61
     },
     {
-      "id": "01",
+      "id": "03",
       "aspect": "9:16",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-01-title_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-01-title_last.png",
-      "interaction_id": "v1_ChdIOHVEYXB5VE0tMk5fUFVQX05TZnlBTRIXSDh1RGFweVRNLTJOX1BVUF9OU2Z5QU0",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-03-four-stacks_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-03-four-stacks_last.png",
+      "interaction_id": "v1_ChdwdGlEYXB5R0FiNmQxTWtQN2MtdHNBNBIXcHRpRGFweUdBYjZkMU1rUDdjLXRzQTQ",
       "cost_usd": 0.8,
-      "duration_seconds": 46.74
+      "duration_seconds": 50.36
     }
   ],
   "okCount": 2,

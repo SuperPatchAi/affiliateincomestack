@@ -3,7 +3,7 @@
 **Date:** 2026-08-17
 **Branch:** `feat/photoreal-cutout-chips`
 **App:** SuperPatch Affiliate Income Stack (this repo)
-**Status:** `01-title` and `02-world` chips are **full-bleed daylight cityscapes** (same compositions as the neon plates, minus night/rain/neon). Isolated cutouts stay in code unused (`CHIP_CUTOUT_SLIDES = []`).
+**Status:** `01-title`, `02-world`, and `03-four-stacks` chips are **full-bleed daylight photographs** with Omni motion in both 16:9 and 9:16. Isolated cutouts stay in code unused (`CHIP_CUTOUT_SLIDES = []`).
 
 ## Problem
 
@@ -109,6 +109,14 @@ Chip-to-chip on `01-title` must stay covered. Do **not** crossfade two backdrops
 - New media kind alongside (not instead of) neon-city chip videos: cutout entries for `02-world`.
 - `CHIP_MEDIA_READY_SLIDES` / `chipMediaForSlide` either gain a cutout path or a separate `chipCutoutForSlide` used when a slide is on the cutout list. **02-world uses cutouts only** on this branch — do not play the neon `_omni.mp4` files behind these chips.
 - `ChipBackdrops` stays for slides that still have Omni clips (title). 02 renders a `ChipCutouts` stack: one absolutely positioned img per chip, opacity/scale owned by the cycle.
+
+## Slide 03 — four stacks
+
+Hero: one harbor headquarters (`sp-stack-03-four-stacks.png`). Chips stay in four unrelated cameras (pool / campaign / yacht / river). Omni on the chips is the same motion-only lock as 01/02.
+
+The **title clip** is the exception: it starts on a foundation still (`sp-stack-03-four-stacks-foundation.png`) and raises the glass headquarters one floor at a time to four floors, each stacking on the one before. Yacht, water, and camera stay locked. Destination still is the approved finished HQ. Poster is the last frame (completed building).
+
+9:16 stills recompose from the approved 16:9 — one continuous photograph, quieter sky/water bands, no collage.
 
 ## Out of scope
 

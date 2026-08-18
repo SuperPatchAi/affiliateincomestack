@@ -148,6 +148,88 @@
       "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/9x16/sp-stack-01-title.png",
       "aspect": "9:16",
       "generatedAt": "2026-08-18T02:19:23.738Z"
+    },
+    "retake:16x9/sp-stack-03-four-stacks.png": {
+      "prompt": "Cinematic photorealistic late-morning elevated photograph of one company on a harbor: glass headquarters, teak terrace, a real yacht at the dock at correct adult scale, cobalt water #2563EB, pale sky. One continuous place, not a collage. Shot like a premium Apple x Nike commercial on anamorphic lenses. Natural skin, no neon, no rain, no night. People stay small for scale. Hull and walls are unmarked — no readable characters anywhere in the scene. Accent lighting: late-morning sun on glass, teak, and harbor water. An elevated late-morning photograph of one company headquarters on a harbor in a single continuous place: a glass building, a sunlit terrace with a few small people, and one real yacht at the dock at correct adult scale against cobalt water and pale sky. People stay small. No single person as the hero and no signage. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/16x9/sp-stack-03-four-stacks.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T03:39:55.354Z"
+    },
+    "16x9/03-four-stacks/product-stack": {
+      "prompt": "Cinematic photorealistic late-morning photograph shot straight down from above: turquoise pool water #2EC4B6 filling most of the frame, white tile, an orange towel, a lime citrus slice, hard sun sparkle on water. Shot like a premium Apple x Nike commercial on anamorphic lenses. Natural skin, no neon, no rain, no night. Keep the person near the pool edge in the center band with quieter corners for later overlays. No readable characters anywhere in the scene. Accent lighting: turquoise water, white tile, orange towel. Straight-down overhead of a swimmer at the pool edge: turquoise water fills most of the frame, white tile along one side, an orange towel and a lime nearby. The subject rests one arm on the deck. A compact postage-stamp SuperPatch sits on the dry shoulder — white rounded square, red repeating marks, clear fingerprint gel. The patch is a small detail, not the frame. Match the palette, lighting mood, and reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech. The last attached image is the SuperPatch product still. Match that exact white rounded-square patch with red repeating marks and a clear fingerprint gel on the forearm. Ignore any watermark or black backdrop. Do not invent a beige oval.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/refs/superpatch-freedom.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/product-stack.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T03:31:47.312Z"
+    },
+    "16x9/03-four-stacks/brand-marketing": {
+      "prompt": "Cinematic photorealistic late-morning photograph of an award-level commercial being made: daylight set, bounce boards, a cinema camera, vivid wardrobe color, pale sky or open warehouse light. Shot like a premium Apple x Nike commercial on anamorphic lenses. Natural skin, no neon, no rain, no night. Keep the talent and camera in the center band with quieter edges for later overlays. Every slate, screen, and board is a blank soft shape — no readable characters. Accent lighting: daylight on a vivid campaign set. Over the shoulder of a cinema camera on a daylight campaign shoot: one talent in vivid coral wardrobe holds a still pose, bounce boards and a small crew at the edge, pale sky behind. Award-level craft on a set. Screens and slates are blank. Exactly one head and two arms on the talent. Match the palette, lighting mood, and reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/brand-marketing.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T03:37:15.381Z"
+    },
+    "16x9/03-four-stacks/income-stack": {
+      "prompt": "Cinematic photorealistic late-morning photograph on a real yacht at sea: teak deck, white hull, cobalt water #2563EB, pale sky. Shot like a premium Apple x Nike commercial on anamorphic lenses. Natural skin, correct adult human scale against the rail and furniture, no neon, no rain, no night. Keep the person in the center band with quieter edges for later overlays. Hull and flags are unmarked — no readable characters anywhere in the scene. Accent lighting: late-morning sun on teak, white hull, and open water. A high-net-worth adult stands on the teak aft deck of a real yacht, correct human scale — the rail, seating, and hull are adult-sized, the person is a normal proportioned adult, not a miniature and not oversized. White unmarked hull, cobalt water, pale sky. Relaxed, easy, looking out. Exactly one head, two arms, two legs. Match the palette, lighting mood, and reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/income-stack.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T03:37:26.567Z"
+    },
+    "16x9/03-four-stacks/personal-development": {
+      "prompt": "Cinematic photorealistic late-morning photograph at water level on a river: cobalt water #2563EB, a yellow racing shell, green bank #166534, pale sky. Shot like a premium Apple x Nike commercial on anamorphic lenses. Natural skin, no neon, no rain, no night. Keep the boat in the center band with quieter edges for later overlays. No readable characters anywhere in the scene. Accent lighting: cobalt river, yellow shell, green bank. Camera at water level: a yellow racing shell cuts across cobalt river, one person calling the stroke, the others in sync. Green bank and pale sky beyond. Faces readable. Leadership as rhythm, not a meeting. Match the palette, lighting mood, and reflections of the reference images exactly. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/personal-development.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-18T03:32:21.978Z"
+    },
+    "9x16/03-four-stacks/product-stack": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/product-stack.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/product-stack.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T03:48:47.896Z"
+    },
+    "9x16/03-four-stacks/brand-marketing": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/brand-marketing.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/brand-marketing.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T03:49:02.296Z"
+    },
+    "9x16/03-four-stacks/income-stack": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/income-stack.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/income-stack.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T03:49:15.315Z"
+    },
+    "9x16/03-four-stacks/personal-development": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/16x9/personal-development.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/personal-development.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T03:49:30.697Z"
+    },
+    "retake:9x16/sp-stack-03-four-stacks.png": {
+      "prompt": "Recompose the attached photograph as a tall vertical portrait image for a phone screen. Keep the exact same scene, subject, lighting, palette, and photographic style. One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge — no black bars, no borders, no split panels, no collage. Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/16x9/sp-stack-03-four-stacks.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-retakes/9x16/sp-stack-03-four-stacks.png",
+      "aspect": "9:16",
+      "generatedAt": "2026-08-18T03:49:46.927Z"
     }
   }
 }

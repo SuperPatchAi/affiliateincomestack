@@ -82,6 +82,58 @@ export const DAYLIGHT_CITY_STYLE_ANCHOR =
 /**
  * Golden-hour beach still for Greater Freedom — warm, open, no city night.
  */
+/**
+ * Late-morning interiors for company-system slides: atrium, studio, loft.
+ * Same photoreal lock as the city plates, without street or neon language.
+ */
+export const DAYLIGHT_INTERIOR_STYLE_ANCHOR =
+  "Cinematic photorealistic daylight interior photograph: a bright airy room " +
+  "in late-morning sun, warm pale stone or plaster, pale wood, large windows, " +
+  "open shade on faces. Shot like a premium Apple x Nike commercial on " +
+  "anamorphic lenses: shallow depth of field, natural skin with laugh lines, " +
+  "no neon, no rain, no night. Keep the hero subject centered with quieter " +
+  "edges reserved for later interface overlays. Every sign, screen, and board " +
+  "is a blank soft shape or distant bokeh — no readable characters anywhere in the scene.";
+
+export const DAYLIGHT_POOL_STYLE_ANCHOR =
+  "Cinematic photorealistic late-morning photograph shot straight down from above: " +
+  "turquoise pool water #2EC4B6 filling most of the frame, white tile, an orange towel, " +
+  "a lime citrus slice, hard sun sparkle on water. Shot like a premium Apple x Nike " +
+  "commercial on anamorphic lenses. Natural skin, no neon, no rain, no night. " +
+  "Keep the person near the pool edge in the center band with quieter corners for later overlays. " +
+  "No readable characters anywhere in the scene.";
+
+export const DAYLIGHT_CAMPAIGN_STYLE_ANCHOR =
+  "Cinematic photorealistic late-morning photograph of an award-level commercial " +
+  "being made: daylight set, bounce boards, a cinema camera, vivid wardrobe color, " +
+  "pale sky or open warehouse light. Shot like a premium Apple x Nike commercial on " +
+  "anamorphic lenses. Natural skin, no neon, no rain, no night. " +
+  "Keep the talent and camera in the center band with quieter edges for later overlays. " +
+  "Every slate, screen, and board is a blank soft shape — no readable characters.";
+
+export const DAYLIGHT_YACHT_STYLE_ANCHOR =
+  "Cinematic photorealistic late-morning photograph on a real yacht at sea: " +
+  "teak deck, white hull, cobalt water #2563EB, pale sky. Shot like a premium " +
+  "Apple x Nike commercial on anamorphic lenses. Natural skin, correct adult " +
+  "human scale against the rail and furniture, no neon, no rain, no night. " +
+  "Keep the person in the center band with quieter edges for later overlays. " +
+  "Hull and flags are unmarked — no readable characters anywhere in the scene.";
+
+export const DAYLIGHT_RIVER_STYLE_ANCHOR =
+  "Cinematic photorealistic late-morning photograph at water level on a river: " +
+  "cobalt water #2563EB, a yellow racing shell, green bank #166534, pale sky. " +
+  "Shot like a premium Apple x Nike commercial on anamorphic lenses. " +
+  "Natural skin, no neon, no rain, no night. Keep the boat in the center band " +
+  "with quieter edges for later overlays. No readable characters anywhere in the scene.";
+
+export const DAYLIGHT_HARBOR_STYLE_ANCHOR =
+  "Cinematic photorealistic late-morning elevated photograph of one company " +
+  "on a harbor: glass headquarters, teak terrace, a real yacht at the dock at " +
+  "correct adult scale, cobalt water #2563EB, pale sky. One continuous place, " +
+  "not a collage. Shot like a premium Apple x Nike commercial on anamorphic lenses. " +
+  "Natural skin, no neon, no rain, no night. People stay small for scale. " +
+  "Hull and walls are unmarked — no readable characters anywhere in the scene.";
+
 export const SUNSET_BEACH_STYLE_ANCHOR =
   "Cinematic photorealistic golden-hour photograph on an open beach: " +
   "warm sunset over the water, long soft shadows, honey light on skin and wet sand. " +
@@ -128,6 +180,29 @@ export function buildPortraitRecomposePrompt(spec: ChipImageSpec): string {
     "One single continuous photograph with one camera and one unbroken depth of field, filling the whole frame edge to edge —",
     "no black bars, no borders, no split panels, no collage.",
     "Extend the scene naturally above and below, keeping the hero subject in the middle band with the upper and lower areas quieter and softer.",
+    OMNI_TEXT_BAN,
+  ].join(" ");
+}
+
+/** Shrink only the SuperPatch on the product-stack still. Keep the photograph. */
+export function buildProductPatchScaleEditPrompt(): string {
+  return [
+    "The attached photograph is the scene. Keep the person, pose, clothing, room, lighting, and composition identical.",
+    "The SuperPatch on the forearm is oversized. Resize only that patch so it is 25% smaller — three-quarters of its current width and height, no wider than two fingers.",
+    "Keep it a white rounded square with red repeating SuperPatch marks and a clear fingerprint gel center.",
+    "Fill the newly exposed skin naturally. Do not change anything else.",
+    OMNI_TEXT_BAN,
+  ].join(" ");
+}
+
+/** Edit the approved harbor plate down to foundation so Omni can raise the floors. */
+export function buildHarborConstructionStartPrompt(): string {
+  return [
+    "The attached photograph is the scene. Keep the harbor water, yacht, dock, sky, camera height, and lighting identical.",
+    "Remove the completed glass headquarters.",
+    "In its place show only a foundation and ground-floor slab on the same footprint — raw concrete and steel just beginning, no finished floors yet.",
+    "The yacht stays at the dock at the same scale. People stay small on the dock.",
+    "Do not change anything else.",
     OMNI_TEXT_BAN,
   ].join(" ");
 }
@@ -186,6 +261,7 @@ export function chipVideoPath(
 export const CHIP_MEDIA_READY_SLIDES: readonly string[] = [
   "01-title",
   "02-world",
+  "03-four-stacks",
 ];
 
 /**
@@ -196,6 +272,7 @@ export const CHIP_MEDIA_READY_SLIDES: readonly string[] = [
 export const CHIP_VIDEO_READY_SLIDES: readonly string[] = [
   "01-title",
   "02-world",
+  "03-four-stacks",
 ];
 
 /** Slides that use isolated cutout stills instead of omni / neon backdrops. */
@@ -398,42 +475,62 @@ export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
       "Hands turn the product slowly. The subjects share a small natural laugh. The camera holds a gentle close drift.",
   },
 
-  // 03-four-stacks — one pillar per chip (multi)
+  // 03-four-stacks — four unrelated cameras, four palettes
   {
     slideId: "03-four-stacks",
     chipIndex: 0,
     slug: "product-stack",
-    accent: "emerald green",
+    accent: "turquoise water, white tile, orange towel",
+    style: DAYLIGHT_POOL_STYLE_ANCHOR,
+    setting: "A sunlit pool photographed straight down in late morning.",
     subject:
-      "Close on a tall emerald glass pillar with a luminous wellness patch embedded at its heart, energy veins branching from the patch through the glass.",
-    motion: "Energy veins pulse outward from the embedded patch.",
+      "Straight-down overhead of a swimmer at the pool edge: turquoise water fills most of the frame, white tile along one side, an orange towel and a lime nearby. The subject rests one arm on the deck. A compact postage-stamp SuperPatch sits on the dry shoulder — white rounded square, red repeating marks, clear fingerprint gel. The patch is a small detail, not the frame.",
+    portraitSubject:
+      "A tall vertical overhead of a swimmer at the pool edge. Turquoise water fills the lower frame, white tile and an orange towel the upper. A compact SuperPatch on the dry shoulder — white rounded square, red repeating marks, fingerprint gel.",
+    motion:
+      "Water sparkles. The subject shifts a hand on the tile. The camera holds a slow overhead drift.",
   },
   {
     slideId: "03-four-stacks",
     chipIndex: 1,
     slug: "brand-marketing",
-    accent: "electric blue",
+    accent: "daylight on a vivid campaign set",
+    style: DAYLIGHT_CAMPAIGN_STYLE_ANCHOR,
+    setting: "A late-morning outdoor campaign set, one talent and a small crew.",
     subject:
-      "Close on a tall blue glass pillar broadcasting expanding rings of light from its crown into the darkness, like a beacon transmitting.",
-    motion: "Broadcast rings expand and fade in steady rhythm.",
+      "Over the shoulder of a cinema camera on a daylight campaign shoot: one talent in vivid coral wardrobe holds a still pose, bounce boards and a small crew at the edge, pale sky behind. Award-level craft on a set. Screens and slates are blank. Exactly one head and two arms on the talent.",
+    portraitSubject:
+      "A tall vertical over-the-shoulder of a cinema camera on a daylight campaign shoot. One talent in vivid coral, bounce boards, pale sky filling the upper frame. Screens and slates are blank.",
+    motion:
+      "The talent breathes. A bounce board shifts. The camera holds a slow, quiet drift.",
   },
   {
     slideId: "03-four-stacks",
     chipIndex: 2,
     slug: "income-stack",
-    accent: "warm amber orange",
+    accent: "late-morning sun on teak, white hull, and open water",
+    style: DAYLIGHT_YACHT_STYLE_ANCHOR,
+    setting: "The aft deck of a real yacht at sea in late morning.",
     subject:
-      "Close on a tall amber glass pillar filled with thin horizontal light strata that rise slowly inside it, stacking brightness toward the top.",
-    motion: "Inner strata climb and stack, the crown brightening.",
+      "A high-net-worth adult stands on the teak aft deck of a real yacht, correct human scale — the rail, seating, and hull are adult-sized, the person is a normal proportioned adult, not a miniature and not oversized. White unmarked hull, cobalt water, pale sky. Relaxed, easy, looking out. Exactly one head, two arms, two legs.",
+    portraitSubject:
+      "A tall vertical photograph of a high-net-worth adult on the teak aft deck of a real yacht, correct adult scale against the rail. Pale sky above, cobalt water and white hull below.",
+    motion:
+      "The subject shifts their weight. Water and a light flag stir. The camera holds a slow, stable drift.",
   },
   {
     slideId: "03-four-stacks",
     chipIndex: 3,
     slug: "personal-development",
-    accent: "deep violet",
+    accent: "cobalt river, yellow shell, green bank",
+    style: DAYLIGHT_RIVER_STYLE_ANCHOR,
+    setting: "A river at water level in late morning.",
     subject:
-      "Close on a tall violet glass pillar with a wireframe figure ascending a spiral of light steps inside it, glow trailing behind each step.",
-    motion: "The figure climbs the inner spiral, steps igniting underfoot.",
+      "Camera at water level: a yellow racing shell cuts across cobalt river, one person calling the stroke, the others in sync. Green bank and pale sky beyond. Faces readable. Leadership as rhythm, not a meeting.",
+    portraitSubject:
+      "A tall vertical water-level photograph of a yellow racing shell on a cobalt river. Green bank and pale sky stack above the boat. One person calls, the others row in sync.",
+    motion:
+      "Oars dip and recover together. Water slides past. The camera holds a low, stable drift.",
   },
 
   // 04-flywheel — one arc per chip (multi)
@@ -958,6 +1055,16 @@ export const PLATE_RETAKES: PlateRetakeSpec[] = [
       "A sweeping aerial view from high above a vast real metropolis in late-morning sun: one great avenue of pale traffic bokeh flows in from the foreground, then splits and branches into many sunlit routes that spread through a city of warm stone and glass, each branch catching its own open shade as it weaves between towers. Sunlit windows and pale streets recede to a bright horizon under a clear sky, and the upper band of the frame stays quiet and soft.",
     motion:
       "Traffic streams along the great avenue, splits at the branch point, and flows outward through the sunlit grid while window reflections drift softly across the towers.",
+  },
+  {
+    plateFile: "sp-stack-03-four-stacks.png",
+    slideId: "03-four-stacks",
+    accent: "late-morning sun on glass, teak, and harbor water",
+    style: DAYLIGHT_HARBOR_STYLE_ANCHOR,
+    subject:
+      "An elevated late-morning photograph of one company headquarters on a harbor in a single continuous place: a glass building, a sunlit terrace with a few small people, and one real yacht at the dock at correct adult scale against cobalt water and pale sky. People stay small. No single person as the hero and no signage.",
+    motion:
+      "Water moves against the hull. People cross the terrace. The camera holds a slow, almost still elevated drift.",
   },
   {
     plateFile: "sp-stack-13-executive.png",

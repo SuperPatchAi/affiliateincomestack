@@ -1,44 +1,32 @@
 {
-  "generatedAt": "2026-08-18T02:39:43.396Z",
+  "generatedAt": "2026-08-18T03:58:49.700Z",
   "aspects": [
-    "16:9",
     "9:16"
   ],
   "results": [
     {
-      "key": "16:9 01-title/better-health",
+      "key": "9:16 03-four-stacks/product-stack",
       "ok": true,
-      "skipped": true
-    },
-    {
-      "key": "16:9 01-title/greater-freedom",
-      "ok": true,
-      "skipped": true
-    },
-    {
-      "key": "16:9 01-title/bigger-impact",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/16x9/bigger-impact_omni.mp4",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/product-stack_omni.mp4",
       "cost_usd": 0.8
     },
     {
-      "key": "9:16 01-title/better-health",
+      "key": "9:16 03-four-stacks/brand-marketing",
       "ok": true,
       "skipped": true
     },
     {
-      "key": "9:16 01-title/greater-freedom",
+      "key": "9:16 03-four-stacks/income-stack",
       "ok": true,
       "skipped": true
     },
     {
-      "key": "9:16 01-title/bigger-impact",
+      "key": "9:16 03-four-stacks/personal-development",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/01-title/9x16/bigger-impact_omni.mp4",
-      "cost_usd": 0.8
+      "skipped": true
     }
   ],
-  "okCount": 6,
+  "okCount": 4,
   "failCount": 0,
-  "cost_usd_sum": 1.6
+  "cost_usd_sum": 0.8
 }

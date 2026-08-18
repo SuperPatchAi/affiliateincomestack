@@ -5,6 +5,7 @@ import {
   buildOmniPrompt,
   omniBridgePath,
   omniOutputPath,
+  omniPlateFirstFramePath,
 } from "./omniChain";
 
 describe("omniChain", () => {
@@ -15,12 +16,12 @@ describe("omniChain", () => {
   });
 
   it("builds a text-free prompt with FIRST_FRAME and ambient audio", () => {
-    const prompt = buildOmniPrompt(OMNI_PLATES[2]!);
+    const prompt = buildOmniPrompt(OMNI_PLATES[3]!);
     expect(prompt).toContain("<FIRST_FRAME>");
     expect(prompt).toContain(OMNI_TEXT_BAN);
     expect(prompt.toLowerCase()).toContain("ambient");
     expect(prompt.toLowerCase()).not.toContain("on-screen text saying");
-    expect(prompt).toContain("four monumental pillars");
+    expect(prompt).toContain("circular flywheel");
   });
 
   it("prompts 01 and 02 as photoreal motion-only, not neon stack warps", () => {
@@ -37,6 +38,32 @@ describe("omniChain", () => {
       expect(prompt).not.toMatch(/luminous slabs|dark navy|infographic/i);
       expect(prompt).not.toMatch(/\[0-2s\]|\[2-6s\]|\[6-8s\]/);
     }
+  });
+
+  it("builds the four-stacks hero as a harbor that rises floor by floor", () => {
+    const stacks = OMNI_PLATES.find((p) => p.id === "03")!;
+    expect(stacks.photoreal).toBe(true);
+    expect(stacks.construct).toBe(true);
+    expect(stacks.slug).toBe("four-stacks");
+    expect(stacks.plateFile).toBe("sp-stack-03-four-stacks.png");
+    expect(stacks.startStill).toBe("sp-stack-03-four-stacks-foundation.png");
+    expect(stacks.motion.toLowerCase()).toMatch(/floor|stack|foundation|ground/);
+    expect(stacks.motion.toLowerCase()).not.toMatch(/pillar|neon/);
+    const prompt = buildOmniPrompt(stacks);
+    expect(prompt).toContain(stacks.motion);
+    expect(prompt).toMatch(/foundation/i);
+    expect(prompt).toMatch(/floor/i);
+    expect(prompt).toMatch(/stack/i);
+    expect(prompt).not.toMatch(/motion only/i);
+    expect(prompt).not.toMatch(/no morph/i);
+    expect(prompt).not.toMatch(/luminous slabs|dark navy|infographic/i);
+    expect(prompt).not.toMatch(/\[0-2s\]|\[2-6s\]|\[6-8s\]/);
+    expect(omniPlateFirstFramePath(stacks, "16:9")).toBe(
+      "public/concepts/clean-retakes/16x9/sp-stack-03-four-stacks-foundation.png",
+    );
+    expect(omniPlateFirstFramePath(stacks, "9:16")).toBe(
+      "public/concepts/clean-retakes/9x16/sp-stack-03-four-stacks-foundation.png",
+    );
   });
 
   it("maps aspect folders and filenames", () => {

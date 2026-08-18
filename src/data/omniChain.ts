@@ -8,6 +8,10 @@ export type OmniPlate = {
   motion: string;
   /** Daylight photograph — prompt for motion only, no neon stack language. */
   photoreal?: boolean;
+  /** Harbor HQ rises floor by floor from a foundation start still. */
+  construct?: boolean;
+  /** Filename under public/concepts/clean-retakes/<aspect>/. */
+  startStill?: string;
 };
 
 export const OMNI_PHOTOREAL_LOCK =
@@ -16,6 +20,14 @@ export const OMNI_PHOTOREAL_LOCK =
   "no jump to another place, no flashing, no warp, no mid-video scene change. " +
   "Subtle human motion only — small natural gestures, cloth, hair, breath. " +
   "Do not re-describe the setting, lighting, or wardrobe. Refer to people as the subject or they.";
+
+export const OMNI_CONSTRUCT_LOCK =
+  "Image-to-video. The first attached still is the first frame — foundation and dock. " +
+  "Stay in this one harbor for the entire clip. No cuts, no jump to another place, " +
+  "no flashing, no warp. The yacht, water, sky, and camera stay locked. " +
+  "Only the headquarters changes: it rises from that foundation, one glass floor " +
+  "stacking on the last, until four floors stand complete and match the destination building. " +
+  "Refer to people as they.";
 
 export const OMNI_TEXT_BAN =
   "Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.";
@@ -43,9 +55,12 @@ export const OMNI_PLATES: OmniPlate[] = [
     id: "03",
     slug: "four-stacks",
     plateFile: "sp-stack-03-four-stacks.png",
-    accent: "multi neon blue green orange violet",
+    photoreal: true,
+    construct: true,
+    startStill: "sp-stack-03-four-stacks-foundation.png",
+    accent: "late-morning sun on glass, teak, and harbor water",
     motion:
-      "four monumental pillars assemble from darkness with subtle energy bridging between them; settle as a stable four-pillar composition",
+      "The headquarters rises from the ground up. The first floor locks, then the next stacks on it, then the next, then the last — four floors, each one building on the one before. Water moves against the hull. People stay small.",
   },
   {
     id: "04",
@@ -164,7 +179,27 @@ export function omniBridgePath(id: string, aspect: OmniAspect): string {
   return `public/concepts/omni-chain/bridges/${aspectDir(aspect)}/sp-stack-${plate.id}-${plate.slug}_last.png`;
 }
 
+export function omniPlateFirstFramePath(
+  plate: OmniPlate,
+  aspect: OmniAspect,
+): string {
+  if (plate.construct && plate.startStill) {
+    return `public/concepts/clean-retakes/${aspectDir(aspect)}/${plate.startStill}`;
+  }
+  return `public/concepts/clean/${plate.plateFile}`;
+}
+
 export function buildOmniPrompt(plate: OmniPlate): string {
+  if (plate.construct) {
+    return [
+      "In a single continuous shot with no scene cuts. <FIRST_FRAME> Begin on the attached foundation still.",
+      OMNI_CONSTRUCT_LOCK,
+      plate.motion,
+      "If a destination still is attached, the last frame matches that completed headquarters.",
+      OMNI_TEXT_BAN,
+    ].join(" ");
+  }
+
   if (plate.photoreal) {
     return [
       "In a single continuous shot with no scene cuts. <FIRST_FRAME> Animate only the attached still.",

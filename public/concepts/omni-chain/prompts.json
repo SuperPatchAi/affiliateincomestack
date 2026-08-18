@@ -25,9 +25,12 @@
       "id": "03",
       "slug": "four-stacks",
       "plateFile": "sp-stack-03-four-stacks.png",
-      "accent": "multi neon blue green orange violet",
-      "motion": "four monumental pillars assemble from darkness with subtle energy bridging between them; settle as a stable four-pillar composition",
-      "prompt": "In a single continuous shot with no scene cuts. <FIRST_FRAME> Animate this premium keynote motion graphic still. Dark navy and black background with subtle gradients; multi neon blue green orange violet accent lighting. Apple × Nike × McKinsey cinematic presentation aesthetic — large scale, premium, abstract infographic motion. [0-2s] Assemble and awaken the composition with restrained camera move. [2-6s] four monumental pillars assemble from darkness with subtle energy bridging between them; settle as a stable four-pillar composition. Keep primary motion in the center sixty percent of the frame; quieter edges for later text overlays. [6-8s] Settle back toward the opening composition so the clip loops cleanly. Consider micro-detail, timing, and lighting to create a rich but natural premium scene. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech."
+      "photoreal": true,
+      "construct": true,
+      "startStill": "sp-stack-03-four-stacks-foundation.png",
+      "accent": "late-morning sun on glass, teak, and harbor water",
+      "motion": "The headquarters rises from the ground up. The first floor locks, then the next stacks on it, then the next, then the last — four floors, each one building on the one before. Water moves against the hull. People stay small.",
+      "prompt": "In a single continuous shot with no scene cuts. <FIRST_FRAME> Begin on the attached foundation still. Image-to-video. The first attached still is the first frame — foundation and dock. Stay in this one harbor for the entire clip. No cuts, no jump to another place, no flashing, no warp. The yacht, water, sky, and camera stay locked. Only the headquarters changes: it rises from that foundation, one glass floor stacking on the last, until four floors stand complete and match the destination building. Refer to people as they. The headquarters rises from the ground up. The first floor locks, then the next stacks on it, then the next, then the last — four floors, each one building on the one before. Water moves against the hull. People stay small. If a destination still is attached, the last frame matches that completed headquarters. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech."
     },
     {
       "id": "04",

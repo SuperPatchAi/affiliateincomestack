@@ -142,6 +142,6 @@ describe("experienceMedia", () => {
     const fourStacksHash = fileMd5(fourStacks);
     expect(fourStacksHash).not.toBe(titleHash);
     // Guard against a near-duplicate woman still being copied under the four-stacks name.
-    expect(fourStacksHash).toBe("49c66a63b61b7a0579c6d1e8ee798439");
+    expect(fourStacksHash).toBe("202f398b34a98a7e60ec7d8e0ce40763");
   });
 });

@@ -86,7 +86,15 @@ function extractLastFrame(videoPath, bridgePath) {
   }
 }
 
-function runOmni({ apiKey, platePath, prompt, aspect, outputPath, bridgeRef }) {
+function runOmni({
+  apiKey,
+  platePath,
+  prompt,
+  aspect,
+  outputPath,
+  bridgeRef,
+  destPath,
+}) {
   const code = `
 import json, os, sys
 from pathlib import Path
@@ -98,8 +106,12 @@ from tools.video.gemini_omni_video import GeminiOmniVideo
 tool = GeminiOmniVideo()
 refs = [${JSON.stringify(platePath)}]
 prompt = ${JSON.stringify(prompt)}
+dest = ${JSON.stringify(destPath || "")}
 bridge = ${JSON.stringify(bridgeRef || "")}
-if bridge:
+if dest:
+    refs.append(dest)
+    # refs[0]=foundation (<FIRST_FRAME>), refs[1]=completed HQ (<IMAGE_REF_1>)
+elif bridge:
     refs.append(bridge)
     # refs[0]=plate (<FIRST_FRAME>), refs[1]=prior last frame (<IMAGE_REF_1>)
     prompt = prompt + " Match the palette and lighting mood of <IMAGE_REF_1> only. Do not continue the previous camera move; this is a new scroll-stack layer."
@@ -192,7 +204,22 @@ async function generateAspect(aspect, plates, apiKey, { forceAll, nums }) {
       aspectDir(aspect),
       `sp-stack-${plate.id}-${plate.slug}_last.png`,
     );
-    const platePath = join(CLEAN, plate.plateFile);
+    const firstFrameRel = plate.construct && plate.startStill
+      ? join("public/concepts/clean-retakes", aspectDir(aspect), plate.startStill)
+      : join("public/concepts/clean", plate.plateFile);
+    const platePath = join(APP, firstFrameRel);
+    const destWide = join(CLEAN, plate.plateFile);
+    const destPortrait = join(
+      APP,
+      "public/concepts/clean-retakes",
+      aspectDir(aspect),
+      plate.plateFile,
+    );
+    const destPath = plate.construct
+      ? aspect === "9:16" && existsSync(destPortrait)
+        ? destPortrait
+        : destWide
+      : null;
 
     if (!existsSync(platePath)) {
       results.push({ id: plate.id, aspect, ok: false, error: `missing ${platePath}` });
@@ -221,7 +248,8 @@ async function generateAspect(aspect, plates, apiKey, { forceAll, nums }) {
         prompt: plate.prompt,
         aspect,
         outputPath: outPath,
-        bridgeRef: plate.photoreal ? null : prevBridge,
+        bridgeRef: plate.photoreal || plate.construct ? null : prevBridge,
+        destPath,
       });
       extractLastFrame(outPath, bridgePath);
       if (!plate.photoreal) prevBridge = bridgePath;

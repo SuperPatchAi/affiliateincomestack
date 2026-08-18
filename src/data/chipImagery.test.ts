@@ -8,6 +8,12 @@ import {
   CHIP_STYLE_ANCHOR,
   CHIP_VIDEO_READY_SLIDES,
   DAYLIGHT_CITY_STYLE_ANCHOR,
+  DAYLIGHT_CAMPAIGN_STYLE_ANCHOR,
+  DAYLIGHT_HARBOR_STYLE_ANCHOR,
+  DAYLIGHT_INTERIOR_STYLE_ANCHOR,
+  DAYLIGHT_YACHT_STYLE_ANCHOR,
+  DAYLIGHT_POOL_STYLE_ANCHOR,
+  DAYLIGHT_RIVER_STYLE_ANCHOR,
   SUNSET_BEACH_STYLE_ANCHOR,
   PLATE_RETAKES,
   NEON_CITY_STYLE_ANCHOR,
@@ -15,7 +21,9 @@ import {
   buildChipMotionPrompt,
   buildPlateRetakePrompt,
   buildPlatePatchEditPrompt,
+  buildProductPatchScaleEditPrompt,
   buildPortraitRecomposePrompt,
+  buildHarborConstructionStartPrompt,
   chipImagePath,
   CHIP_CUTOUT_SLIDES,
   chipCutoutForSlide,
@@ -182,6 +190,45 @@ describe("chip image specs", () => {
     expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/no readable characters/i);
     expect(DAYLIGHT_CITY_STYLE_ANCHOR).toMatch(/center/i);
   });
+
+  it("keeps the daylight interior photoreal, sunlit, and free of readable signage", () => {
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).toMatch(/photoreal/i);
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).toMatch(/interior/i);
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).toMatch(/late-morning/i);
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).not.toMatch(/rain-slicked|after dark/);
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).toMatch(/no readable characters/i);
+    expect(DAYLIGHT_INTERIOR_STYLE_ANCHOR).toMatch(/center/i);
+  });
+
+  it("gives each four-stacks chip its own daylight world and color", () => {
+    const specs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === "03-four-stacks");
+    expect(specs).toHaveLength(4);
+    const styles = specs.map((s) => s.style);
+    expect(new Set(styles).size).toBe(4);
+    for (const spec of specs) {
+      expect(spec.style).not.toBe(DAYLIGHT_INTERIOR_STYLE_ANCHOR);
+      expect(spec.setting).toBeDefined();
+      expect(spec.subject.toLowerCase()).not.toMatch(
+        /pillar|neon|wireframe|plaster|kitchen table|loft/,
+      );
+      expect(spec.setting?.toLowerCase()).not.toMatch(/neon|night|pillar|studio|loft/);
+    }
+    const [product, brand, income, development] = specs;
+    expect(product.style).toBe(DAYLIGHT_POOL_STYLE_ANCHOR);
+    expect(product.subject).toMatch(/overhead|straight down|pool/i);
+    expect(product.subject).toMatch(/SuperPatch|rounded.square|fingerprint/i);
+    expect(product.subject).toMatch(/shoulder|arm/i);
+    expect(product.subject).not.toMatch(/applying|close on|forearm/i);
+    expect(brand.style).toBe(DAYLIGHT_CAMPAIGN_STYLE_ANCHOR);
+    expect(brand.subject).toMatch(/campaign|shoot|camera|set/i);
+    expect(brand.subject).not.toMatch(/amphitheater|crowd|stadium|arena/i);
+    expect(income.style).toBe(DAYLIGHT_YACHT_STYLE_ANCHOR);
+    expect(income.subject).toMatch(/yacht/i);
+    expect(income.subject).toMatch(/scale|proportion|adult/i);
+    expect(income.subject).not.toMatch(/gold|bullion|champagne/i);
+    expect(development.style).toBe(DAYLIGHT_RIVER_STYLE_ANCHOR);
+    expect(development.subject).toMatch(/rowing|shell|water level/i);
+  });
 });
 
 describe("chip motion prompts (omni)", () => {
@@ -336,10 +383,11 @@ describe("chip media wiring leftovers", () => {
 });
 
 describe("plate retakes", () => {
-  it("covers the four off-style plates plus the world hero retake", () => {
+  it("covers the four off-style plates plus the world and four-stacks hero retakes", () => {
     expect(PLATE_RETAKES.map((r) => r.plateFile).sort()).toEqual([
       "sp-stack-01-title.png",
       "sp-stack-02-world.png",
+      "sp-stack-03-four-stacks.png",
       "sp-stack-13-executive.png",
       "sp-stack-15-closing.png",
       "sp-stack-18-different.png",
@@ -365,6 +413,40 @@ describe("plate retakes", () => {
     expect(prompt).toMatch(/upper arm/i);
     expect(prompt).toMatch(/fingerprint/i);
     expect(prompt).toMatch(/keep|identical|same/i);
+    expect(prompt).toContain(OMNI_TEXT_BAN);
+  });
+
+  it("scales only the product-chip patch down while keeping the photograph", () => {
+    const prompt = buildProductPatchScaleEditPrompt();
+    expect(prompt).toMatch(/attached photograph/i);
+    expect(prompt).toMatch(/twenty-five percent smaller|25% smaller/i);
+    expect(prompt).toMatch(/two fingers/i);
+    expect(prompt).toMatch(/keep|identical|same/i);
+    expect(prompt).toMatch(/forearm|patch/i);
+    expect(prompt).toContain(OMNI_TEXT_BAN);
+  });
+
+  it("tells the four-stacks hero as one harbor company, not neon pillars", () => {
+    const stacks = PLATE_RETAKES.find(
+      (r) => r.plateFile === "sp-stack-03-four-stacks.png",
+    );
+    expect(stacks).toBeDefined();
+    expect(stacks!.slideId).toBe("03-four-stacks");
+    expect(stacks!.style).toBe(DAYLIGHT_HARBOR_STYLE_ANCHOR);
+    expect(stacks!.subject).toMatch(/harbor|headquarters|yacht/i);
+    expect(stacks!.subject.toLowerCase()).not.toMatch(
+      /pillar|neon|wireframe|atrium|portrait|collage/,
+    );
+    expect(stacks!.accent.toLowerCase()).not.toMatch(/neon|night/);
+  });
+
+  it("edits the harbor plate down to a foundation so Omni can raise the floors", () => {
+    const prompt = buildHarborConstructionStartPrompt();
+    expect(prompt).toMatch(/attached photograph/i);
+    expect(prompt).toMatch(/foundation|ground/i);
+    expect(prompt).toMatch(/yacht|harbor|water/i);
+    expect(prompt).toMatch(/keep|identical|same/i);
+    expect(prompt).not.toMatch(/[0-9%$"]/);
     expect(prompt).toContain(OMNI_TEXT_BAN);
   });
 
