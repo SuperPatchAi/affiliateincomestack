@@ -30,6 +30,12 @@ import {
   createChipAutoCycle,
   type ChipAutoCycle,
 } from "./chipAutoCycle";
+import {
+  applyCutoutEnter,
+  applyCutoutExit,
+  ensureCutoutPlugins,
+  resetCutouts,
+} from "./chipCutoutMotion";
 import { applyTitlePatchExit } from "./titlePatchExit";
 
 let registered = false;
@@ -37,6 +43,7 @@ let registered = false;
 function ensurePlugins() {
   if (!registered) {
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, SplitText, useGSAP);
+    ensureCutoutPlugins();
     registered = true;
   }
 }
@@ -55,6 +62,7 @@ type SceneChipCycle = { cycle: ChipAutoCycle; dispose: () => void };
 function buildSceneChipCycle(
   scene: HTMLElement,
   onSequenceComplete?: () => void,
+  reduceMotion = false,
 ): SceneChipCycle | null {
   const chipEls = Array.from(
     scene.querySelectorAll<HTMLElement>("[data-chip-item]"),
@@ -64,6 +72,9 @@ function buildSceneChipCycle(
   if (!copyBlock) return null;
   const backdrops = Array.from(
     scene.querySelectorAll<HTMLElement>("[data-chip-backdrop]"),
+  );
+  const cutouts = Array.from(
+    scene.querySelectorAll<HTMLElement>("[data-chip-cutout]"),
   );
   const videos = backdrops.map((backdrop) =>
     backdrop.querySelector("video"),
@@ -91,6 +102,10 @@ function buildSceneChipCycle(
         });
       },
       enterChip(index, { loop }) {
+        if (cutouts[index]) {
+          applyCutoutEnter(cutouts[index], chipEls[index], { reduceMotion });
+          return false;
+        }
         gsap.fromTo(
           chipEls[index],
           { opacity: 0, x: 72 },
@@ -121,6 +136,13 @@ function buildSceneChipCycle(
         return true;
       },
       exitChip(index) {
+        if (cutouts[index]) {
+          applyCutoutExit(cutouts[index], chipEls[index], {
+            reduceMotion,
+            parkIndex: cutouts.length - 1 - index,
+          });
+          return;
+        }
         gsap.to(chipEls[index], {
           opacity: 0,
           x: -72,
@@ -142,9 +164,13 @@ function buildSceneChipCycle(
         }
       },
       reset() {
-        gsap.killTweensOf([copyBlock, ...chipEls, ...backdrops]);
+        gsap.killTweensOf([copyBlock, ...chipEls, ...backdrops, ...cutouts]);
         gsap.set(copyBlock, { x: 0 });
-        gsap.set(chipEls, { opacity: 0, x: 72 });
+        if (cutouts.length > 0) {
+          resetCutouts(cutouts, chipEls);
+        } else {
+          gsap.set(chipEls, { opacity: 0, x: 72 });
+        }
         if (backdrops.length > 0) {
           gsap.set(backdrops, { opacity: 0 });
         }
@@ -508,6 +534,7 @@ export function useExperienceMotion({
                     });
                   }
                 : undefined,
+              Boolean(reduceMotion),
             );
             if (chipCycle) {
               scene.dataset.chipsAnimated = "true";
@@ -518,6 +545,10 @@ export function useExperienceMotion({
               const backdrops = scene.querySelectorAll("[data-chip-backdrop]");
               if (backdrops.length > 0) {
                 gsap.set(backdrops, { opacity: 0 });
+              }
+              const cutoutEls = scene.querySelectorAll("[data-chip-cutout]");
+              if (cutoutEls.length > 0) {
+                gsap.set(cutoutEls, { opacity: 0 });
               }
               chipCycles.set(index, chipCycle);
               // Scroll gate: the hero holds at the scene top; the first scroll
