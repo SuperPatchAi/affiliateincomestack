@@ -7,6 +7,7 @@ import {
   CHIP_MEDIA_READY_SLIDES,
   CHIP_STYLE_ANCHOR,
   CHIP_VIDEO_READY_SLIDES,
+  CUTOUT_STYLE_ANCHOR,
   PLATE_RETAKES,
   NEON_CITY_STYLE_ANCHOR,
   buildChipImagePrompt,
@@ -101,18 +102,31 @@ describe("chip image specs", () => {
     expect(impact.subject).toMatch(/crowd|people|crossing/i);
   });
 
-  it("grounds every world chip in a real-world neon-city scene", () => {
-    const worldSpecs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === "02-world");
-    expect(worldSpecs).toHaveLength(4);
-    for (const spec of worldSpecs) {
-      expect(spec.style, spec.slug).toBe(NEON_CITY_STYLE_ANCHOR);
-      expect(spec.setting, spec.slug).toMatch(/neon|city/i);
+  it("locks 02-world specs to the bright cutout anchor", () => {
+    const specs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === "02-world");
+    expect(specs).toHaveLength(4);
+    for (const spec of specs) {
+      expect(spec.style).toBe(CUTOUT_STYLE_ANCHOR);
+      const prompt = buildChipImagePrompt(spec);
+      expect(prompt).toContain(CUTOUT_STYLE_ANCHOR);
+      expect(prompt).toMatch(/two arms/i);
+      expect(prompt).toMatch(/five fingers/i);
+      expect(spec.subject.toLowerCase()).not.toMatch(/neon|rain-slicked/);
+      expect(spec.setting?.toLowerCase()).not.toMatch(/neon|rain/);
     }
-    const [jobs, gig, creator, social] = worldSpecs;
-    expect(jobs.subject).toMatch(/office|tower/i);
-    expect(gig.subject).toMatch(/rider|scooter|courier/i);
-    expect(creator.subject).toMatch(/ring light|studio|camera/i);
-    expect(social.subject).toMatch(/hands|phone/i);
+  });
+
+  it("tells each 02 chip as one sunlit subject", () => {
+    const bySlug = Object.fromEntries(
+      CHIP_IMAGE_SPECS.filter((s) => s.slideId === "02-world").map((s) => [
+        s.slug,
+        s,
+      ]),
+    );
+    expect(bySlug["traditional-jobs"].subject).toMatch(/coffee cup/i);
+    expect(bySlug["gig-economy"].subject).toMatch(/standing beside/i);
+    expect(bySlug["creator-economy"].subject).toMatch(/tripod/i);
+    expect(bySlug["social-commerce"].subject).toMatch(/product/i);
   });
 
   it("uses the portrait subject override when rendering 9:16", () => {

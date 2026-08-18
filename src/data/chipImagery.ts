@@ -67,6 +67,19 @@ export const NEON_CITY_STYLE_ANCHOR =
   "screen, and billboard reads as pure abstract glowing shape or soft bokeh — " +
   "no readable characters anywhere in the scene.";
 
+/**
+ * Bright isolated-subject stills for the cutout experiment (02-world).
+ * Anatomy and daylight are hard gates — extra limbs fail QC.
+ */
+export const CUTOUT_STYLE_ANCHOR =
+  "Bright airy photoreal photograph on a clean warm-white void, late-morning " +
+  "window light, soft open shade, natural skin with laugh lines and pores, " +
+  "premium Super Patch lifestyle still — no neon, no rain, no night. " +
+  "Keep the hero subject centered in frame. Exactly one head, exactly two arms, " +
+  "exactly two legs, five fingers on every visible hand. No extra limbs or " +
+  "appendages. Isolate the hero so the background can be erased. Screens and " +
+  "badges are blank soft shapes.";
+
 export function buildChipImagePrompt(
   spec: ChipImageSpec,
   aspect: ChipAspect = "16:9",
@@ -252,60 +265,52 @@ export const CHIP_IMAGE_SPECS: ChipImageSpec[] = [
       "The crowd flows through the crossing as the glowing umbrella colors drift and mingle across the wet asphalt.",
   },
 
-  // 02-world — one real neon city, four real ways people earn in it
+  // 02-world — bright isolated cutouts, one subject per chip
   {
     slideId: "02-world",
     chipIndex: 0,
     slug: "traditional-jobs",
-    accent: "cool fluorescent white-blue against warm amber street glow",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
+    accent: "warm window daylight on pale cotton",
+    style: CUTOUT_STYLE_ANCHOR,
+    setting: "A clean warm-white photographic void in late-morning sun.",
     subject:
-      "A towering glass office block fills the frame at night, shot from street level looking up: a vast grid of identical fluorescent-lit windows with tiny silhouettes still working at desks, row after row. Below, the rain-slicked street mirrors the tower's cold light while one warm streetlamp glows at the curb.",
-    motion:
-      "Window lights flicker subtly across the tower while a thin sheet of rain drifts past the streetlamp.",
+      "One man, waist-up, pale oxford shirt, mid-laugh, both hands on a paper coffee cup, a blank badge on a lanyard. Soft sun on his face, laugh lines visible. No other people.",
+    motion: "He holds the cup steady as soft sun drifts across his face.",
   },
   {
     slideId: "02-world",
     chipIndex: 1,
     slug: "gig-economy",
-    accent: "magenta and cyan neon streaked across wet asphalt",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A rain-slicked neon night city, vivid mixed color reflected in wet streets.",
+    accent: "open daylight and pale sky",
+    style: CUTOUT_STYLE_ANCHOR,
+    setting: "A clean warm-white photographic void in late-morning sun.",
     subject:
-      "A delivery rider on a scooter cuts through a narrow rain-slicked street at night, insulated courier box on the back. The street has no signboards at all: it is lit purely by bare neon tubes, colored strip lights, and glowing shop windows, all smeared by motion blur into ribbons of magenta and cyan. The rider reads as a silhouette in a wet jacket; the handlebar-mounted phone glows as a soft blank rectangle of light.",
-    motion:
-      "The rider leans through the street as neon reflections streak past in the wet asphalt.",
+      "One rider standing beside a cream scooter, visor up, easy smile, one hand on the seat, a courier bag on his back, both feet on the ground. Open daylight. No other people.",
+    motion: "A light breeze lifts his shirt while he stands beside the scooter.",
   },
   {
     slideId: "02-world",
     chipIndex: 2,
     slug: "creator-economy",
-    accent: "warm amber ring-light glow against violet and cyan city bokeh",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A dim apartment home studio at night above a neon city, warm practicals against cool bokeh.",
+    accent: "morning window light on white stone",
+    style: CUTOUT_STYLE_ANCHOR,
+    setting: "A clean warm-white photographic void in late-morning sun.",
     subject:
-      "Inside a dim apartment at night, a creator sits with their back to camera at a desk, facing a glowing ring light and a camera on a tripod, warm amber light pooling around them. Behind the desk a floor-to-ceiling window reveals the neon city below as soft violet and cyan bokeh. Every screen faces away or glows as a soft blank shape.",
-    motion:
-      "The ring light breathes warmly while city bokeh twinkles beyond the window.",
+      "One woman seated at a white kitchen island, mid-laugh, both hands visible near a phone on a tiny tripod. A houseplant at the edge. Morning window light. No other people.",
+    motion: "She leans toward the phone as window light shifts across the island.",
   },
   {
     slideId: "02-world",
     chipIndex: 3,
     slug: "social-commerce",
-    accent: "vivid mixed neon shop glow — pink, cyan, and amber",
-    style: NEON_CITY_STYLE_ANCHOR,
-    setting:
-      "A small neon-lit shop counter at night in the city, vivid mixed glow on close surfaces.",
+    accent: "sun on skin and pale wood",
+    style: CUTOUT_STYLE_ANCHOR,
+    setting: "A clean warm-white photographic void in late-morning sun.",
     subject:
-      "At a small neon-lit shop counter at night, a pair of hands holds a phone upright to film a product standing on the counter, the vertical phone screen a soft blank rectangle of glow. The shop has no signs or lettering anywhere: tall shelves of colorfully lit products rise high behind the counter, outlined purely by bare colored neon tubes and strip lights that melt into vivid pink, cyan, and amber bokeh. One single continuous photograph filling the whole frame.",
+      "Tight crop of two friends at an outdoor cafe table, four hands around one small product, coffee cups only, sun on faces.",
     portraitSubject:
-      "A vertical over-the-shoulder photograph in one unbroken depth of field: a person stands at a small neon-lit shop counter at night, holding a phone upright to film a product on the counter, the phone screen a soft blank glow. Tall shelves of colorfully lit products tower above the counter, lit only by bare pink, cyan, and amber neon tubes — no signs or lettering anywhere — the highest shelves dissolving into soft bokeh. One single continuous photograph, one camera, one focus plane, filling the whole frame edge to edge.",
-    motion:
-      "The hands steady the phone as neon bokeh shimmers and colored glow shifts across the product.",
+      "A tall vertical crop of two friends at an outdoor cafe table, four hands around one small product, coffee cups only, sun on faces, warm-white void above and below.",
+    motion: "Hands turn the product as sun moves across the table.",
   },
 
   // 03-four-stacks — one pillar per chip (multi)
