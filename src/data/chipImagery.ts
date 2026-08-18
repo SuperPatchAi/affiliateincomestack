@@ -132,6 +132,17 @@ export function buildPortraitRecomposePrompt(spec: ChipImageSpec): string {
   ].join(" ");
 }
 
+/** Edit the approved title still so only the arm wearable matches the product photo. */
+export function buildPlatePatchEditPrompt(): string {
+  return [
+    "The first attached photograph is the scene. Keep the person, pose, clothing, city, lighting, and composition identical.",
+    "Replace only the wearable on the subject's upper arm with the product in the second attached image.",
+    "The patch is a white rounded square with a red repeating SuperPatch mark — diamond S and circle-X — and a clear fingerprint gel in the center.",
+    "Ignore any watermark or black backdrop on the product photo. Do not change anything else.",
+    OMNI_TEXT_BAN,
+  ].join(" ");
+}
+
 export function buildPlateRetakePrompt(spec: PlateRetakeSpec): string {
   return [
     spec.style ?? CHIP_STYLE_ANCHOR,
@@ -934,7 +945,7 @@ export const PLATE_RETAKES: PlateRetakeSpec[] = [
     accent: "warm sun on skin and a pale city sky",
     style: DAYLIGHT_CITY_STYLE_ANCHOR,
     subject:
-      "A sunlit late-morning photograph of one person standing at a wide window or open terrace, a small wellness patch on their upper arm, looking out over an airy city of pale stone and glass. Warm skin, laugh lines, open shade. The feeling is better health, greater freedom, and a bigger life ahead — one quiet human moment, not a collage. No stacked graphics and no signage.",
+      "A sunlit late-morning photograph of one person standing at a wide window or open terrace, a white rounded-square SuperPatch on their upper arm with red repeating marks and a clear fingerprint gel center, looking out over an airy city of pale stone and glass. Warm skin, laugh lines, open shade. The feeling is better health, greater freedom, and a bigger life ahead — one quiet human moment, not a collage. No stacked graphics and no signage.",
     motion:
       "The subject breathes and the breeze stirs their clothes. The camera holds a slow, almost still push-in.",
   },

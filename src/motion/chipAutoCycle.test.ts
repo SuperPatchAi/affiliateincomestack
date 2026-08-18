@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CHIP_COPY_EXIT_MS,
   CHIP_FALLBACK_DWELL_MS,
-  CHIP_SCROLL_GATE_START,
   createChipAutoCycle,
+  heroCopyDwellMs,
   type ChipCycleHandlers,
 } from "./chipAutoCycle";
 
@@ -24,25 +24,42 @@ function begin(cycle: ReturnType<typeof createChipAutoCycle>) {
   vi.advanceTimersByTime(CHIP_COPY_EXIT_MS);
 }
 
-describe("createChipAutoCycle", () => {
-  it("requires a deeper scroll into the scene before copy flies off", () => {
-    expect(CHIP_SCROLL_GATE_START).toMatch(/top\+=/);
-    expect(CHIP_SCROLL_GATE_START).not.toMatch(/top-=/);
+describe("heroCopyDwellMs", () => {
+  it("gives hero copy more time when there is more written text", () => {
+    const short = heroCopyDwellMs("The SuperPatch Super Stack");
+    const long = heroCopyDwellMs(
+      "More Than an Affiliate Program. A Complete Opportunity. At Super Patch we did not build another affiliate program. We built a complete opportunity: better health, greater freedom, and bigger impact.",
+    );
+    expect(long).toBeGreaterThan(short);
+    expect(short).toBeGreaterThanOrEqual(5000);
+    expect(long).toBeLessThanOrEqual(16_000);
   });
+});
 
+describe("createChipAutoCycle", () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it("holds the hero copy indefinitely until the user scrolls", () => {
+  it("holds the hero copy for the dwell, then begins chips without a scroll", () => {
     const handlers = makeHandlers();
-    const cycle = createChipAutoCycle({ chipCount: 3, handlers });
+    const cycle = createChipAutoCycle({
+      chipCount: 3,
+      handlers,
+      heroDwellMs: 8000,
+    });
     cycle.start();
 
-    // No read timer anymore: the hero never advances on its own.
-    vi.advanceTimersByTime(60_000);
+    vi.advanceTimersByTime(7999);
     expect(handlers.exitCopy).not.toHaveBeenCalled();
-    expect(handlers.enterChip).not.toHaveBeenCalled();
     expect(cycle.currentChip()).toBe(-1);
+
+    vi.advanceTimersByTime(1);
+    expect(handlers.exitCopy).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(CHIP_COPY_EXIT_MS);
+    expect(handlers.enterChip).toHaveBeenCalledWith(0, {
+      loop: false,
+      handoff: false,
+    });
   });
 
   it("beginChips() exits the copy, then enters the first chip", () => {

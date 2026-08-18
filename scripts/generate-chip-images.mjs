@@ -202,11 +202,34 @@ async function main() {
     PLATE_RETAKES,
     buildChipImagePrompt,
     buildPlateRetakePrompt,
+    buildPlatePatchEditPrompt,
     buildPortraitRecomposePrompt,
     chipImagePath,
   } = imagery;
   const slideById = new Map(slides.SLIDES.map((s) => [s.id, s]));
   const manifest = loadManifest();
+
+  if (argv.includes("--patch-edit")) {
+    const scenePath = join(CLEAN, "sp-stack-01-title.png");
+    const patchPath = join(APP, "public/concepts/refs/superpatch-freedom.png");
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    if (!existsSync(patchPath)) throw new Error(`missing ${patchPath}`);
+    const prompt = buildPlatePatchEditPrompt();
+    console.log("patch-edit: sp-stack-01-title.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath, patchPath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    return;
+  }
 
   if (retakesMode) {
     // Optional slide-id args narrow which retakes run (e.g. --retakes 02-world).

@@ -14,6 +14,7 @@ import {
   buildChipImagePrompt,
   buildChipMotionPrompt,
   buildPlateRetakePrompt,
+  buildPlatePatchEditPrompt,
   buildPortraitRecomposePrompt,
   chipImagePath,
   CHIP_CUTOUT_SLIDES,
@@ -354,7 +355,17 @@ describe("plate retakes", () => {
     expect(title!.slideId).toBe("01-title");
     expect(title!.style).toBe(DAYLIGHT_CITY_STYLE_ANCHOR);
     expect(title!.subject).toMatch(/patch|wellness|person|terrace|window/i);
-    expect(title!.subject.toLowerCase()).not.toMatch(/neon|slab|wireframe/);
+    expect(title!.subject).toMatch(/fingerprint|rounded.square|circle.x/i);
+    expect(title!.subject.toLowerCase()).not.toMatch(/neon|slab|wireframe|beige oval/);
+  });
+
+  it("edits the title plate by swapping only the arm patch for the product still", () => {
+    const prompt = buildPlatePatchEditPrompt();
+    expect(prompt).toMatch(/attached photograph/i);
+    expect(prompt).toMatch(/upper arm/i);
+    expect(prompt).toMatch(/fingerprint/i);
+    expect(prompt).toMatch(/keep|identical|same/i);
+    expect(prompt).toContain(OMNI_TEXT_BAN);
   });
 
   it("tells the world hero as a real aerial daylight city whose routes branch", () => {

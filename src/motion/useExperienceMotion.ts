@@ -27,8 +27,8 @@ import {
 } from "./chipDwellParking";
 import {
   CHIP_COPY_EXIT_MS,
-  CHIP_SCROLL_GATE_START,
   createChipAutoCycle,
+  heroCopyDwellMs,
   type ChipAutoCycle,
 } from "./chipAutoCycle";
 import {
@@ -113,8 +113,16 @@ function buildSceneChipCycle(
   let outgoingHold: gsap.core.Tween | undefined;
   const loopFlags = videos.map(() => false);
 
+  const heroText = ["eyebrow", "headline", "body"]
+    .map(
+      (layer) =>
+        scene.querySelector(`[data-anim-layer='${layer}']`)?.textContent ?? "",
+    )
+    .join(" ");
+
   const cycle = createChipAutoCycle({
     chipCount: chipEls.length,
+    heroDwellMs: heroCopyDwellMs(heroText),
     handlers: {
       exitCopy() {
         gsap.to(copyBlock, {
@@ -600,10 +608,9 @@ export function useExperienceMotion({
             }
 
             // Chip beats are timed to their omni clips: build the cycle now,
-            // arm it when this scene becomes active. The hero copy holds until
-            // the user scrolls into the scene (scroll gate below); after that
-            // chips auto-advance and the final clip's warp ending auto-scrolls
-            // into the next scene.
+            // arm it when this scene becomes active. Hero copy holds for a
+            // text-scaled dwell, then chips auto-advance; the final clip
+            // auto-scrolls into the next scene.
             const nextScene = scenes[index + 1] ?? null;
             const chipCycle = buildSceneChipCycle(
               scene,
@@ -634,17 +641,6 @@ export function useExperienceMotion({
                 gsap.set(cutoutEls, { opacity: 0 });
               }
               chipCycles.set(index, chipCycle);
-              // Scroll gate: the hero holds at the scene top; the first scroll
-              // past it begins the chip sequence. beginChips() is idempotent
-              // and a no-op unless this scene's cycle is armed (active scene),
-              // so the final-chip auto-scroll passing through is harmless.
-              ScrollTrigger.create({
-                trigger: scene,
-                start: CHIP_SCROLL_GATE_START,
-                end: "bottom bottom",
-                onUpdate: () => chipCycle.cycle.beginChips(),
-                onEnter: () => chipCycle.cycle.beginChips(),
-              });
             }
           });
 

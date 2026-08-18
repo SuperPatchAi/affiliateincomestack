@@ -1,21 +1,31 @@
 /**
- * Video-timed chip sequencing with a scroll-gated start. When a chip scene
- * becomes active the hero copy holds indefinitely — `start()` only arms the
- * cycle. The user's first scroll into the scene calls `beginChips()`, which
- * exits the copy and enters chip 0; from there each chip beat runs for
- * exactly the length of its omni clip — the clip's warp ending IS the
- * transition cue. When a `completeSequence` handler is provided the final
- * clip's ending fires it (e.g. auto-scroll to the next scene); otherwise the
- * final clip loops (it settles cleanly by design). Chips without a playable
- * video (data-save mode) advance on a fixed timer.
+ * Video-timed chip sequencing. When a chip scene becomes active the hero
+ * copy holds for a text-scaled dwell, then `beginChips()` exits the copy
+ * and enters chip 0. Each chip beat runs for the length of its omni clip.
+ * When a `completeSequence` handler is provided the final clip's ending
+ * fires it (auto-advance to the next scene); otherwise the final clip loops.
+ * Chips without a playable video advance on a fixed timer.
  */
 
 /** Copy slide-out duration; the first chip enters when it completes. */
 export const CHIP_COPY_EXIT_MS = 700;
-/** ScrollTrigger start: copy holds until the user has scrolled into the scene. */
-export const CHIP_SCROLL_GATE_START = "top+=30% top";
 /** Per-chip dwell when no video is available to time the beat. */
 export const CHIP_FALLBACK_DWELL_MS = 6000;
+/** Floor / ceiling for the hero-copy read before chips begin. */
+export const HERO_COPY_DWELL_MIN_MS = 5000;
+export const HERO_COPY_DWELL_MAX_MS = 16_000;
+const HERO_COPY_DWELL_BASE_MS = 4000;
+const HERO_COPY_DWELL_MS_PER_WORD = 180;
+
+/** Longer hero copy (more written text) holds longer before chips begin. */
+export function heroCopyDwellMs(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const ms = HERO_COPY_DWELL_BASE_MS + words * HERO_COPY_DWELL_MS_PER_WORD;
+  return Math.min(
+    HERO_COPY_DWELL_MAX_MS,
+    Math.max(HERO_COPY_DWELL_MIN_MS, ms),
+  );
+}
 
 export type ChipCycleHandlers = {
   /** Slide the headline copy off screen. Called once per run. */
@@ -42,10 +52,10 @@ export type ChipCycleHandlers = {
 };
 
 export type ChipAutoCycle = {
-  /** Arm the cycle: hero copy holds until `beginChips()`. */
+  /** Arm the cycle; if `heroDwellMs` is set, chips begin after that read. */
   start: () => void;
   stop: () => void;
-  /** Scroll-gated kickoff: exit the copy and enter the first chip. */
+  /** Exit the copy and enter the first chip. Idempotent. */
   beginChips: () => void;
   /** Wire to each chip video's `ended` event. */
   handleVideoEnded: (index: number) => void;
@@ -58,12 +68,15 @@ export function createChipAutoCycle(options: {
   handlers: ChipCycleHandlers;
   copyExitMs?: number;
   fallbackChipMs?: number;
+  /** When > 0, `start()` begins chips after this read — no scroll gate. */
+  heroDwellMs?: number;
 }): ChipAutoCycle {
   const {
     chipCount,
     handlers,
     copyExitMs = CHIP_COPY_EXIT_MS,
     fallbackChipMs = CHIP_FALLBACK_DWELL_MS,
+    heroDwellMs = 0,
   } = options;
 
   let running = false;
@@ -119,6 +132,13 @@ export function createChipAutoCycle(options: {
     enter(current + 1);
   };
 
+  const beginChips = () => {
+    if (!running || begun) return;
+    begun = true;
+    handlers.exitCopy();
+    schedule(copyExitMs, () => enter(0));
+  };
+
   return {
     start() {
       if (running || chipCount <= 0) return;
@@ -126,13 +146,9 @@ export function createChipAutoCycle(options: {
       begun = false;
       completed = false;
       current = -1;
+      if (heroDwellMs > 0) schedule(heroDwellMs, beginChips);
     },
-    beginChips() {
-      if (!running || begun) return;
-      begun = true;
-      handlers.exitCopy();
-      schedule(copyExitMs, () => enter(0));
-    },
+    beginChips,
     stop() {
       if (!running) return;
       running = false;

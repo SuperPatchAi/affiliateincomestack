@@ -100,8 +100,8 @@ Chip-to-chip on `01-title` must stay covered. Do **not** crossfade two backdrops
 - Chip overlay (count / label / sub) waits until the video has taken over: first chip after the 0.8s fade, later chips after `CHIP_OVERLAY_AFTER_HANDOFF_MS`. Outgoing overlay exits immediately so the new scene plays before the next label slides in.
 - Playback cuts `CHIP_VIDEO_TAIL_TRIM_SEC` (1.1s) before the true end so the settle/glitch tail never shows. Advance and freeze use that earlier frame.
 - Omni I2V (Gemini best practice): one scene per clip, prompt for motion only, subtle human + slow camera. Do not chain last-frame travel between different places.
-- Scene 0 has the same dwell as later scenes so the opener cannot fly off on first scroll. Chip copy waits for `CHIP_SCROLL_GATE_START` (`top+=30% top`).
-- `01-title` hero is a still-only daylight plate (`sp-stack-01-title.png`), not the old neon-stack Omni.
+- Scene 0 has the same dwell as later scenes so the opener cannot fly off on first scroll. Chip hero copy holds for `heroCopyDwellMs` (longer when there is more written text), then chips auto-advance; the final chip auto-scrolls to the next scene.
+- `01-title` hero is a daylight plate (`sp-stack-01-title.png`) with the real SuperPatch on the arm, animated as a subtle Omni loop.
 - `reset()` clears `data-chip-cover` so the 3D can show again if the scene restarts.
 
 ## Wiring

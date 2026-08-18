@@ -1,6 +1,6 @@
 {
   "model": "gemini-omni-flash-preview",
-  "generatedAt": "2026-08-18T02:47:33.542Z",
+  "generatedAt": "2026-08-18T03:01:59.912Z",
   "aspects": [
     "16:9",
     "9:16"
@@ -12,19 +12,9 @@
       "ok": true,
       "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-01-title_omni.mp4",
       "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-01-title_last.png",
-      "interaction_id": "v1_ChdJOGVEYXUtRUY3NmkxTWtQeFp2SnNRNBIXSThlRGF1LUVGNzZpMU1rUHhadkpzUTQ",
+      "interaction_id": "v1_Chc4TXFEYXRfUEtldVZfdU1QaDVhYXdRYxIXOE1xRGF0X1BLZXVWX3VNUGg1YWF3UWM",
       "cost_usd": 0.8,
-      "duration_seconds": 52.03
-    },
-    {
-      "id": "02",
-      "aspect": "16:9",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-02-world_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-02-world_last.png",
-      "interaction_id": "v1_ChdVc2VEYXI2bkNPRElfdU1Qdl9iVzhRaxIXVXNlRGFyNm5DT0RJX3VNUHZfYlc4UWs",
-      "cost_usd": 0.8,
-      "duration_seconds": 46.2
+      "duration_seconds": 48.75
     },
     {
       "id": "01",
@@ -32,22 +22,12 @@
       "ok": true,
       "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-01-title_omni.mp4",
       "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-01-title_last.png",
-      "interaction_id": "v1_ChdqTWVEYXRpVklwRzlfdU1QXzdLODRBVRIXak1lRGF0aVZJcEc5X3VNUF83Szg0QVU",
+      "interaction_id": "v1_ChdIOHVEYXB5VE0tMk5fUFVQX05TZnlBTRIXSDh1RGFweVRNLTJOX1BVUF9OU2Z5QU0",
       "cost_usd": 0.8,
-      "duration_seconds": 57.9
-    },
-    {
-      "id": "02",
-      "aspect": "9:16",
-      "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-02-world_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-02-world_last.png",
-      "interaction_id": "v1_Chd2Y2VEYXFDVU5iU3MxTWtQOTlEZzZRVRIXdmNlRGFxQ1VOYlNzMU1rUDk5RGc2UVU",
-      "cost_usd": 0.8,
-      "duration_seconds": 49.17
+      "duration_seconds": 46.74
     }
   ],
-  "okCount": 4,
+  "okCount": 2,
   "failCount": 0,
-  "cost_usd_sum": 3.2
+  "cost_usd_sum": 1.6
 }
