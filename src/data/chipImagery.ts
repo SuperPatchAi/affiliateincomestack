@@ -165,6 +165,28 @@ export const CHIP_MEDIA_READY_SLIDES: readonly string[] = [
  */
 export const CHIP_VIDEO_READY_SLIDES: readonly string[] = [];
 
+/** Slides that use isolated cutout stills instead of omni / neon backdrops. */
+export const CHIP_CUTOUT_SLIDES: readonly string[] = ["02-world"];
+
+export type ChipCutoutEntry = {
+  slug: string;
+  src: string;
+};
+
+export function chipCutoutForSlide(
+  slideId: string,
+  aspect: "landscape" | "portrait",
+): ChipCutoutEntry[] {
+  if (!CHIP_CUTOUT_SLIDES.includes(slideId)) return [];
+  const chipAspect: ChipAspect = aspect === "landscape" ? "16:9" : "9:16";
+  return CHIP_IMAGE_SPECS.filter((spec) => spec.slideId === slideId).map(
+    (spec) => ({
+      slug: spec.slug,
+      src: chipImagePath(spec, chipAspect),
+    }),
+  );
+}
+
 export type ChipMediaEntry = {
   slug: string;
   /** Omni warp clip for this chip beat; absent when the slide is stills-only. */
@@ -179,6 +201,7 @@ export function chipMediaForSlide(
   aspect: "landscape" | "portrait",
 ): ChipMediaEntry[] {
   if (!CHIP_MEDIA_READY_SLIDES.includes(slideId)) return [];
+  if (CHIP_CUTOUT_SLIDES.includes(slideId)) return [];
   const hasVideo = CHIP_VIDEO_READY_SLIDES.includes(slideId);
   const chipAspect: ChipAspect = aspect === "landscape" ? "16:9" : "9:16";
   return CHIP_IMAGE_SPECS.filter((spec) => spec.slideId === slideId).map(

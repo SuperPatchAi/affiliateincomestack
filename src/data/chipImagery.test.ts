@@ -15,6 +15,8 @@ import {
   buildPlateRetakePrompt,
   buildPortraitRecomposePrompt,
   chipImagePath,
+  CHIP_CUTOUT_SLIDES,
+  chipCutoutForSlide,
   chipMediaForSlide,
   chipVideoPath,
 } from "./chipImagery";
@@ -208,7 +210,9 @@ describe("chip motion prompts (omni)", () => {
 
 describe("chip media wiring", () => {
   it("returns one entry per chip, in slide order, for ready slides", () => {
-    for (const slideId of CHIP_MEDIA_READY_SLIDES) {
+    for (const slideId of CHIP_MEDIA_READY_SLIDES.filter(
+      (id) => !CHIP_CUTOUT_SLIDES.includes(id),
+    )) {
       const specs = CHIP_IMAGE_SPECS.filter((s) => s.slideId === slideId);
       for (const aspect of ["landscape", "portrait"] as const) {
         const entries = chipMediaForSlide(slideId, aspect);
@@ -236,6 +240,36 @@ describe("chip media wiring", () => {
     }
   });
 
+  it("omits cutout slides from omni backdrop media", () => {
+    expect(chipMediaForSlide("02-world", "landscape")).toEqual([]);
+  });
+});
+
+describe("chip cutout wiring", () => {
+  it("lists 02-world only", () => {
+    expect(CHIP_CUTOUT_SLIDES).toEqual(["02-world"]);
+  });
+
+  it("returns four cutout entries in chip order", () => {
+    const entries = chipCutoutForSlide("02-world", "landscape");
+    expect(entries.map((e) => e.slug)).toEqual([
+      "traditional-jobs",
+      "gig-economy",
+      "creator-economy",
+      "social-commerce",
+    ]);
+    for (const entry of entries) {
+      expect(entry.src).toMatch(/\/02-world\/16x9\/.+\.png$/);
+    }
+  });
+
+  it("returns nothing for title or unknown slides", () => {
+    expect(chipCutoutForSlide("01-title", "landscape")).toEqual([]);
+    expect(chipCutoutForSlide("nope", "portrait")).toEqual([]);
+  });
+});
+
+describe("chip media wiring leftovers", () => {
   it("only lists slides whose assets exist on disk", () => {
     for (const slideId of CHIP_MEDIA_READY_SLIDES) {
       for (const aspect of ["landscape", "portrait"] as const) {
