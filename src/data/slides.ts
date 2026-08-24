@@ -243,8 +243,8 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 20) {
-    throw new Error(`Expected 20 slides, got ${slides.length}`);
+  if (slides.length !== 23) {
+    throw new Error(`Expected 23 slides, got ${slides.length}`);
   }
   for (const s of slides) {
     const heroCaption = s.copyLayout === "hero-caption";
@@ -329,12 +329,12 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Chapter groupings after dropping the 3D logo opener — scenes 01–07, 08–16, 17–19, 20. */
+/** Chapter groupings after dropping the 3D logo opener — scenes 01–10, 11–19, 20–22, 23. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 6 },
-  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 7, sceneEnd: 15 },
-  { id: "momentum", label: "Momentum", sceneStart: 16, sceneEnd: 18 },
-  { id: "action", label: "Action", sceneStart: 19, sceneEnd: 19 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 9 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 10, sceneEnd: 18 },
+  { id: "momentum", label: "Momentum", sceneStart: 19, sceneEnd: 21 },
+  { id: "action", label: "Action", sceneStart: 22, sceneEnd: 22 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -436,6 +436,29 @@ export const SLIDES: Slide[] = [
       "Product trust: point to official Super Patch materials for outcomes — do not invent clinical claims on this slide.",
   },
   {
+    id: "03b-name-stacks",
+    conceptSrc: "/concepts/clean/sp-stack-03b-name-stacks.png",
+    accent: "multi",
+    eyebrow: "The Four Stacks",
+    headline: "Name the system. Own every layer.",
+    body: "Product creates results people feel. Branding creates demand you don't have to chase. Income creates real opportunity at every stage. Development builds the leaders who keep it growing. Four stacks. One company. Nothing left to chance.",
+    annotations: [
+      { text: "PRODUCT", xPct: 20, yPct: 48, sizePct: 4.2, role: "label" },
+      { text: "BRANDING", xPct: 42, yPct: 40, sizePct: 4.2, role: "label" },
+      { text: "INCOME", xPct: 62, yPct: 32, sizePct: 4.2, role: "label" },
+      { text: "DEVELOPMENT", xPct: 80, yPct: 24, sizePct: 3.8, role: "label" },
+    ],
+    chips: [
+      { label: "PRODUCT", sub: "Results people feel and reorder." },
+      { label: "BRANDING", sub: "Demand you don't have to chase." },
+      { label: "INCOME", sub: "Opportunity at every stage of build." },
+      { label: "DEVELOPMENT", sub: "Leaders who keep the system growing." },
+    ],
+    flywheelArc: "all",
+    motionPreset: "pillars-sequence",
+    requiresDisclosure: false,
+  },
+  {
     id: "04-flywheel",
     conceptSrc: "/concepts/clean/sp-stack-04-flywheel.png",
     hero: {
@@ -470,13 +493,13 @@ export const SLIDES: Slide[] = [
     conceptSrc: "/concepts/clean/sp-stack-05-product.png",
     accent: "green",
     eyebrow: "Product Stack",
-    headline: "Better products. Better results. Raving customers.",
+    headline: "More than fifteen targeted solutions.",
     body: "World-class VTT™ patches and innovative wellness solutions that deliver real results. Proprietary technology, backed by science, more than fifteen targeted solutions, trusted by millions. Better products create raving customers — and customers start the Income Stack.",
     annotations: [
-      { text: "PROPRIETARY TECHNOLOGY", xPct: 20, yPct: 28, sizePct: 2.8, role: "label" },
-      { text: "BACKED BY SCIENCE", xPct: 20, yPct: 36, sizePct: 2.8, role: "label" },
-      { text: "15+ SOLUTIONS", xPct: 20, yPct: 44, sizePct: 2.8, role: "label" },
-      { text: "TRUSTED BY MILLIONS", xPct: 20, yPct: 52, sizePct: 2.8, role: "label" },
+      { text: "15+ SOLUTIONS", xPct: 18, yPct: 22, sizePct: 2.8, role: "label" },
+      { text: "PROPRIETARY TECHNOLOGY", xPct: 18, yPct: 30, sizePct: 2.8, role: "label" },
+      { text: "BACKED BY SCIENCE", xPct: 18, yPct: 38, sizePct: 2.8, role: "label" },
+      { text: "TRUSTED BY MILLIONS", xPct: 18, yPct: 46, sizePct: 2.8, role: "label" },
     ],
     chips: [
       { label: "PROPRIETARY TECHNOLOGY", sub: "Vibrotactile trigger technology found nowhere else." },
@@ -488,7 +511,68 @@ export const SLIDES: Slide[] = [
     motionPreset: "node-mesh",
     requiresDisclosure: false,
     presenterNotes:
-      "Product trust: point to official Super Patch materials for outcomes — do not invent clinical claims on this slide.",
+      "Product trust: point to the fifteen-pack lineup and official Super Patch materials for outcomes — do not invent clinical claims on this slide.",
+  },
+  {
+    id: "05b-science",
+    conceptSrc: "/concepts/clean/sp-stack-05b-science.png",
+    accent: "green",
+    eyebrow: "Product Stack",
+    headline: "The Science Behind SuperPatch",
+    body: "Vibrotactile Transduction Technology engages the skin's mechanosensory system through a precisely engineered tactile pattern. When the pattern contacts the skin, it stimulates receptors that convert mechanical input into organized electrical signaling.",
+    annotations: [
+      // Same seats as the source diagram: left column, then right column
+      { text: "VTT", xPct: 16, yPct: 30, sizePct: 3.4, role: "label" },
+      { text: "SKIN", xPct: 16, yPct: 42, sizePct: 3.4, role: "label" },
+      { text: "SKIN RECEPTORS", xPct: 16, yPct: 50, sizePct: 2.6, role: "label" },
+      { text: "OUTER LAYER", xPct: 82, yPct: 28, sizePct: 2.8, role: "label" },
+      { text: "ADHESIVE", xPct: 82, yPct: 36, sizePct: 2.8, role: "label" },
+      { text: "ELECTRICAL SIGNAL TRAVEL", xPct: 82, yPct: 50, sizePct: 2.2, role: "label" },
+    ],
+    chips: [
+      {
+        label: "VTT",
+        sub: "A proprietary pattern of contoured ridges to trigger a neural response",
+      },
+      {
+        label: "SKIN",
+        sub: "Protective sensory barrier for touch, pain, and temperature.",
+      },
+      {
+        label: "SKIN RECEPTORS",
+        sub: "Piezo channels convert physical stimuli into electrical signals.",
+      },
+      {
+        label: "OUTER LAYER",
+        sub: "Designed for 24-hour wear.",
+      },
+      {
+        label: "ADHESIVE",
+        sub: "Water-resistant medical-grade adhesive for all-day hold.",
+      },
+      {
+        label: "SIGNAL TRAVEL",
+        sub: "Through nerves to the spinal pathway and brain to produce a response.",
+      },
+    ],
+    flywheelArc: "product",
+    motionPreset: "node-mesh",
+    requiresDisclosure: false,
+    presenterNotes:
+      "From a clinical standpoint (source art): this mechanism can enhance postural stability, refine motor control, improve sleep quality, and support cognitive focus via endogenous neural pathways — non-pharmacological. Point to official Super Patch materials for clinical claims; do not invent outcomes on this slide.",
+  },
+  {
+    id: "05c-market",
+    conceptSrc: "/concepts/clean/sp-stack-05c-market.png",
+    accent: "cool",
+    eyebrow: "The Opportunity",
+    headline: "$4.7 trillion.",
+    body: "The global wellness economy is one of the largest consumer markets on earth. People spend for sleep, energy, focus, recovery, and longevity. Super Patch sits in that demand with products people feel — and share.",
+    flywheelArc: "product",
+    motionPreset: "ken-burns-glow",
+    requiresDisclosure: false,
+    presenterNotes:
+      "Market context only: cite official Super Patch / approved materials for the $4.7T global wellness figure. Do not invent sources or turn market size into an income promise.",
   },
   {
     id: "06-brand",

@@ -3,10 +3,10 @@ import {
   PRODUCT_PATCH_MODEL_URL,
 } from "../hero3d/patchHero";
 
-/** Product Stack is the remaining live 3D hero after dropping the logo opener. */
+/** No live 3D hero — Product Stack uses the photoreal still plate. */
 export const HERO3D_EXPERIENCE_SLIDE_ID = "05-product";
 
-export const HERO3D_EXPERIENCE_SLIDE_IDS = ["05-product"] as const;
+export const HERO3D_EXPERIENCE_SLIDE_IDS = [] as const;
 
 export function isHero3dExperienceSlide(slideId: string): boolean {
   return (HERO3D_EXPERIENCE_SLIDE_IDS as readonly string[]).includes(slideId);

@@ -18,7 +18,9 @@
     "remotion:compositions": "remotion compositions src/remotion/index.ts",
     "remotion:render": "remotion render src/remotion/index.ts IncomeStackFilm ../../docs/orgs/superpatch/customers/affiliates/initiatives/income-stack-deck/business-idea/15-media/openmontage/income-stack-deck-remotion.mp4",
     "omni:animate": "node scripts/omni-animate-plates.mjs",
-    "verify:omni-assets": "node scripts/verify-omni-assets.mjs"
+    "verify:omni-assets": "node scripts/verify-omni-assets.mjs",
+    "export:pptx": "tsx scripts/export-experience-pptx.ts",
+    "export:pptx:tron": "tsx scripts/export-experience-pptx.ts --tron"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -49,7 +51,9 @@
     "@vitejs/plugin-react": "^6.0.4",
     "jsdom": "^29.1.1",
     "oxlint": "^1.75.0",
+    "pptxgenjs": "^4.0.1",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.12",
     "typescript": "~6.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"

@@ -16,14 +16,17 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 20 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(20);
+  it("has 23 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(23);
     expect(SLIDES.map((s) => s.id)).toEqual([
       "01-title",
       "02-world",
       "03-four-stacks",
+      "03b-name-stacks",
       "04-flywheel",
       "05-product",
+      "05b-science",
+      "05c-market",
       "06-brand",
       "07-development",
       "08-ten-layers",
@@ -180,14 +183,16 @@ describe("SLIDES", () => {
     expect(() => assertSlidesValid(broken)).toThrow(/incomplete end-card/i);
   });
 
-  it("gives every lower-third scene a sequenced chip set (63 chips total)", () => {
+  it("gives every lower-third scene a sequenced chip set (73 chips total)", () => {
     const withChips = SLIDES.filter((s) => (s.chips?.length ?? 0) > 0);
     expect(withChips.map((s) => s.id)).toEqual([
       "01-title",
       "02-world",
       "03-four-stacks",
+      "03b-name-stacks",
       "04-flywheel",
       "05-product",
+      "05b-science",
       "06-brand",
       "07-development",
       "08-ten-layers",
@@ -204,7 +209,7 @@ describe("SLIDES", () => {
       "19-future",
     ]);
     const total = withChips.reduce((n, s) => n + (s.chips?.length ?? 0), 0);
-    expect(total).toBe(63);
+    expect(total).toBe(73);
     expect(SLIDES.find((s) => s.id === "00-super-stack")).toBeUndefined();
     expect(SLIDES.find((s) => s.id === "15-closing")?.chips).toBeUndefined();
   });
@@ -235,7 +240,7 @@ describe("assertSlidesValid chip rules", () => {
     requiresDisclosure: false,
   };
   const stack = (overrides: Partial<Slide>): Slide[] =>
-    Array.from({ length: 20 }, (_, i) =>
+    Array.from({ length: 23 }, (_, i) =>
       i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
     );
 
@@ -329,6 +334,57 @@ describe("plate annotations", () => {
       "INCOME STACK",
       "PERSONAL DEVELOPMENT",
     ]);
+  });
+
+  it("names the four stacks on the platforms beat", () => {
+    expect(byId("03b-name-stacks").annotations?.map((a) => a.text)).toEqual([
+      "PRODUCT",
+      "BRANDING",
+      "INCOME",
+      "DEVELOPMENT",
+    ]);
+    expect(byId("03b-name-stacks").headline).toBe(
+      "Name the system. Own every layer.",
+    );
+  });
+
+  it("locks the science beat to extracted SuperPatch diagram copy", () => {
+    const science = byId("05b-science");
+    expect(science.headline).toBe("The Science Behind SuperPatch");
+    expect(science.body).toMatch(/Vibrotactile Transduction Technology/);
+    expect(science.body).toMatch(/mechanosensory/);
+    expect(science.annotations?.map((a) => a.text)).toEqual([
+      "VTT",
+      "SKIN",
+      "SKIN RECEPTORS",
+      "OUTER LAYER",
+      "ADHESIVE",
+      "ELECTRICAL SIGNAL TRAVEL",
+    ]);
+    expect(science.chips?.map((c) => c.label)).toEqual([
+      "VTT",
+      "SKIN",
+      "SKIN RECEPTORS",
+      "OUTER LAYER",
+      "ADHESIVE",
+      "SIGNAL TRAVEL",
+    ]);
+    // Same side seats as the source diagram: left trio, right trio
+    const byText = Object.fromEntries(
+      science.annotations!.map((a) => [a.text, a]),
+    );
+    for (const left of ["VTT", "SKIN", "SKIN RECEPTORS"]) {
+      expect(byText[left].xPct, left).toBeLessThan(40);
+    }
+    for (const right of ["OUTER LAYER", "ADHESIVE", "ELECTRICAL SIGNAL TRAVEL"]) {
+      expect(byText[right].xPct, right).toBeGreaterThan(60);
+    }
+    expect(byText["VTT"].yPct).toBeLessThan(byText["SKIN"].yPct);
+    expect(byText["SKIN"].yPct).toBeLessThan(byText["SKIN RECEPTORS"].yPct);
+    expect(byText["OUTER LAYER"].yPct).toBeLessThan(byText["ADHESIVE"].yPct);
+    expect(byText["ADHESIVE"].yPct).toBeLessThan(
+      byText["ELECTRICAL SIGNAL TRAVEL"].yPct,
+    );
   });
 
   it("re-declares the flywheel quadrant labels", () => {
@@ -495,6 +551,9 @@ describe("plate annotations", () => {
   it("uses animated hero loops on Omni scenes and omits hero on still-only beats", () => {
     const stillOnly = new Set([
       "02-world",
+      "03b-name-stacks",
+      "05b-science",
+      "05c-market",
       "05-product",
       "06-brand",
       "07-development",

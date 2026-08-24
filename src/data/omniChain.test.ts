@@ -28,18 +28,33 @@ describe("omniChain", () => {
     expect(prompt).not.toMatch(/circular flywheel|energy arcs|multi neon/i);
   });
 
-  it("prompts 01, 02, and 04 as photoreal motion-only, not neon stack warps", () => {
+  it("prompts 01, 02, 04, and 05 as photoreal motion-only, not neon stack warps", () => {
     const title = OMNI_PLATES.find((p) => p.id === "01")!;
     const world = OMNI_PLATES.find((p) => p.id === "02")!;
     const flywheel = OMNI_PLATES.find((p) => p.id === "04")!;
+    const product = OMNI_PLATES.find((p) => p.id === "05")!;
     expect(title.photoreal).toBe(true);
     expect(world.photoreal).toBe(true);
     expect(flywheel.photoreal).toBe(true);
+    expect(product.photoreal).toBe(true);
     expect(world.slug).toBe("world");
     expect(world.plateFile).toBe("sp-stack-02-world.png");
     expect(flywheel.slug).toBe("flywheel");
     expect(flywheel.plateFile).toBe("sp-stack-04-flywheel.png");
-    for (const plate of [title, world, flywheel]) {
+    expect(product.slug).toBe("product");
+    expect(product.plateFile).toBe("sp-stack-05-product.png");
+    expect(product.useRetakeStill).toBe(true);
+    expect(product.motion.toLowerCase()).toMatch(/pouch|pinch|grip/);
+    expect(product.motion.toLowerCase()).toMatch(/one-hand|one-arm|second hand/);
+    expect(product.motion.toLowerCase()).toMatch(/do not.*pouch|exact pouch|keep the pouch/);
+    expect(product.motion.toLowerCase()).not.toMatch(/mesh|ecosystem|neon/);
+    expect(omniPlateFirstFramePath(product, "16:9")).toBe(
+      "public/concepts/clean-retakes/16x9/sp-stack-05-product.png",
+    );
+    expect(omniPlateFirstFramePath(product, "9:16")).toBe(
+      "public/concepts/clean-retakes/16x9/sp-stack-05-product.png",
+    );
+    for (const plate of [title, world, flywheel, product]) {
       const prompt = buildOmniPrompt(plate);
       expect(prompt).toMatch(/motion only/i);
       expect(prompt).toContain(plate.motion);

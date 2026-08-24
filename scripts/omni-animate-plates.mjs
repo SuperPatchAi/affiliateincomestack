@@ -206,7 +206,9 @@ async function generateAspect(aspect, plates, apiKey, { forceAll, nums }) {
     );
     const firstFrameRel = plate.construct && plate.startStill
       ? join("public/concepts/clean-retakes", aspectDir(aspect), plate.startStill)
-      : join("public/concepts/clean", plate.plateFile);
+      : plate.useRetakeStill
+        ? join("public/concepts/clean-retakes/16x9", plate.plateFile)
+        : join("public/concepts/clean", plate.plateFile);
     const platePath = join(APP, firstFrameRel);
     const destWide = join(CLEAN, plate.plateFile);
     const destPortrait = join(

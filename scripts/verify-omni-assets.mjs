@@ -15,7 +15,7 @@ const PLATES = [
   ["02", "world"],
   ["03", "four-stacks"],
   ["04", "flywheel"],
-  ["05", "ecosystem"],
+  ["05", "product"],
   ["06", "ten-layers"],
   ["07", "retail"],
   ["08", "fast-start"],

@@ -12,6 +12,8 @@ export type OmniPlate = {
   construct?: boolean;
   /** Filename under public/concepts/clean-retakes/<aspect>/. */
   startStill?: string;
+  /** Use the approved clean-retake still for this aspect instead of clean/. */
+  useRetakeStill?: boolean;
 };
 
 export const OMNI_PHOTOREAL_LOCK =
@@ -74,11 +76,13 @@ export const OMNI_PLATES: OmniPlate[] = [
   },
   {
     id: "05",
-    slug: "ecosystem",
-    plateFile: "sp-stack-05-ecosystem.png",
-    accent: "violet",
+    slug: "product",
+    plateFile: "sp-stack-05-product.png",
+    photoreal: true,
+    useRetakeStill: true,
+    accent: "late-morning sun on skin, stone, and the Freedom pouch",
     motion:
-      "a node mesh pulses outward from center as connections brighten; settle as a glowing network",
+      "The subject holds the pouch in the same one-hand pinch — thumb on the front of the top seal, fingers behind. Do not add a second hand. Do not pull the pouch to the chest. Keep the exact pouch — do not redraw, restyle, or replace it. A breath. The face stays soft. Same face, same clothing. The camera holds a slow, almost still drift.",
   },
   {
     id: "06",
@@ -187,6 +191,9 @@ export function omniPlateFirstFramePath(
 ): string {
   if (plate.construct && plate.startStill) {
     return `public/concepts/clean-retakes/${aspectDir(aspect)}/${plate.startStill}`;
+  }
+  if (plate.useRetakeStill) {
+    return `public/concepts/clean-retakes/16x9/${plate.plateFile}`;
   }
   return `public/concepts/clean/${plate.plateFile}`;
 }

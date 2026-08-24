@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  HERO3D_EXPERIENCE_SLIDE_ID,
+  HERO3D_EXPERIENCE_SLIDE_IDS,
   canUseWebGL,
   hero3dCompactScaleMul,
   hero3dModelUrl,
@@ -9,12 +9,12 @@ import {
 } from "./hero3dExperienceSlide";
 
 describe("hero3dExperienceSlide", () => {
-  it("targets only Product Stack for the live 3D hero", () => {
-    expect(HERO3D_EXPERIENCE_SLIDE_ID).toBe("05-product");
-    expect(isHero3dExperienceSlide("05-product")).toBe(true);
+  it("does not mount a live 3D hero on Product Stack", () => {
+    expect(isHero3dExperienceSlide("05-product")).toBe(false);
     expect(isHero3dExperienceSlide("00-super-stack")).toBe(false);
     expect(isHero3dExperienceSlide("01-title")).toBe(false);
     expect(isHero3dExperienceSlide("06-brand")).toBe(false);
+    expect(HERO3D_EXPERIENCE_SLIDE_IDS).toEqual([]);
   });
 
   it("uses the 3D patch on Product Stack", () => {

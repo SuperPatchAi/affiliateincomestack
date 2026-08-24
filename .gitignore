@@ -26,3 +26,4 @@ pnpm-debug.log*
 public/concepts/animated/veo-batch-summary.json
 yarn-debug.log*
 yarn-error.log*
+exports/*.pptx

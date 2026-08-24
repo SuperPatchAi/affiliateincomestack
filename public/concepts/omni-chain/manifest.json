@@ -1,19 +1,19 @@
 {
   "model": "gemini-omni-flash-preview",
-  "generatedAt": "2026-08-18T20:27:09.632Z",
+  "generatedAt": "2026-08-19T16:35:56.598Z",
   "aspects": [
-    "9:16"
+    "16:9"
   ],
   "results": [
     {
-      "id": "04",
-      "aspect": "9:16",
+      "id": "05",
+      "aspect": "16:9",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/9x16/sp-stack-04-flywheel_omni.mp4",
-      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/9x16/sp-stack-04-flywheel_last.png",
-      "interaction_id": "v1_ChdGY0NFYXNxTU5JeU1qckVQeE9XLWtRbxIXRmNDRWFzcU1OSXlNanJFUHhPVy1rUW8",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/16x9/sp-stack-05-product_omni.mp4",
+      "bridge": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/omni-chain/bridges/16x9/sp-stack-05-product_last.png",
+      "interaction_id": "v1_ChdaTnVGYXBXaEx1R2FfdU1QanYyV3VRbxIXWk51RmFwV2hMdUdhX3VNUGp2Mld1UW8",
       "cost_usd": 0.8,
-      "duration_seconds": 48.51
+      "duration_seconds": 60.59
     }
   ],
   "okCount": 1,

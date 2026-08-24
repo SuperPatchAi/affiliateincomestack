@@ -7,15 +7,26 @@
  * Usage (from the app root):
  *   node scripts/generate-chip-images.mjs 01-title                 # one slide, 16:9
  *   node scripts/generate-chip-images.mjs 01-title --aspect 9:16   # mobile
+ *   node scripts/generate-chip-images.mjs 04-flywheel products-create-customers
  *   node scripts/generate-chip-images.mjs --all --aspect both      # everything
- *   node scripts/generate-chip-images.mjs --retakes                # 4 off-style plates
+ *   node scripts/generate-chip-images.mjs --retakes                # daylight plate retakes
+ *   node scripts/generate-chip-images.mjs --neon-city              # neon restyle of photoreal titles
+ *   node scripts/generate-chip-images.mjs --neon-city 05-product --force
  *   node scripts/generate-chip-images.mjs 01-title --force         # regenerate
  *
  * Requires GEMINI_API_KEY (or GOOGLE_API_KEY) in repo-root .env.local.
  * Outputs: public/concepts/chips/<slideId>/<16x9|9x16>/<slug>.png
  *          public/concepts/clean-retakes/<16x9|9x16>/<plateFile>   (retakes mode)
+ *          public/concepts/clean-neon-city/<16x9|9x16>/<plateFile> (neon-city mode)
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -25,6 +36,8 @@ const REPO = resolve(APP, "../..");
 const CLEAN = join(APP, "public/concepts/clean");
 const CHIP_OUT = join(APP, "public/concepts/chips");
 const RETAKE_OUT = join(APP, "public/concepts/clean-retakes");
+const NEON_CITY_OUT = join(APP, "public/concepts/clean-neon-city");
+const CONCEPTS = join(APP, "public/concepts");
 const MANIFEST_PATH = join(CHIP_OUT, "manifest.json");
 
 const MODEL = process.env.GEMINI_IMAGE_MODEL || "gemini-3.1-flash-image";
@@ -38,10 +51,16 @@ const RETAKE_REFS = {
   "sp-stack-01-title.png": [],
   "sp-stack-02-world.png": [],
   "sp-stack-03-four-stacks.png": [],
-  "sp-stack-13-executive.png": ["sp-stack-08-fast-start.png", "sp-stack-07-development.png"],
-  "sp-stack-19-future.png": ["sp-stack-08-fast-start.png", "sp-stack-06-ten-layers.png"],
-  "sp-stack-15-closing.png": ["sp-stack-08-fast-start.png", "sp-stack-12-generations.png"],
-  "sp-stack-18-different.png": ["sp-stack-01-title.png", "sp-stack-03-four-stacks.png"],
+  "sp-stack-05-product.png": [],
+  "sp-stack-08-fast-start.png": [],
+  "sp-stack-09-team-overrides.png": [],
+  "sp-stack-10-unlimited-depth.png": [],
+  "sp-stack-11-vp-override.png": [],
+  "sp-stack-12-generations.png": [],
+  "sp-stack-13-executive.png": [],
+  "sp-stack-18-different.png": [],
+  "sp-stack-19-future.png": [],
+  "sp-stack-15-closing.png": [],
 };
 
 function loadEnvLocal() {
@@ -95,6 +114,8 @@ async function generateImage({
   aspect,
   styled,
   recompose = false,
+  identityRef = false,
+  packIdentity = false,
 }) {
   const portraitNote =
     aspect === "9:16" && !recompose
@@ -112,9 +133,19 @@ async function generateImage({
   // model to re-frame the attached photograph, so no style-only note applies.
   const refNote =
     refPaths.length > 0 && !recompose
-      ? " Use the attached reference images strictly as the style, " +
-        "palette, lighting, and reflection guide. Compose a brand new scene; " +
-        "do not copy the reference composition."
+      ? packIdentity
+        ? " The first attached image is the official pouch. Keep that packaging " +
+          "unaltered — do not redraw or restyle it. If a second image is attached, " +
+          "it is the same man; keep his face, hair, clothes, and one-arm pose. " +
+          "Generate one new photograph of him holding the official pouch. " +
+          "Do not paste the pouch on afterwards."
+        : identityRef
+          ? " The attached image is a product or brand-mark identity reference only. " +
+            "Compose a brand-new photograph; do not copy the reference composition, " +
+            "camera, or backdrop."
+          : " Use the attached reference images strictly as the style, " +
+            "palette, lighting, and reflection guide. Compose a brand new scene; " +
+            "do not copy the reference composition."
       : "";
   const parts = [
     ...refPaths.map(imagePart),
@@ -181,6 +212,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const force = argv.includes("--force");
   const retakesMode = argv.includes("--retakes");
+  const neonCityMode = argv.includes("--neon-city");
   const all = argv.includes("--all");
   const aspectIdx = argv.indexOf("--aspect");
   const aspectArg = aspectIdx !== -1 ? argv[aspectIdx + 1] : "16:9";
@@ -201,9 +233,17 @@ async function main() {
   const {
     CHIP_IMAGE_SPECS,
     PLATE_RETAKES,
+    NEON_CITY_PLATE_RETAKES,
+    NEON_CITY_EXISTING_FITS,
     buildChipImagePrompt,
     buildPlateRetakePrompt,
+    buildNeonCityFromPhotorealPrompt,
     buildPlatePatchEditPrompt,
+    buildPlateRemoveArmPatchPrompt,
+    buildCompoundingScreenMarkEditPrompt,
+    buildProductPackCompositePrompt,
+    buildProductPackGripEditPrompt,
+    buildProductPackHealPrompt,
     buildProductPatchScaleEditPrompt,
     buildPortraitRecomposePrompt,
     buildHarborConstructionStartPrompt,
@@ -270,6 +310,112 @@ async function main() {
     return;
   }
 
+  if (argv.includes("--grip-pack")) {
+    const scenePath = join(RETAKE_OUT, "16x9", "sp-stack-05-product.png");
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    const prompt = buildProductPackGripEditPrompt();
+    console.log("grip-pack: sp-stack-05-product.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    return;
+  }
+
+  if (argv.includes("--heal-pack")) {
+    const scenePath = join(RETAKE_OUT, "16x9", "sp-stack-05-product.png");
+    const pouchPath = join(APP, "public/concepts/refs/na-sp-freedom-30pk.png");
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    if (!existsSync(pouchPath)) throw new Error(`missing ${pouchPath}`);
+    const prompt = buildProductPackHealPrompt();
+    console.log("heal-pack: sp-stack-05-product.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath, pouchPath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+        identityRef: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    return;
+  }
+
+  if (argv.includes("--pack-composite")) {
+    const scenePath = join(RETAKE_OUT, "16x9", "sp-stack-05-product.png");
+    const pouchPath = join(APP, "public/concepts/refs/na-sp-freedom-30pk.png");
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    if (!existsSync(pouchPath)) throw new Error(`missing ${pouchPath}`);
+    const prompt = buildProductPackCompositePrompt();
+    console.log("pack-composite: sp-stack-05-product.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath, pouchPath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+        identityRef: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    return;
+  }
+
+  if (argv.includes("--remove-arm-patch")) {
+    const scenePath = join(CLEAN, "sp-stack-01-title.png");
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    const prompt = buildPlateRemoveArmPatchPrompt();
+    console.log("remove-arm-patch: sp-stack-01-title.png");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    console.log(`  wrote ${scenePath}`);
+    const retake16 = join(RETAKE_OUT, "16x9", "sp-stack-01-title.png");
+    mkdirSync(dirname(retake16), { recursive: true });
+    writeFileSync(retake16, readFileSync(scenePath));
+    console.log(`  wrote ${retake16}`);
+    // Recompose portrait from the healed landscape still.
+    const retake9 = join(RETAKE_OUT, "9x16", "sp-stack-01-title.png");
+    mkdirSync(dirname(retake9), { recursive: true });
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt:
+          "Recompose the attached photograph into a vertical phone-screen frame. Keep the same person with bare upper arms, same city, lighting, and no wearable on the arm. Fill the frame edge to edge with no letterboxing.",
+        refPaths: [scenePath],
+        outPath: retake9,
+        aspect: "9:16",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    console.log(`  wrote ${retake9}`);
+    return;
+  }
+
   if (argv.includes("--patch-edit")) {
     const scenePath = join(CLEAN, "sp-stack-01-title.png");
     const patchPath = join(APP, "public/concepts/refs/superpatch-freedom.png");
@@ -292,6 +438,39 @@ async function main() {
     return;
   }
 
+  if (argv.includes("--compounding-screens")) {
+    const chipPath = join(
+      APP,
+      "public/concepts/chips/05-product/16x9/trusted-by-millions.png",
+    );
+    const cleanPath = join(CLEAN, "sp-stack-17-compounding.png");
+    const markPath = join(APP, "public/brand/superpatch-horizontal-wordmark.png");
+    if (!existsSync(chipPath)) throw new Error(`missing ${chipPath}`);
+    if (!existsSync(markPath)) throw new Error(`missing ${markPath}`);
+    const prompt = buildCompoundingScreenMarkEditPrompt();
+    console.log("compounding-screens: trusted-by-millions + clean compounding");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [chipPath, markPath],
+        outPath: chipPath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    mkdirSync(dirname(cleanPath), { recursive: true });
+    writeFileSync(cleanPath, readFileSync(chipPath));
+    const retakePath = join(RETAKE_OUT, "16x9", "sp-stack-17-compounding.png");
+    mkdirSync(dirname(retakePath), { recursive: true });
+    writeFileSync(retakePath, readFileSync(chipPath));
+    console.log(`  wrote ${chipPath}`);
+    console.log(`  wrote ${cleanPath}`);
+    console.log(`  wrote ${retakePath}`);
+    return;
+  }
+
   if (retakesMode) {
     // Optional slide-id args narrow which retakes run (e.g. --retakes 02-world).
     const retakes =
@@ -308,12 +487,23 @@ async function main() {
         const wideRetake = join(RETAKE_OUT, "16x9", retake.plateFile);
         const recompose =
           aspect === "9:16" && existsSync(wideRetake) && Boolean(retake.style);
+        const pouchPath = join(APP, "public/concepts/refs/na-sp-freedom-30pk.png");
+        const styleRefs = (RETAKE_REFS[retake.plateFile] ?? []).map((f) =>
+          join(CLEAN, f),
+        );
+        const packRefs = [pouchPath];
         const refPaths = recompose
           ? [wideRetake]
-          : (RETAKE_REFS[retake.plateFile] ?? []).map((f) => join(CLEAN, f));
+          : retake.allowProductPack
+            ? [...packRefs, ...styleRefs]
+            : styleRefs;
         const prompt = recompose
-          ? buildPortraitRecomposePrompt(retake)
-          : buildPlateRetakePrompt(retake);
+          ? retake.allowProductPack
+            ? buildPortraitRecomposePrompt(retake)
+            : `${buildPortraitRecomposePrompt(retake)} Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed.`
+          : retake.slideId === "06-brand"
+            ? `${buildPlateRetakePrompt(retake)} Documentary campaign-street photograph. Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed. Screens stay blank soft shapes.`
+            : buildPlateRetakePrompt(retake);
         console.log(
           `retake: ${aspectDir(aspect)}/${retake.plateFile}${recompose ? " (recompose)" : ""}`,
         );
@@ -326,6 +516,8 @@ async function main() {
             aspect,
             styled: Boolean(retake.style),
             recompose,
+            identityRef: Boolean(retake.allowProductPack),
+            packIdentity: Boolean(retake.allowProductPack),
           }),
         );
         manifest.entries[`retake:${aspectDir(aspect)}/${retake.plateFile}`] = {
@@ -342,12 +534,136 @@ async function main() {
     return;
   }
 
-  const specs = CHIP_IMAGE_SPECS.filter(
-    (spec) => all || slideIds.includes(spec.slideId),
-  );
+  if (neonCityMode) {
+    const retakes =
+      slideIds.length > 0
+        ? NEON_CITY_PLATE_RETAKES.filter((r) => slideIds.includes(r.slideId))
+        : NEON_CITY_PLATE_RETAKES;
+    mkdirSync(join(NEON_CITY_OUT, "16x9"), { recursive: true });
+    mkdirSync(join(NEON_CITY_OUT, "9x16"), { recursive: true });
+
+    // Promote composition-matched existing neon stills (skip Gemini).
+    for (const retake of retakes) {
+      const fitRel = NEON_CITY_EXISTING_FITS[retake.plateFile];
+      if (!fitRel) continue;
+      const src = join(CONCEPTS, fitRel);
+      if (!existsSync(src)) {
+        throw new Error(`Missing neon fit source: ${fitRel}`);
+      }
+      for (const aspect of aspects) {
+        if (aspect !== "16:9") continue; // fits are landscape; regenerate 9:16 later if needed
+        const outPath = join(NEON_CITY_OUT, aspectDir(aspect), retake.plateFile);
+        if (existsSync(outPath) && !force) {
+          console.log(`skip fit (exists): ${aspectDir(aspect)}/${retake.plateFile}`);
+          continue;
+        }
+        copyFileSync(src, outPath);
+        console.log(`fit → neon-city: ${retake.plateFile} ← ${fitRel}`);
+        // Update the live presentation plate for composition-matched fits only.
+        copyFileSync(src, join(CLEAN, retake.plateFile));
+        console.log(`  updated clean/${retake.plateFile}`);
+      }
+    }
+
+    for (const aspect of aspects) {
+      for (const retake of retakes) {
+        if (NEON_CITY_EXISTING_FITS[retake.plateFile] && aspect === "16:9") {
+          continue; // already promoted
+        }
+        const outPath = join(NEON_CITY_OUT, aspectDir(aspect), retake.plateFile);
+        if (existsSync(outPath) && !force) {
+          console.log(`skip (exists): neon-city/${aspectDir(aspect)}/${retake.plateFile}`);
+          continue;
+        }
+        const photoreal = join(CLEAN, retake.plateFile);
+        const wideNeon = join(NEON_CITY_OUT, "16x9", retake.plateFile);
+        const recompose = aspect === "9:16" && existsSync(wideNeon);
+        const composeFromPhotoreal = retake.composeFromPhotoreal !== false;
+        let refPaths = [];
+        if (recompose) {
+          refPaths = [wideNeon];
+        } else if (composeFromPhotoreal) {
+          if (!existsSync(photoreal)) {
+            throw new Error(`Missing photoreal reference: ${photoreal}`);
+          }
+          refPaths = [photoreal];
+        } else if (retake.allowScienceDiagram) {
+          // Science void stage — do not style-lock to neon city title plates.
+          refPaths = [];
+        } else if (retake.skipNeonStyleLock) {
+          // Fresh compose without title/world terrace-or-city pulls.
+          refPaths = [];
+        } else {
+          // Fresh neon compose — style-lock to approved neon titles, not alpine photoreal.
+          for (const stylePlate of [
+            "sp-stack-01-title.png",
+            "sp-stack-02-world.png",
+            "sp-stack-07-development.png",
+          ]) {
+            const p = join(NEON_CITY_OUT, "16x9", stylePlate);
+            const fallback = join(CLEAN, stylePlate);
+            if (existsSync(p)) refPaths.push(p);
+            else if (existsSync(fallback)) refPaths.push(fallback);
+          }
+        }
+        for (const rel of retake.extraRefs ?? []) {
+          const extra = join(APP, "public", rel.replace(/^\//, ""));
+          if (!existsSync(extra)) {
+            throw new Error(`Missing neon extraRef: ${extra}`);
+          }
+          refPaths.push(extra);
+        }
+        const prompt = recompose
+          ? `${buildNeonCityFromPhotorealPrompt(retake)} Vertical portrait recomposition of the attached neon still — fill the frame edge to edge, no letterboxing.`
+          : buildNeonCityFromPhotorealPrompt(retake);
+        console.log(
+          `neon-city: ${aspectDir(aspect)}/${retake.plateFile}${recompose ? " (recompose)" : composeFromPhotoreal ? " (from photoreal)" : " (fresh neon)"}`,
+        );
+        await withRetries(() =>
+          generateImage({
+            apiKey,
+            prompt,
+            refPaths,
+            outPath,
+            aspect,
+            styled: true,
+            recompose,
+          }),
+        );
+        // Keep photoreal clean/ intact for review — only write neon-city outputs here.
+        manifest.entries[`neon-city:${aspectDir(aspect)}/${retake.plateFile}`] = {
+          prompt,
+          refs: refPaths,
+          out: outPath,
+          aspect,
+          generatedAt: new Date().toISOString(),
+        };
+        saveManifest(manifest);
+        console.log(`  wrote ${outPath}`);
+      }
+    }
+    return;
+  }
+
+  const knownSlideIds = new Set(CHIP_IMAGE_SPECS.map((spec) => spec.slideId));
+  const knownSlugs = new Set(CHIP_IMAGE_SPECS.map((spec) => spec.slug));
+  const requestedSlides = slideIds.filter((id) => knownSlideIds.has(id));
+  const requestedSlugs = slideIds.filter((id) => knownSlugs.has(id));
+  const specs = CHIP_IMAGE_SPECS.filter((spec) => {
+    if (all) return true;
+    if (requestedSlugs.length > 0 && requestedSlides.length > 0) {
+      return (
+        requestedSlides.includes(spec.slideId) &&
+        requestedSlugs.includes(spec.slug)
+      );
+    }
+    if (requestedSlugs.length > 0) return requestedSlugs.includes(spec.slug);
+    if (requestedSlides.length > 0) return requestedSlides.includes(spec.slideId);
+    return false;
+  });
   if (specs.length === 0) {
     console.error(
-      "No chips selected. Pass slide ids (e.g. 01-title), --all, or --retakes.",
+      "No chips selected. Pass slide ids (e.g. 01-title), --all, --retakes, or --neon-city.",
     );
     process.exit(1);
   }
@@ -382,19 +698,65 @@ async function main() {
         if (prev && existsSync(prev)) refPaths.push(prev);
       }
 
+      const patchPath = join(APP, "public/concepts/refs/superpatch-freedom.png");
       if (
-        spec.slug === "product-stack" &&
+        (spec.slug === "product-stack" || spec.slug === "proprietary-technology") &&
         !recompose &&
-        existsSync(join(APP, "public/concepts/refs/superpatch-freedom.png"))
+        existsSync(patchPath)
       ) {
-        refPaths.push(join(APP, "public/concepts/refs/superpatch-freedom.png"));
+        refPaths.push(patchPath);
+      }
+      const varietyDir = join(APP, "public/concepts/refs/patches");
+      if (spec.slug === "many-solutions" && !recompose && existsSync(varietyDir)) {
+        for (const name of readdirSync(varietyDir).toSorted()) {
+          if (name.endsWith(".png")) refPaths.push(join(varietyDir, name));
+        }
+      }
+      const markPath = join(
+        APP,
+        "public/brand/superpatch-horizontal-wordmark.png",
+      );
+      if (
+        (spec.slug === "marketing-creates-demand" ||
+          spec.slug === "pro-sports" ||
+          spec.slug === "trusted-by-millions") &&
+        !recompose &&
+        existsSync(markPath)
+      ) {
+        refPaths.push(markPath);
+      }
+      const pressRowPath = join(APP, "public/concepts/refs/press-row.png");
+      if (spec.slug === "global-media" && !recompose && existsSync(pressRowPath)) {
+        refPaths.push(pressRowPath);
       }
 
       const prompt = recompose
         ? buildPortraitRecomposePrompt(spec)
         : spec.slug === "product-stack"
           ? `${buildChipImagePrompt(spec, aspect)} The last attached image is the SuperPatch product still. Match that exact white rounded-square patch with red repeating marks and a clear fingerprint gel on the forearm. Ignore any watermark or black backdrop. Do not invent a beige oval.`
-          : buildChipImagePrompt(spec, aspect);
+          : spec.slug === "proprietary-technology"
+            ? `${buildChipImagePrompt(spec, aspect)} The last attached image is the SuperPatch product still. Place that exact white rounded-square patch with red repeating marks and a clear fingerprint gel inside the locked glass case. Ignore any watermark or black backdrop. Do not invent a beige oval. The vitrine and lock are the hero.`
+            : spec.slug === "backed-by-science"
+              ? `${buildChipImagePrompt(spec, aspect)} Documentary sports-science photograph. The treadmill runner and the lab-coat clinician are the hero. Monitors stay blank soft shapes.`
+              : spec.slug === "many-solutions"
+                ? `${buildChipImagePrompt(spec, aspect)} The attached images are official Super Patch variants. Place those exact patches in the tray — mixed colors and marks, several different designs visible at once. Ignore watermarks and black backdrops. Do not redraw them all as one red patch. The mixed assortment on the tray is the hero.`
+                : spec.slug === "trusted-by-millions"
+                  ? `${buildChipImagePrompt(spec, aspect)} Documentary concert-stadium photograph. A live event with a stage and one speaker — not a sports match, no grass pitch, no goals. The packed stands facing the stage are the hero. The last attached image is the Super Patch mark — place that exact mark large and sharp on the stage LED screens (backdrop, side screen, overhead ribbon) in light or white.`
+                : spec.slug === "retail-digital"
+                  ? `${buildChipImagePrompt(spec, aspect)} Documentary high-street photograph. The open flagship storefront is the hero — people walking in through the doors. Windows stay blank soft glass. Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed.`
+                : spec.slug === "global-media"
+                  ? `${buildChipImagePrompt(spec, aspect)} Dusk at the Shibuya scramble in downtown Tokyo — Japanese crossing paint, Japanese street lamps, glass towers. Not New York and not Times Square. The last attached still is the exact press row — CBS, Forbes, NBC, Fortune, Fox, MarketWatch, Medium, Yahoo Finance. Put those marks huge and bold on giant LED billboards that fill the canyon. No extra brand marks. Wet stone, cobalt sky, crimson and amber city glow. One person in the street for scale. Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed.`
+                : spec.slug === "pro-sports"
+                  ? `${buildChipImagePrompt(spec, aspect)} Packed NFL stadium during a live American football game. The last attached image is the Super Patch mark. Place that exact mark huge and sharp on the scoreboard — the scoreboard is the focus. Packed stands and the play on the field stay soft and blurred. Not a running track. Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed.`
+                : spec.slug === "top-creators"
+                  ? `${buildChipImagePrompt(spec, aspect)} Documentary live-taping still in a sunlit loft, not a red carpet and not a sidewalk crush. One creator in everyday athleisure facing a camera on a tripod. A dense crowd of fans watches the taping, some phones raised. Blank phone and camera glass. Unrecognizable real faces — pores, laugh lines, wrinkles, a stray blemish. Not a movie star, not CGI, not a beauty campaign, not plastic. Not a concert, not a stadium.`
+                : spec.slideId === "06-brand"
+                  ? `${buildChipImagePrompt(spec, aspect)} Documentary photograph. Lived-in adult faces — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed. Screens and windows stay blank soft shapes.`
+            : spec.slug === "products-create-customers"
+            ? `${buildChipImagePrompt(spec, aspect)} Documentary street photograph, not a styled campaign. Real people in varied everyday clothing — do not dress the line in matching coral and cobalt. Do not unify the street into one brand color. The long London high-street queue in front of the flagship store is the hero.`
+            : spec.slug === "marketing-creates-demand"
+              ? `${buildChipImagePrompt(spec, aspect)} The last attached image is the Super Patch mark. Place that exact mark on one giant screen only. Every other screen is a blank glow.`
+              : buildChipImagePrompt(spec, aspect);
       console.log(
         `chip: ${spec.slideId}/${spec.slug} ${aspect} (${refPaths.length} refs${recompose ? ", recompose" : ""})`,
       );
@@ -407,6 +769,12 @@ async function main() {
           aspect,
           styled: Boolean(spec.style),
           recompose,
+          identityRef:
+            spec.slug === "marketing-creates-demand" ||
+            spec.slug === "proprietary-technology" ||
+            spec.slug === "many-solutions" ||
+            spec.slug === "global-media" ||
+            spec.slug === "pro-sports",
         }),
       );
       prevBySlide.set(spec.slideId, outPath);

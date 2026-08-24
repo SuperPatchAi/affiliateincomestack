@@ -49,8 +49,8 @@ describe("remotion timeline", () => {
     );
   });
 
-  it("keeps the film on the 20-scene cut without the hero-caption scene", () => {
-    expect(FILM_SLIDES).toHaveLength(20);
+  it("keeps the film on the 23-scene cut without the hero-caption scene", () => {
+    expect(FILM_SLIDES).toHaveLength(23);
     expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00-super-stack");
     expect(FILM_SLIDES[0].id).toBe("01-title");
   });
