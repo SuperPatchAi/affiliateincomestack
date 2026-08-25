@@ -34,6 +34,7 @@ import {
   buildPlateRetakePrompt,
   buildNeonCityFromPhotorealPrompt,
   buildPlatePatchEditPrompt,
+  buildEraPatchDepthEditPrompt,
   buildPlateRemoveArmPatchPrompt,
   buildCompoundingScreenMarkEditPrompt,
   buildProductPackCompositePrompt,
@@ -871,6 +872,16 @@ describe("plate retakes", () => {
     expect(prompt).toMatch(/do not redraw/i);
     expect(prompt).toMatch(/exact/i);
     expect(prompt).toMatch(/pouch/i);
+  });
+
+  it("edits the era plate with lighting-only depth on the locked Freedom seal", () => {
+    const prompt = buildEraPatchDepthEditPrompt();
+    expect(prompt).toMatch(/locked master|do not reframe/i);
+    expect(prompt).toMatch(/Freedom seal|fingerprint/i);
+    expect(prompt).toMatch(/do not redraw/i);
+    expect(prompt).toMatch(/bevel|rim light|contact shadow/i);
+    expect(prompt).toMatch(/white face|opaque white/i);
+    expect(prompt).toContain(OMNI_TEXT_BAN);
   });
 
   it("edits the title plate by swapping only the arm patch for the product still", () => {

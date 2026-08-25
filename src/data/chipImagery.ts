@@ -483,6 +483,19 @@ export function buildCompoundingScreenMarkEditPrompt(): string {
   ].join(" ");
 }
 
+/** Edit the era opener so the composited Freedom seal reads more 3D — lighting only. */
+export function buildEraPatchDepthEditPrompt(): string {
+  return [
+    "The first attached photograph is the locked master frame — do not reframe, crop, zoom, tilt, or change camera angle.",
+    "Keep the exact neon night city, wet terrace, glass rail, skyline, depth of field, and composition identical.",
+    "The white rounded-square Freedom seal already in the scene must stay in the same place and size.",
+    "The second attached image is the exact Freedom seal identity — white face, red diamond-S and circle-X print, clear fingerprint gel center. Keep every printed mark identical. Do not redraw, restyle, recolor, or invent new lettering. Ignore any watermark or black backdrop on the second image.",
+    "Lighting edit only on that seal: give it subtle physical thickness — soft bevel on the rounded edges, a thin cyan-magenta neon rim light catching the top and side edges, a soft contact shadow and faint wet-floor reflection under the seal so it floats just above the terrace. Keep the white face opaque white.",
+    "Change nothing else in the photograph. No people, no extra products, no readable text.",
+    OMNI_TEXT_BAN,
+  ].join(" ");
+}
+
 /** Edit the approved title still so only the arm wearable matches the product photo. */
 export function buildPlatePatchEditPrompt(): string {
   return [

@@ -239,6 +239,7 @@ async function main() {
     buildPlateRetakePrompt,
     buildNeonCityFromPhotorealPrompt,
     buildPlatePatchEditPrompt,
+    buildEraPatchDepthEditPrompt,
     buildPlateRemoveArmPatchPrompt,
     buildCompoundingScreenMarkEditPrompt,
     buildProductPackCompositePrompt,
@@ -413,6 +414,38 @@ async function main() {
       }),
     );
     console.log(`  wrote ${retake9}`);
+    return;
+  }
+
+  if (argv.includes("--era-depth")) {
+    const scenePath = join(CLEAN, "sp-stack-00-era.png");
+    const patchPath = join(
+      APP,
+      "public/concepts/refs/packages/Patch_Freedom_NoPeel_RGB.png",
+    );
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    if (!existsSync(patchPath)) throw new Error(`missing ${patchPath}`);
+    const backup = `${scenePath}.pre-depth`;
+    if (!existsSync(backup)) {
+      copyFileSync(scenePath, backup);
+      console.log(`backup: ${backup}`);
+    }
+    const prompt = buildEraPatchDepthEditPrompt();
+    console.log("era-depth: sp-stack-00-era.png (lighting only)");
+    await withRetries(() =>
+      generateImage({
+        apiKey,
+        prompt,
+        refPaths: [scenePath, patchPath],
+        outPath: scenePath,
+        aspect: "16:9",
+        styled: true,
+        recompose: true,
+      }),
+    );
+    // Keep tron in sync for PPTX tron variant.
+    copyFileSync(scenePath, join(APP, "public/concepts/clean-tron/sp-stack-00-era.png"));
+    console.log(`  wrote ${scenePath}`);
     return;
   }
 
