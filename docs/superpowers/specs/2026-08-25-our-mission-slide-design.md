@@ -26,15 +26,13 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 | Accent | cool |
 | copyLayout | `headline-only` |
 
-## Plate — Concept A (Horizon overlook)
+## Plate — Concept B (Constellation of lives)
 
-- Neon night-city family (cyan / magenta / amber, wet reflections, deep blacks)
-- Empty rain-slicked terrace / glass balcony overlooking the metropolis
-- No people, no figures, no products, no packages, no Freedom seal
-- Quiet darker **left** third for the headline; city glow and skyline hold center-right
-- No readable text / signage in the image
+- Neon night field: soft anonymous cyan / magenta / warm amber points of light linking into a connected network above a distant metropolis
+- Quiet darker **left** third for the headline
+- No faces / hero figures / products / packages; not a terrace balcony overlook (avoids repeating `00-era`)
 - Live path: `public/concepts/clean/sp-stack-00b-mission.png`
-- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true` (avoids pulling people from title style refs)
+- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true`
 
 ## Experience + PPTX
 

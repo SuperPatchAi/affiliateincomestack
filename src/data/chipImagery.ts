@@ -1759,14 +1759,14 @@ export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
   {
     plateFile: "sp-stack-00b-mission.png",
     slideId: "00b-mission",
-    accent: "cyan and magenta neon on wet terrace glass looking into the skyline",
+    accent: "cyan magenta and warm amber points of light over a deep night field",
     style: NEON_CITY_STYLE_ANCHOR,
     composeFromPhotoreal: false,
     skipNeonStyleLock: true,
     subject:
-      "A rain-slicked neon night-city photograph from an empty glass balcony or terrace overlooking a cyan-magenta metropolis horizon — wet reflective floor, soft bokeh towers, deep clean blacks. Completely empty of humans — no people, no figures, no faces, no silhouettes, no backs turned to camera, no couples, no hands on the rail. No products, no patches, no packages. Architecture and light only. Quiet darker left third for later type. Horizon overlook into the glowing city — not a retail aisle, not a void stage, not a product hero.",
+      "A cinematic neon night photograph of a constellation of lives: countless soft anonymous points of warm amber and cool cyan-magenta light hover and link across a deep dark field above a distant rain-slicked metropolis far below — path lights and living nodes forming a vast connected network, not a star chart UI and not a data dashboard. Completely empty of readable people — no faces, no figures in the foreground, no silhouettes as heroes, no products, no patches, no packages. Quiet darker left third for later type. Mission as connection at scale — health, freedom, and impact as one field of light. Not a terrace balcony overlook, not a retail aisle, not a void hologram stage.",
     motion:
-      "Distant neon traffic trails drift. Wet terrace reflections shimmer. Slow almost-still push toward the skyline.",
+      "Linked light points breathe softly. Distant city glow holds. Slow almost-still drift through the constellation.",
   },
   {
     plateFile: "sp-stack-02-world.png",
