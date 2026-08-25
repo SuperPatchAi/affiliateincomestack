@@ -25,15 +25,15 @@ PLATE_W, PLATE_H = 2752, 1536
 PATCH_SCALE = 0.46  # fraction of plate height
 PATCH_CENTER_X = 0.62  # cityscape side (center-right)
 PATCH_CENTER_Y = 0.42  # float higher above the glass rail
-# Former white seal face → transparent black ~30% opacity
-BACKING_RGBA = (0, 0, 0, 77)  # ≈30% of 255
-PRINT_ALPHA = 255  # red icons fully solid for readability
-MID_ALPHA_MIN = 100  # fingerprint ridges on dark backing
-MID_ALPHA_MAX = 220
+PRINT_ALPHA = 255  # red icons fully solid
+# Keep the official white seal face (opaque); only knock out the outer black void.
+WHITE_ALPHA = 255
+MID_ALPHA_MIN = 200
+MID_ALPHA_MAX = 255
 
 
 def translucent_patch(src: Image.Image) -> Image.Image:
-    """Knock out black void; replace white fill with 30% black; keep print + fingerprint."""
+    """Knock out black void only; keep white seal face + print + fingerprint."""
     rgba = src.convert("RGBA")
     pixels = rgba.load()
     w, h = rgba.size
@@ -48,15 +48,14 @@ def translucent_patch(src: Image.Image) -> Image.Image:
             if r > 140 and r >= g * 1.35 and r >= b * 1.35:
                 pixels[x, y] = (r, g, b, PRINT_ALPHA)
                 continue
-            # Near-white seal face → transparent black backing (~30%)
+            # Near-white seal face — keep white
             if lum >= 200 and abs(r - g) < 22 and abs(g - b) < 22:
-                pixels[x, y] = BACKING_RGBA
+                pixels[x, y] = (r, g, b, WHITE_ALPHA)
                 continue
-            # Fingerprint ridges / soft gray relief over the dark backing
+            # Fingerprint ridges / soft gray relief
             t = max(0.0, min(1.0, (lum - 22) / (200 - 22)))
             a = int(MID_ALPHA_MIN + t * (MID_ALPHA_MAX - MID_ALPHA_MIN))
-            # Tint midtones toward dark so they sit on the black backing
-            pixels[x, y] = (min(r, 40), min(g, 40), min(b, 40), a)
+            pixels[x, y] = (r, g, b, a)
     return rgba
 
 
