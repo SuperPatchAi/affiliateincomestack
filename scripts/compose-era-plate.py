@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Compose the 00-era plate: translucent Freedom peel over neon city BG.
+"""Compose the 00-era plate: translucent Freedom patch over neon city BG.
 
-Does not redraw the patch — only knocks out black, softens white fill alpha,
-and pastes the official peel PNG onto an approved neon cityscape still.
+Does not redraw the patch — knocks out black, softens white fill alpha,
+and pastes the official NoPeel Freedom PNG onto the dark terrace zone so
+the seal stays readable (quiet left reserved for headline).
 """
 
 from __future__ import annotations
@@ -13,26 +14,25 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-PATCH_SRC = ROOT / "public/concepts/refs/packages/Patch_Freedom_PeelTopLeft_RGB.png"
+PATCH_SRC = ROOT / "public/concepts/refs/packages/Patch_Freedom_NoPeel_RGB.png"
 NEON_BG = ROOT / "public/concepts/clean-neon-city/16x9/sp-stack-00-era.png"
 OUT_CLEAN = ROOT / "public/concepts/clean/sp-stack-00-era.png"
 OUT_TRON = ROOT / "public/concepts/clean-tron/sp-stack-00-era.png"
 
 # Plate is 16:9 experience still size.
 PLATE_W, PLATE_H = 2752, 1536
-# Patch sits center-right; quiet left stays free for headline.
-PATCH_SCALE = 0.62  # fraction of plate height
-PATCH_CENTER_X = 0.68  # of plate width
-PATCH_CENTER_Y = 0.52  # of plate height
-WHITE_ALPHA = 48  # translucent seal fill (0–255) — neon reads through
-PRINT_ALPHA = 250  # red icons / strong print
-PEEL_FACE_ALPHA = 72  # peel flap / underside — still see-through, slightly denser
-MID_ALPHA_MIN = 35
-MID_ALPHA_MAX = 140
+# Sit fully on the dark left architecture / floor — avoid bright tower glow.
+PATCH_SCALE = 0.40  # fraction of plate height
+PATCH_CENTER_X = 0.24  # far-left dark structure
+PATCH_CENTER_Y = 0.62  # mid dark wall / terrace shadow
+WHITE_ALPHA = 0  # white seal body fully clear — only print + fingerprint remain
+PRINT_ALPHA = 255  # red icons fully solid for readability
+MID_ALPHA_MIN = 90  # fingerprint ridges stay visible on dark
+MID_ALPHA_MAX = 210
 
 
 def translucent_patch(src: Image.Image) -> Image.Image:
-    """Knock out black void; make white fill translucent; keep print readable."""
+    """Knock out black void; make white fill translucent; keep print + fingerprint."""
     rgba = src.convert("RGBA")
     pixels = rgba.load()
     w, h = rgba.size
@@ -47,17 +47,11 @@ def translucent_patch(src: Image.Image) -> Image.Image:
             if r > 140 and r >= g * 1.35 and r >= b * 1.35:
                 pixels[x, y] = (r, g, b, PRINT_ALPHA)
                 continue
-            # Near-white (seal face + peel underside) — translucent, never solid white
+            # Near-white seal face → translucent (never solid white plate)
             if lum >= 200 and abs(r - g) < 22 and abs(g - b) < 22:
-                in_peel_zone = x < w * 0.45 and y < h * 0.45
-                pixels[x, y] = (
-                    r,
-                    g,
-                    b,
-                    PEEL_FACE_ALPHA if in_peel_zone else WHITE_ALPHA,
-                )
+                pixels[x, y] = (r, g, b, WHITE_ALPHA)
                 continue
-            # Fingerprint gray, soft shadows
+            # Fingerprint ridges / soft gray relief
             t = max(0.0, min(1.0, (lum - 22) / (200 - 22)))
             a = int(MID_ALPHA_MIN + t * (MID_ALPHA_MAX - MID_ALPHA_MIN))
             pixels[x, y] = (r, g, b, a)
@@ -65,7 +59,9 @@ def translucent_patch(src: Image.Image) -> Image.Image:
 
 
 def compose(bg_path: Path, patch_path: Path, out_path: Path) -> None:
-    bg = Image.open(bg_path).convert("RGB").resize((PLATE_W, PLATE_H), Image.Resampling.LANCZOS)
+    bg = Image.open(bg_path).convert("RGB").resize(
+        (PLATE_W, PLATE_H), Image.Resampling.LANCZOS
+    )
     patch = translucent_patch(Image.open(patch_path))
     target_h = int(PLATE_H * PATCH_SCALE)
     scale = target_h / patch.size[1]
@@ -82,7 +78,7 @@ def compose(bg_path: Path, patch_path: Path, out_path: Path) -> None:
     out = canvas.convert("RGB")
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out.save(out_path, format="PNG", optimize=True)
-    print(f"wrote {out_path} ({out.size[0]}x{out.size[1]})")
+    print(f"wrote {out_path} ({out.size[0]}x{out.size[1]}) patch@({x0},{y0})")
 
 
 def main() -> None:
@@ -104,7 +100,7 @@ def main() -> None:
     if not args.bg.exists():
         raise SystemExit(f"missing neon background: {args.bg}")
     if not args.patch.exists():
-        raise SystemExit(f"missing Freedom peel: {args.patch}")
+        raise SystemExit(f"missing Freedom patch: {args.patch}")
     compose(args.bg, args.patch, args.out)
     if args.also_tron:
         compose(args.bg, args.patch, OUT_TRON)

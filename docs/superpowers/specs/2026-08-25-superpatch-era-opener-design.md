@@ -29,12 +29,13 @@ Open the deck with a single opportunity headline over a **neon night-city** plat
 ## Plate
 
 - Neon night-city atmosphere (same family as the rest of the deck) — cyan / magenta / amber, wet reflections, quiet darker **left** for type
-- Exact Freedom peel PNG composited — **no redraw**, true proportions
-- Source: `public/concepts/refs/packages/Patch_Freedom_PeelTopLeft_RGB.png`
-- Patch large, centered-right; white seal fill is **translucent** (neon shows through); red print + peel edge stay readable; outer black of the source is knocked out
+- Exact Freedom **NoPeel** PNG composited — **no redraw**, true proportions
+- Source: `public/concepts/refs/packages/Patch_Freedom_NoPeel_RGB.png`
+- Patch sits on the **dark left architecture** — not over bright tower glow; lower-left stays freer for headline
+- White seal fill is **fully clear** (knocked out); red print + fingerprint stay readable; outer black of the source is knocked out
 - No text in the image
 - Live path: `public/concepts/clean/sp-stack-00-era.png`
-- Neon BG staging: `public/concepts/clean-neon-city/16x9/sp-stack-00-era.png` (city only) → compose → `clean/`
+- Neon BG staging: `public/concepts/clean-neon-city/16x9/sp-stack-00-era.png` (city only) → `scripts/compose-era-plate.py` → `clean/`
 
 ## Experience + PPTX
 
