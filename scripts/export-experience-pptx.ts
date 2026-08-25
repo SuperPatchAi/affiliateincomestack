@@ -284,8 +284,16 @@ async function main() {
         throw new Error(`Missing background: ${bg}`);
       }
       const slide = pptx.addSlide();
-      // Gemini plates are often JPEG bytes with a .png name — Online needs .jpg.
-      slide.background = { path: materializePptxImagePath(bg, mediaTemp) };
+      // Full-bleed picture (not slide.background) + Online-safe JPEG rewrite.
+      // Online often fails on JPEG-as-PNG and on high-DPI oversized backgrounds.
+      const platePath = materializePptxImagePath(bg, mediaTemp);
+      slide.addImage({
+        path: platePath,
+        x: 0,
+        y: 0,
+        w: PPTX_SLIDE_INCHES.width,
+        h: PPTX_SLIDE_INCHES.height,
+      });
       addScrim(slide, pptx);
       addChrome(slide, pptx, { brandLockup: spec.brandLockup });
       addCopy(slide, pptx, spec);

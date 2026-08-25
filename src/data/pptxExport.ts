@@ -1,5 +1,6 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { execFileSync } from "node:child_process";
 
 import { SLIDES, type Slide } from "./slides";
 import {
@@ -14,6 +15,9 @@ export const PPTX_SLIDE_INCHES = {
   width: 13.333,
   height: 7.5,
 } as const;
+
+/** Max long edge for PPTX Online-safe plate embeds (1080p 16:9). */
+export const PPTX_ONLINE_MAX_EDGE_PX = 1920;
 
 /** Photoreal stills (current clean/) vs original clean Tron plates (clean-tron/). */
 export type PptxPlateVariant = "photoreal" | "tron";
@@ -48,9 +52,11 @@ export function publicPathToDisk(publicPath: string): string {
 }
 
 /**
- * PowerPoint Online rejects JPEG bytes packaged as `.png` (desktop often forgives it).
- * Neon plates are frequently Gemini JPEGs saved with a `.png` extension — copy those
- * into a sibling `.jpg` under `tempDir` so Content_Types matches the payload.
+ * PowerPoint Online rejects Gemini plates that are JPEG bytes named `.png`,
+ * and often fails on high-DPI / oversized slide backgrounds.
+ *
+ * Always emit a fresh `.jpg` under `tempDir` when the source is JPEG:
+ * correct extension, 72 dpi, long edge capped at 1920px.
  */
 export function materializePptxImagePath(
   srcPath: string,
@@ -58,14 +64,45 @@ export function materializePptxImagePath(
 ): string {
   const bytes = readFileSync(srcPath);
   const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  const looksLikePngPath = /\.png$/i.test(srcPath);
-  if (!isJpeg || !looksLikePngPath) return srcPath;
+  if (!isJpeg) return srcPath;
 
   mkdirSync(tempDir, { recursive: true });
-  const base = basename(srcPath).replace(/\.png$/i, ".jpg");
-  const outPath = join(tempDir, base);
-  writeFileSync(outPath, bytes);
-  return outPath;
+  const base = basename(srcPath).replace(/\.(png|jpe?g)$/i, ".jpg");
+  const rawJpg = join(tempDir, `raw-${base}`);
+  writeFileSync(rawJpg, bytes);
+
+  const optimized = join(tempDir, base);
+  try {
+    execFileSync(
+      "sips",
+      [
+        "-s",
+        "format",
+        "jpeg",
+        "-s",
+        "formatOptions",
+        "85",
+        "-s",
+        "dpiWidth",
+        "72",
+        "-s",
+        "dpiHeight",
+        "72",
+        "-Z",
+        String(PPTX_ONLINE_MAX_EDGE_PX),
+        rawJpg,
+        "--out",
+        optimized,
+      ],
+      { stdio: "pipe" },
+    );
+    if (existsSync(optimized) && readFileSync(optimized).length > 0) {
+      return optimized;
+    }
+  } catch {
+    // Fall back to extension-corrected JPEG if sips cannot rewrite the bytes.
+  }
+  return rawJpg;
 }
 
 /**

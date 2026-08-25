@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 
 import { SLIDES } from "./slides";
 import { INCOME_STREAMS } from "./streamIndex";
@@ -162,14 +163,18 @@ describe("pptx export model", () => {
   it("rewrites JPEG bytes saved as .png into a .jpg path for PowerPoint Online", () => {
     const tempRoot = join(tmpdir(), `pptx-img-${Date.now()}`);
     mkdirSync(tempRoot, { recursive: true });
-    const fakePng = join(tempRoot, "plate.png");
-    // Minimal JPEG SOI + truncated payload is enough for magic sniff.
-    writeFileSync(fakePng, Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]));
-    const embed = materializePptxImagePath(fakePng, tempRoot);
+    const mission = join(ROOT, "public/concepts/clean/sp-stack-00b-mission.png");
+    expect(existsSync(mission)).toBe(true);
+    expect(readFileSync(mission)[0]).toBe(0xff); // jpeg masquerading as png
+    const embed = materializePptxImagePath(mission, tempRoot);
     expect(embed.endsWith(".jpg")).toBe(true);
     expect(existsSync(embed)).toBe(true);
     expect(readFileSync(embed)[0]).toBe(0xff);
     expect(readFileSync(embed)[1]).toBe(0xd8);
+    const dpi = execFileSync("sips", ["-g", "dpiWidth", embed], {
+      encoding: "utf8",
+    });
+    expect(dpi).toMatch(/dpiWidth:\s*72/);
     rmSync(tempRoot, { recursive: true, force: true });
   });
 
