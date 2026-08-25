@@ -1021,9 +1021,7 @@ describe("plate retakes", () => {
 });
 
 describe("neon cityscape title plates", () => {
-  const neonSlides = SLIDES.filter(
-    (s) => s.id !== "06-brand" && s.id !== "00-era",
-  );
+  const neonSlides = SLIDES.filter((s) => s.id !== "06-brand");
 
   it("covers every experience title plate except the global-media brand still", () => {
     const plateFiles = neonSlides.map((s) => s.conceptSrc.split("/").pop()!);

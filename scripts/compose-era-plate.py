@@ -24,11 +24,11 @@ PLATE_W, PLATE_H = 2752, 1536
 PATCH_SCALE = 0.62  # fraction of plate height
 PATCH_CENTER_X = 0.68  # of plate width
 PATCH_CENTER_Y = 0.52  # of plate height
-WHITE_ALPHA = 52  # translucent seal fill (0–255) — neon reads through
+WHITE_ALPHA = 48  # translucent seal fill (0–255) — neon reads through
 PRINT_ALPHA = 250  # red icons / strong print
-PEEL_EDGE_ALPHA = 200  # keep peel curl readable
-MID_ALPHA_MIN = 40
-MID_ALPHA_MAX = 150
+PEEL_FACE_ALPHA = 72  # peel flap / underside — still see-through, slightly denser
+MID_ALPHA_MIN = 35
+MID_ALPHA_MAX = 140
 
 
 def translucent_patch(src: Image.Image) -> Image.Image:
@@ -47,20 +47,18 @@ def translucent_patch(src: Image.Image) -> Image.Image:
             if r > 140 and r >= g * 1.35 and r >= b * 1.35:
                 pixels[x, y] = (r, g, b, PRINT_ALPHA)
                 continue
-            # Bright peel curl (near-white with soft shading) — more solid than face
-            if lum >= 230 and abs(r - g) < 12 and abs(g - b) < 12:
-                # Top-left peel zone stays more opaque so the flap reads
-                if x < w * 0.42 and y < h * 0.42:
-                    pixels[x, y] = (r, g, b, PEEL_EDGE_ALPHA)
-                else:
-                    pixels[x, y] = (r, g, b, WHITE_ALPHA)
+            # Near-white (seal face + peel underside) — translucent, never solid white
+            if lum >= 200 and abs(r - g) < 22 and abs(g - b) < 22:
+                in_peel_zone = x < w * 0.45 and y < h * 0.45
+                pixels[x, y] = (
+                    r,
+                    g,
+                    b,
+                    PEEL_FACE_ALPHA if in_peel_zone else WHITE_ALPHA,
+                )
                 continue
-            # Near-white seal face → translucent so neon shows through
-            if lum >= 205 and abs(r - g) < 18 and abs(g - b) < 18:
-                pixels[x, y] = (r, g, b, WHITE_ALPHA)
-                continue
-            # Peel curl, fingerprint gray, soft shadows
-            t = max(0.0, min(1.0, (lum - 22) / (205 - 22)))
+            # Fingerprint gray, soft shadows
+            t = max(0.0, min(1.0, (lum - 22) / (200 - 22)))
             a = int(MID_ALPHA_MIN + t * (MID_ALPHA_MAX - MID_ALPHA_MIN))
             pixels[x, y] = (r, g, b, a)
     return rgba
