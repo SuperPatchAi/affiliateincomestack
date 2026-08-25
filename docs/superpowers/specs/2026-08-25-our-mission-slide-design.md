@@ -28,9 +28,9 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 
 ## Plate — Concept B (Constellation of lives)
 
-- Dark void-adjacent night: warm amber + cyan-magenta dots (people as path lights) linked by faint threads into one constellation over a distant metropolis along the bottom edge
+- Dark void-adjacent night: warm amber + cyan-magenta **photographic bokeh** (soft out-of-focus orbs / path-light blooms) suggesting people at scale; connection via clustered depth, not mesh lines
 - Quiet darker **left** third for the headline
-- No faces / hero figures / products / packages; not terrace, not street-level sidewalk, not dashboard/UI markers (avoids repeating `00-era` and reading as interface)
+- No faces / hero figures / products / packages; not terrace, not street-level sidewalk; ban wireframe / node-edge / constellation chart lines (avoids UI read)
 - Live path: `public/concepts/clean/sp-stack-00b-mission.png`
 - Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true` (no `neonVoidStage` — city rim must remain)
 

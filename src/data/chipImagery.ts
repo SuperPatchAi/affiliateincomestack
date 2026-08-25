@@ -1759,14 +1759,14 @@ export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
   {
     plateFile: "sp-stack-00b-mission.png",
     slideId: "00b-mission",
-    accent: "warm amber path lights and cyan-magenta links over a distant night city",
+    accent: "warm amber and cyan-magenta photographic bokeh over a distant night city",
     style: NEON_CITY_STYLE_ANCHOR,
     composeFromPhotoreal: false,
     skipNeonStyleLock: true,
     subject:
-      "Dark void-adjacent night sky filling most of the frame: soft anonymous warm amber and soft cyan-magenta points of light — people as tiny glowing dots and path lights — linked by thin faint luminous threads into one larger constellation network floating high above a distant rain-slicked neon metropolis far below along the bottom edge only. Deep clean blacks between the lights. Completely empty of readable humans — no faces, no bodies, no silhouettes as heroes, no hands, no products, no patches, no packages, no UI charts, no dashboards, no graphs, no icons, no HUD overlays. The dots are photographic bokeh and soft path lights, not interface markers. Quiet darker left third for later type. Mission as connection at scale — one field of light over the world. Not a street-level sidewalk, not a terrace balcony, not a retail aisle, not a product hero.",
+      "Dark void-adjacent night sky filling most of the frame: a dense field of soft photographic bokeh — out-of-focus warm amber and cyan-magenta orbs and path-light blooms, like distant people and street lamps seen through an anamorphic lens at wide aperture. Connection reads only as clustered depth and overlapping soft discs of light, never as drawn lines. Absolutely no mesh, no wireframe, no node-edge graph, no constellation chart lines, no luminous threads, no geometric lattice, no HUD overlays, no dashboards, no icons. Deep clean blacks between the soft orbs. A distant rain-slicked neon metropolis sits far below along the bottom edge only as soft city bokeh. Completely empty of readable humans — no faces, no bodies, no silhouettes as heroes. Quiet darker left third for later type. Mission as one living field of light over the world. Not street-level sidewalk, not terrace balcony, not product hero, not UI.",
     motion:
-      "Linked light points breathe softly. Faint threads shimmer. Slow almost-still drift through the constellation above the distant city.",
+      "Soft bokeh orbs breathe and drift. Distant city glow shimmers. Slow almost-still drift through the light field.",
   },
   {
     plateFile: "sp-stack-02-world.png",
