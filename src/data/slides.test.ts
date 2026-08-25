@@ -16,11 +16,12 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 24 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(24);
+  it("has 25 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(25);
     expect(SLIDES.map((s) => s.id)).toEqual([
       "00-era",
       "01-title",
+      "00b-mission",
       "02-world",
       "03-four-stacks",
       "03b-name-stacks",
@@ -56,7 +57,7 @@ describe("SLIDES", () => {
     }
   });
 
-  it("opens on the SuperPatch Era opener, then the complete-opportunity title", () => {
+  it("opens on the SuperPatch Era opener, then title, then Our Mission", () => {
     const era = SLIDES[0];
     expect(era.id).toBe("00-era");
     expect(era.copyLayout).toBe("headline-only");
@@ -73,6 +74,13 @@ describe("SLIDES", () => {
     );
     expect(title.eyebrow).toBe("The Super Patch Income Stack™");
     expect(title.requiresDisclosure).toBe(false);
+
+    const mission = SLIDES[2];
+    expect(mission.id).toBe("00b-mission");
+    expect(mission.copyLayout).toBe("headline-only");
+    expect(mission.headline).toBe("Our Mission.");
+    expect(mission.eyebrow).toBe("");
+    expect(mission.body).toBe("");
   });
 
   it("keeps the trademark on the Income Stack title scene", () => {
@@ -251,7 +259,7 @@ describe("assertSlidesValid chip rules", () => {
     requiresDisclosure: false,
   };
   const stack = (overrides: Partial<Slide>): Slide[] =>
-    Array.from({ length: 24 }, (_, i) =>
+    Array.from({ length: 25 }, (_, i) =>
       i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
     );
 
@@ -575,6 +583,7 @@ describe("plate annotations", () => {
   it("uses animated hero loops on Omni scenes and omits hero on still-only beats", () => {
     const stillOnly = new Set([
       "00-era",
+      "00b-mission",
       "02-world",
       "03b-name-stacks",
       "05b-science",

@@ -56,7 +56,7 @@ describe("ExperienceChrome", () => {
         onJumpTo={() => {}}
       />,
     );
-    expect(screen.getByText("07 / 24")).toBeTruthy();
+    expect(screen.getByText("07 / 25")).toBeTruthy();
     expect(screen.getByText("Full Stack")).toBeTruthy();
   });
 

@@ -246,8 +246,8 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 24) {
-    throw new Error(`Expected 24 slides, got ${slides.length}`);
+  if (slides.length !== 25) {
+    throw new Error(`Expected 25 slides, got ${slides.length}`);
   }
   for (const s of slides) {
     const heroCaption = s.copyLayout === "hero-caption";
@@ -338,12 +338,12 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Chapter groupings — era opener + full stack, ten streams, momentum, action. */
+/** Chapter groupings — era + title + mission + full stack, ten streams, momentum, action. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 10 },
-  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 11, sceneEnd: 19 },
-  { id: "momentum", label: "Momentum", sceneStart: 20, sceneEnd: 22 },
-  { id: "action", label: "Action", sceneStart: 23, sceneEnd: 23 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 11 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 12, sceneEnd: 20 },
+  { id: "momentum", label: "Momentum", sceneStart: 21, sceneEnd: 23 },
+  { id: "action", label: "Action", sceneStart: 24, sceneEnd: 24 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -402,6 +402,19 @@ export const SLIDES: Slide[] = [
     flywheelArc: "income",
     motionPreset: "parallax-slabs",
     requiresDisclosure: false,
+  },
+  {
+    id: "00b-mission",
+    conceptSrc: "/concepts/clean/sp-stack-00b-mission.png",
+    accent: "cool",
+    eyebrow: "",
+    headline: "Our Mission.",
+    body: "",
+    copyLayout: "headline-only",
+    motionPreset: "ken-burns-glow",
+    requiresDisclosure: false,
+    presenterNotes:
+      "Headline only — Our Mission over the empty neon horizon overlook. Advance into the world-has-changed beat; do not invent mission body on this slide.",
   },
   {
     id: "02-world",

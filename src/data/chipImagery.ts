@@ -1757,6 +1757,18 @@ export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
       "The subject breathes. Distant neon traffic trails drift. The camera holds a slow push-in.",
   },
   {
+    plateFile: "sp-stack-00b-mission.png",
+    slideId: "00b-mission",
+    accent: "cyan and magenta neon on wet terrace glass looking into the skyline",
+    style: NEON_CITY_STYLE_ANCHOR,
+    composeFromPhotoreal: false,
+    skipNeonStyleLock: true,
+    subject:
+      "A rain-slicked neon night-city photograph from an empty glass balcony or terrace overlooking a cyan-magenta metropolis horizon — wet reflective floor, soft bokeh towers, deep clean blacks. Completely empty of humans — no people, no figures, no faces, no silhouettes, no backs turned to camera, no couples, no hands on the rail. No products, no patches, no packages. Architecture and light only. Quiet darker left third for later type. Horizon overlook into the glowing city — not a retail aisle, not a void stage, not a product hero.",
+    motion:
+      "Distant neon traffic trails drift. Wet terrace reflections shimmer. Slow almost-still push toward the skyline.",
+  },
+  {
     plateFile: "sp-stack-02-world.png",
     slideId: "02-world",
     accent: "cyan highways and magenta tower glow on wet night asphalt",

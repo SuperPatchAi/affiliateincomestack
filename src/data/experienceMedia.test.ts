@@ -21,13 +21,13 @@ function fileMd5(publicPath: string): string {
 }
 
 describe("experienceMedia", () => {
-  it("maps exactly 24 unique scenes that match SLIDES order", () => {
+  it("maps exactly 25 unique scenes that match SLIDES order", () => {
     expect(EXPERIENCE_MEDIA).toHaveLength(SLIDES.length);
-    expect(EXPERIENCE_MEDIA).toHaveLength(24);
+    expect(EXPERIENCE_MEDIA).toHaveLength(25);
     expect(EXPERIENCE_MEDIA.map((m) => m.slideId)).toEqual(
       SLIDES.map((s) => s.id),
     );
-    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(24);
+    expect(new Set(EXPERIENCE_MEDIA.map((m) => m.slideId)).size).toBe(25);
   });
 
   it("serves every scene as a still-only title plate from conceptSrc", () => {
