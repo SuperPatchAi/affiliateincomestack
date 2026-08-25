@@ -1759,14 +1759,14 @@ export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
   {
     plateFile: "sp-stack-00b-mission.png",
     slideId: "00b-mission",
-    accent: "cyan magenta and warm amber points of light over a deep night field",
+    accent: "warm amber path lights and cyan-magenta links over a distant night city",
     style: NEON_CITY_STYLE_ANCHOR,
     composeFromPhotoreal: false,
     skipNeonStyleLock: true,
     subject:
-      "A cinematic neon night photograph of a constellation of lives: countless soft anonymous points of warm amber and cool cyan-magenta light hover and link across a deep dark field above a distant rain-slicked metropolis far below — path lights and living nodes forming a vast connected network, not a star chart UI and not a data dashboard. Completely empty of readable people — no faces, no figures in the foreground, no silhouettes as heroes, no products, no patches, no packages. Quiet darker left third for later type. Mission as connection at scale — health, freedom, and impact as one field of light. Not a terrace balcony overlook, not a retail aisle, not a void hologram stage.",
+      "Dark void-adjacent night sky filling most of the frame: soft anonymous warm amber and soft cyan-magenta points of light — people as tiny glowing dots and path lights — linked by thin faint luminous threads into one larger constellation network floating high above a distant rain-slicked neon metropolis far below along the bottom edge only. Deep clean blacks between the lights. Completely empty of readable humans — no faces, no bodies, no silhouettes as heroes, no hands, no products, no patches, no packages, no UI charts, no dashboards, no graphs, no icons, no HUD overlays. The dots are photographic bokeh and soft path lights, not interface markers. Quiet darker left third for later type. Mission as connection at scale — one field of light over the world. Not a street-level sidewalk, not a terrace balcony, not a retail aisle, not a product hero.",
     motion:
-      "Linked light points breathe softly. Distant city glow holds. Slow almost-still drift through the constellation.",
+      "Linked light points breathe softly. Faint threads shimmer. Slow almost-still drift through the constellation above the distant city.",
   },
   {
     plateFile: "sp-stack-02-world.png",

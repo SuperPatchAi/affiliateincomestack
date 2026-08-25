@@ -6,7 +6,7 @@
 
 ## Goal
 
-Add a **new slide** after the Income Stack title with hero text **Our Mission.** over a neon night-city horizon overlook — empty terrace / balcony looking into the skyline, quiet left for type, no product, no people.
+Add a **new slide** after the Income Stack title with hero text **Our Mission.** over a constellation of lives — soft anonymous neon points linked into a network above a distant night city, quiet left for type, no product, no people, not UI.
 
 ## Placement (locked)
 
@@ -28,11 +28,11 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 
 ## Plate — Concept B (Constellation of lives)
 
-- Neon night field: soft anonymous cyan / magenta / warm amber points of light linking into a connected network above a distant metropolis
+- Dark void-adjacent night: warm amber + cyan-magenta dots (people as path lights) linked by faint threads into one constellation over a distant metropolis along the bottom edge
 - Quiet darker **left** third for the headline
-- No faces / hero figures / products / packages; not a terrace balcony overlook (avoids repeating `00-era`)
+- No faces / hero figures / products / packages; not terrace, not street-level sidewalk, not dashboard/UI markers (avoids repeating `00-era` and reading as interface)
 - Live path: `public/concepts/clean/sp-stack-00b-mission.png`
-- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true`
+- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true` (no `neonVoidStage` — city rim must remain)
 
 ## Experience + PPTX
 
@@ -45,5 +45,5 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 
 - [x] Opens as scene 3 (after era + title)
 - [x] Headline on-screen: Our Mission.
-- [x] Neon horizon overlook plate; quiet left; empty of people/product
+- [x] Constellation-over-city plate; quiet left; empty of people/product/UI
 - [x] PPTX regenerated with 25 slides

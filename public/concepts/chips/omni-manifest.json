@@ -1,32 +1,54 @@
 {
-  "generatedAt": "2026-08-18T03:58:49.700Z",
+  "generatedAt": "2026-08-19T16:25:47.464Z",
   "aspects": [
+    "16:9",
     "9:16"
   ],
   "results": [
     {
-      "key": "9:16 03-four-stacks/product-stack",
+      "key": "16:9 05-product/proprietary-technology",
       "ok": true,
-      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/03-four-stacks/9x16/product-stack_omni.mp4",
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/05-product/16x9/proprietary-technology_omni.mp4",
       "cost_usd": 0.8
     },
     {
-      "key": "9:16 03-four-stacks/brand-marketing",
+      "key": "16:9 05-product/backed-by-science",
       "ok": true,
       "skipped": true
     },
     {
-      "key": "9:16 03-four-stacks/income-stack",
+      "key": "16:9 05-product/many-solutions",
       "ok": true,
       "skipped": true
     },
     {
-      "key": "9:16 03-four-stacks/personal-development",
+      "key": "16:9 05-product/trusted-by-millions",
+      "ok": true,
+      "skipped": true
+    },
+    {
+      "key": "9:16 05-product/proprietary-technology",
+      "ok": true,
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/chips/05-product/9x16/proprietary-technology_omni.mp4",
+      "cost_usd": 0.8
+    },
+    {
+      "key": "9:16 05-product/backed-by-science",
+      "ok": true,
+      "skipped": true
+    },
+    {
+      "key": "9:16 05-product/many-solutions",
+      "ok": true,
+      "skipped": true
+    },
+    {
+      "key": "9:16 05-product/trusted-by-millions",
       "ok": true,
       "skipped": true
     }
   ],
-  "okCount": 4,
+  "okCount": 8,
   "failCount": 0,
-  "cost_usd_sum": 0.8
+  "cost_usd_sum": 1.6
 }
