@@ -1,3 +1,6 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+
 import { SLIDES, type Slide } from "./slides";
 import {
   INCOME_STREAMS,
@@ -42,6 +45,27 @@ export function publicPathToDisk(publicPath: string): string {
     ? publicPath.slice(1)
     : publicPath;
   return `public/${trimmed}`;
+}
+
+/**
+ * PowerPoint Online rejects JPEG bytes packaged as `.png` (desktop often forgives it).
+ * Neon plates are frequently Gemini JPEGs saved with a `.png` extension — copy those
+ * into a sibling `.jpg` under `tempDir` so Content_Types matches the payload.
+ */
+export function materializePptxImagePath(
+  srcPath: string,
+  tempDir: string,
+): string {
+  const bytes = readFileSync(srcPath);
+  const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const looksLikePngPath = /\.png$/i.test(srcPath);
+  if (!isJpeg || !looksLikePngPath) return srcPath;
+
+  mkdirSync(tempDir, { recursive: true });
+  const base = basename(srcPath).replace(/\.png$/i, ".jpg");
+  const outPath = join(tempDir, base);
+  writeFileSync(outPath, bytes);
+  return outPath;
 }
 
 /**

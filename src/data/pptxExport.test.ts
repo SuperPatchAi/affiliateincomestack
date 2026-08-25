@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 import { SLIDES } from "./slides";
 import { INCOME_STREAMS } from "./streamIndex";
 import {
   PPTX_SLIDE_INCHES,
   buildPptxSlideSpecs,
+  materializePptxImagePath,
   publicPathToDisk,
   resolvePptxBackgroundPath,
 } from "./pptxExport";
@@ -155,5 +157,31 @@ describe("pptx export model", () => {
       }
     }
     expect(differingPlates).toBeGreaterThan(SLIDES.length / 2);
+  });
+
+  it("rewrites JPEG bytes saved as .png into a .jpg path for PowerPoint Online", () => {
+    const tempRoot = join(tmpdir(), `pptx-img-${Date.now()}`);
+    mkdirSync(tempRoot, { recursive: true });
+    const fakePng = join(tempRoot, "plate.png");
+    // Minimal JPEG SOI + truncated payload is enough for magic sniff.
+    writeFileSync(fakePng, Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]));
+    const embed = materializePptxImagePath(fakePng, tempRoot);
+    expect(embed.endsWith(".jpg")).toBe(true);
+    expect(existsSync(embed)).toBe(true);
+    expect(readFileSync(embed)[0]).toBe(0xff);
+    expect(readFileSync(embed)[1]).toBe(0xd8);
+    rmSync(tempRoot, { recursive: true, force: true });
+  });
+
+  it("leaves real PNG paths unchanged for PowerPoint Online", () => {
+    const tempRoot = join(tmpdir(), `pptx-png-${Date.now()}`);
+    mkdirSync(tempRoot, { recursive: true });
+    const realPng = join(tempRoot, "mark.png");
+    writeFileSync(
+      realPng,
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00]),
+    );
+    expect(materializePptxImagePath(realPng, tempRoot)).toBe(realPng);
+    rmSync(tempRoot, { recursive: true, force: true });
   });
 });

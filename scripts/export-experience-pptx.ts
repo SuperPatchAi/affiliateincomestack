@@ -11,7 +11,7 @@
  *
  * Backgrounds are full-bleed 16:9 plates; eyebrow / headline / body are editable.
  */
-import { mkdirSync, existsSync } from "node:fs";
+import { mkdirSync, existsSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import PptxGenJS from "pptxgenjs";
@@ -19,6 +19,7 @@ import PptxGenJS from "pptxgenjs";
 import {
   PPTX_SLIDE_INCHES,
   buildPptxSlideSpecs,
+  materializePptxImagePath,
   publicPathToDisk,
   type PptxPlateVariant,
   type PptxSlideSpec,
@@ -273,22 +274,30 @@ async function main() {
       : "Editable 16:9 stills experience export (photoreal)";
   pptx.company = "The Super Patch Company";
 
-  for (const spec of specs) {
-    const bg = join(APP, publicPathToDisk(spec.backgroundPublicPath));
-    if (!existsSync(bg)) {
-      throw new Error(`Missing background: ${bg}`);
-    }
-    const slide = pptx.addSlide();
-    slide.background = { path: bg };
-    addScrim(slide, pptx);
-    addChrome(slide, pptx, { brandLockup: spec.brandLockup });
-    addCopy(slide, pptx, spec);
-    if (spec.notes) slide.addNotes(spec.notes);
-  }
+  const mediaTemp = join(APP, "exports", `.pptx-media-${variant}-${Date.now()}`);
+  mkdirSync(mediaTemp, { recursive: true });
 
-  mkdirSync(dirname(OUT), { recursive: true });
-  await pptx.writeFile({ fileName: OUT });
-  console.log(`wrote ${OUT} (${specs.length} slides, 16:9, ${variant})`);
+  try {
+    for (const spec of specs) {
+      const bg = join(APP, publicPathToDisk(spec.backgroundPublicPath));
+      if (!existsSync(bg)) {
+        throw new Error(`Missing background: ${bg}`);
+      }
+      const slide = pptx.addSlide();
+      // Gemini plates are often JPEG bytes with a .png name — Online needs .jpg.
+      slide.background = { path: materializePptxImagePath(bg, mediaTemp) };
+      addScrim(slide, pptx);
+      addChrome(slide, pptx, { brandLockup: spec.brandLockup });
+      addCopy(slide, pptx, spec);
+      if (spec.notes) slide.addNotes(spec.notes);
+    }
+
+    mkdirSync(dirname(OUT), { recursive: true });
+    await pptx.writeFile({ fileName: OUT });
+    console.log(`wrote ${OUT} (${specs.length} slides, 16:9, ${variant})`);
+  } finally {
+    rmSync(mediaTemp, { recursive: true, force: true });
+  }
 }
 
 main().catch((err) => {
