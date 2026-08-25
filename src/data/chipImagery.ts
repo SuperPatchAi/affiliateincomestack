@@ -2058,7 +2058,7 @@ export function buildNeonCityFromPhotorealPrompt(spec: PlateRetakeSpec): string 
     SKIN_REALISM_LOCK,
     ...(spec.personIdentity
       ? [
-          "The attached photographs are the exact person identity reference. Keep his face, bald head, salt-and-pepper goatee, body proportions, and navy suit wardrobe identical and unaltered. Natural lived-in skin only — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed, not porcelain CGI. Compose a brand-new neon night scene and camera; do not copy the daylight lobby backdrop from the references.",
+          "The attached photographs are the exact person identity reference. Keep his face, bald head, salt-and-pepper goatee, body proportions, and navy suit identical and unaltered. Natural lived-in skin only — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed, not porcelain CGI. Compose a brand-new neon night scene and camera; do not copy the daylight lobby backdrop from the references.",
         ]
       : []),
     ...(composeFromPhotoreal
