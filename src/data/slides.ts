@@ -373,7 +373,7 @@ export const SLIDES: Slide[] = [
     motionPreset: "ken-burns-glow",
     requiresDisclosure: false,
     presenterNotes:
-      "Opener only — headline over the locked Freedom peel void plate. Do not invent claims; advance into the full Income Stack title.",
+      "Opener only — headline over the empty neon terrace plate. Do not invent claims; advance into the full Income Stack title.",
   },
   {
     id: "01-title",
