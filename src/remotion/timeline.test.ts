@@ -53,6 +53,7 @@ describe("remotion timeline", () => {
     expect(FILM_SLIDES).toHaveLength(23);
     expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00-era");
     expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00b-mission");
+    expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00c-ceo");
     expect(FILM_SLIDES[0].id).toBe("01-title");
   });
 });

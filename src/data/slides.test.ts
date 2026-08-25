@@ -16,12 +16,13 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 25 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(25);
+  it("has 26 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(26);
     expect(SLIDES.map((s) => s.id)).toEqual([
       "00-era",
       "01-title",
       "00b-mission",
+      "00c-ceo",
       "02-world",
       "03-four-stacks",
       "03b-name-stacks",
@@ -57,7 +58,7 @@ describe("SLIDES", () => {
     }
   });
 
-  it("opens on the SuperPatch Era opener, then title, then Our Mission", () => {
+  it("opens on Era, title, Mission, then Jay Dhaliwal CEO", () => {
     const era = SLIDES[0];
     expect(era.id).toBe("00-era");
     expect(era.copyLayout).toBe("headline-only");
@@ -81,6 +82,15 @@ describe("SLIDES", () => {
     expect(mission.headline).toBe("Our Mission.");
     expect(mission.eyebrow).toBe("");
     expect(mission.body).toBe("");
+
+    const ceo = SLIDES[3];
+    expect(ceo.id).toBe("00c-ceo");
+    expect(ceo.copyLayout).toBe("headline-only");
+    expect(ceo.headline).toBe("Jay Dhaliwal — CEO.");
+    expect(ceo.eyebrow).toBe("");
+    expect(ceo.body).toBe("");
+    expect(ceo.conceptSrc).toBe("/concepts/clean/sp-stack-00c-ceo.png");
+    expect(ceo.requiresDisclosure).toBe(false);
   });
 
   it("keeps the trademark on the Income Stack title scene", () => {
@@ -259,7 +269,7 @@ describe("assertSlidesValid chip rules", () => {
     requiresDisclosure: false,
   };
   const stack = (overrides: Partial<Slide>): Slide[] =>
-    Array.from({ length: 25 }, (_, i) =>
+    Array.from({ length: 26 }, (_, i) =>
       i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
     );
 
@@ -584,6 +594,7 @@ describe("plate annotations", () => {
     const stillOnly = new Set([
       "00-era",
       "00b-mission",
+      "00c-ceo",
       "02-world",
       "03b-name-stacks",
       "05b-science",

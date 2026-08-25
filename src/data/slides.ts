@@ -246,8 +246,8 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 25) {
-    throw new Error(`Expected 25 slides, got ${slides.length}`);
+  if (slides.length !== 26) {
+    throw new Error(`Expected 26 slides, got ${slides.length}`);
   }
   for (const s of slides) {
     const heroCaption = s.copyLayout === "hero-caption";
@@ -338,12 +338,12 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Chapter groupings — era + title + mission + full stack, ten streams, momentum, action. */
+/** Chapter groupings — era + title + mission + ceo + full stack, ten streams, momentum, action. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 11 },
-  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 12, sceneEnd: 20 },
-  { id: "momentum", label: "Momentum", sceneStart: 21, sceneEnd: 23 },
-  { id: "action", label: "Action", sceneStart: 24, sceneEnd: 24 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 12 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 13, sceneEnd: 21 },
+  { id: "momentum", label: "Momentum", sceneStart: 22, sceneEnd: 24 },
+  { id: "action", label: "Action", sceneStart: 25, sceneEnd: 25 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -414,7 +414,20 @@ export const SLIDES: Slide[] = [
     motionPreset: "ken-burns-glow",
     requiresDisclosure: false,
     presenterNotes:
-      "Headline only — Our Mission over the empty neon horizon overlook. Advance into the world-has-changed beat; do not invent mission body on this slide.",
+      "Headline only — Our Mission over the empty neon horizon overlook. Advance into the Jay Dhaliwal CEO beat; do not invent mission body on this slide.",
+  },
+  {
+    id: "00c-ceo",
+    conceptSrc: "/concepts/clean/sp-stack-00c-ceo.png",
+    accent: "cool",
+    eyebrow: "",
+    headline: "Jay Dhaliwal — CEO.",
+    body: "",
+    copyLayout: "headline-only",
+    motionPreset: "ken-burns-glow",
+    requiresDisclosure: false,
+    presenterNotes:
+      "Headline only — Jay Dhaliwal CEO on the wet neon street plate. Identity locked from approved refs; advance into the world-has-changed beat.",
   },
   {
     id: "02-world",

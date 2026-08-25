@@ -35,10 +35,10 @@ describe("ExperienceShell", () => {
     });
   });
 
-  it("renders 25 ordered semantic scenes with heading hierarchy", () => {
+  it("renders 26 ordered semantic scenes with heading hierarchy", () => {
     const { container } = render(<ExperienceShell />);
     const scenes = container.querySelectorAll("[data-experience-scene]");
-    expect(scenes).toHaveLength(25);
+    expect(scenes).toHaveLength(26);
     expect([...scenes].map((el) => el.getAttribute("data-slide"))).toEqual(
       SLIDES.map((s) => s.id),
     );
@@ -193,10 +193,10 @@ describe("ExperienceShell", () => {
     expect(copy?.querySelector("[data-anim-layer='body']")).toBeTruthy();
   });
 
-  it("exposes a vertical scene navigator with 25 steps", () => {
+  it("exposes a vertical scene navigator with 26 steps", () => {
     render(<ExperienceShell />);
     const nav = screen.getByRole("navigation", { name: /scene navigator/i });
-    expect(nav.querySelectorAll("button")).toHaveLength(25);
+    expect(nav.querySelectorAll("button")).toHaveLength(26);
   });
 
   it("composes each scene as one layered viewport card", () => {
@@ -267,7 +267,7 @@ describe("ExperienceShell", () => {
 
   it("exposes chapter-aware orientation in the chrome", () => {
     render(<ExperienceShell />);
-    expect(screen.getByText("01 / 25")).toBeTruthy();
+    expect(screen.getByText("01 / 26")).toBeTruthy();
     expect(
       screen.getByText("Full Stack", { selector: ".experience-chapter-label" }),
     ).toBeTruthy();

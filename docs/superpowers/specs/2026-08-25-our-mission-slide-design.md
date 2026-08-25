@@ -11,7 +11,7 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 ## Placement (locked)
 
 ```
-00-era → 01-title → 00b-mission → 02-world → …
+00-era → 01-title → 00b-mission → 00c-ceo → 02-world → …
 ```
 
 ## Copy (locked)
@@ -36,7 +36,7 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 
 ## Experience + PPTX
 
-- Inserted after `01-title`; deck is **25** scenes
+- Inserted after `01-title`; deck is **26** scenes
 - Chapters: Full Stack 0–11, Ten Income Streams 12–20, Momentum 21–23, Action 24
 - `headline-only` overlay + PPTX headline-only export
 - Excluded from Remotion `FILM_SLIDES` (with `00-era`); film stays 23 scenes

@@ -74,6 +74,11 @@ export type PlateRetakeSpec = {
    * (no outdoor skyline / terrace / Earth language).
    */
   neonRetailInterior?: boolean;
+  /**
+   * Attached extraRefs are an exact person identity lock (face/body/wardrobe).
+   * Generate script passes personIdentity ref guidance instead of style-only.
+   */
+  personIdentity?: boolean;
 };
 
 /** Canonical deck style — matches the fifteen on-style clean plates. */
@@ -1769,6 +1774,23 @@ export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
       "One continuous night field breathes. Soft bokeh orbs drift. Slow almost-still push across the unified city.",
   },
   {
+    plateFile: "sp-stack-00c-ceo.png",
+    slideId: "00c-ceo",
+    accent: "cyan magenta and amber neon on wet asphalt and navy wool",
+    style: NEON_CITY_STYLE_ANCHOR,
+    composeFromPhotoreal: false,
+    skipNeonStyleLock: true,
+    personIdentity: true,
+    extraRefs: [
+      "concepts/refs/characters/gq-jay-standing.png",
+      "concepts/refs/characters/gq-jay-leaning.png",
+    ],
+    subject:
+      "The attached photographs are the exact identity of one man — keep his face, bald head, salt-and-pepper goatee, body, and tailored navy suit with white shirt, tie, and brown leather shoes identical and unaltered. Lived-in natural skin with visible pores, laugh lines, slight uneven tone — not plastic, not airbrushed, not a beauty filter, not porcelain CGI. Full-body wet neon street arrival: he stands on rain-slicked night asphalt with hands in his trouser pockets, confident and approachable, in a rain-slicked neon metropolis canyon — cyan magenta and amber glows on wet pavement and glass behind him. Quiet darker left third for later type. No product, no patch on skin, no second hero figure, no readable signage. Not a terrace balcony overlook, not a corporate daylight lobby.",
+    motion:
+      "Soft neon reflections shimmer on wet asphalt. Distant traffic trails drift. Slow almost-still push-in on the man.",
+  },
+  {
     plateFile: "sp-stack-02-world.png",
     slideId: "02-world",
     accent: "cyan highways and magenta tower glow on wet night asphalt",
@@ -2034,6 +2056,11 @@ export function buildNeonCityFromPhotorealPrompt(spec: PlateRetakeSpec): string 
   return [
     NEON_CITY_STYLE_ANCHOR,
     SKIN_REALISM_LOCK,
+    ...(spec.personIdentity
+      ? [
+          "The attached photographs are the exact person identity reference. Keep his face, bald head, salt-and-pepper goatee, body proportions, and navy suit wardrobe identical and unaltered. Natural lived-in skin only — pores, laugh lines, wrinkles where age belongs. Not plastic, not airbrushed, not porcelain CGI. Compose a brand-new neon night scene and camera; do not copy the daylight lobby backdrop from the references.",
+        ]
+      : []),
     ...(composeFromPhotoreal
       ? [
           "The attached photograph is the scene example. Keep the same subject, pose, camera height, framing, and story beat.",

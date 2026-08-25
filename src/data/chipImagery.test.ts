@@ -1235,4 +1235,25 @@ describe("neon cityscape title plates", () => {
     const prompt = buildNeonCityFromPhotorealPrompt(flywheel!);
     expect(prompt).toMatch(/fresh|do not include mountains/i);
   });
+
+  it("locks Jay Dhaliwal CEO as wet neon street identity plate", () => {
+    const ceo = NEON_CITY_PLATE_RETAKES.find((r) => r.slideId === "00c-ceo");
+    expect(ceo).toBeDefined();
+    expect(ceo!.plateFile).toBe("sp-stack-00c-ceo.png");
+    expect(ceo!.composeFromPhotoreal).toBe(false);
+    expect(ceo!.skipNeonStyleLock).toBe(true);
+    expect(ceo!.personIdentity).toBe(true);
+    expect(ceo!.extraRefs).toEqual([
+      "concepts/refs/characters/gq-jay-standing.png",
+      "concepts/refs/characters/gq-jay-leaning.png",
+    ]);
+    expect(ceo!.subject.toLowerCase()).toMatch(/rain|neon|street|city|metropolis/);
+    expect(ceo!.subject.toLowerCase()).toMatch(/full-body|full body|hands in/);
+    expect(ceo!.subject.toLowerCase()).toMatch(/lived-in|pores|laugh lines/);
+    expect(ceo!.subject.toLowerCase()).toMatch(/not plastic|no plastic/);
+    expect(ceo!.subject).not.toMatch(/[0-9%$"]/);
+    const prompt = buildNeonCityFromPhotorealPrompt(ceo!);
+    expect(prompt).toMatch(/identity|exact (man|person|face)/i);
+    expect(prompt).toContain(SKIN_REALISM_LOCK);
+  });
 });

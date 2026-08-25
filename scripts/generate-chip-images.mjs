@@ -117,6 +117,7 @@ async function generateImage({
   recompose = false,
   identityRef = false,
   packIdentity = false,
+  personIdentity = false,
 }) {
   const portraitNote =
     aspect === "9:16" && !recompose
@@ -140,7 +141,13 @@ async function generateImage({
           "it is the same man; keep his face, hair, clothes, and one-arm pose. " +
           "Generate one new photograph of him holding the official pouch. " +
           "Do not paste the pouch on afterwards."
-        : identityRef
+        : personIdentity
+          ? " The attached photographs are the exact person identity reference. " +
+            "Keep his face, bald head, salt-and-pepper goatee, body, and navy suit " +
+            "identical and unaltered. Natural lived-in skin with pores and laugh lines — " +
+            "not plastic, not airbrushed, not porcelain CGI. Compose a brand-new neon " +
+            "night-city scene and camera; do not copy the daylight lobby backdrop."
+          : identityRef
           ? " The attached image is a product or brand-mark identity reference only. " +
             "Compose a brand-new photograph; do not copy the reference composition, " +
             "camera, or backdrop."
@@ -678,6 +685,7 @@ async function main() {
             aspect,
             styled: true,
             recompose,
+            personIdentity: Boolean(retake.personIdentity),
           }),
         );
         // Keep photoreal clean/ intact for review — only write neon-city outputs here.
