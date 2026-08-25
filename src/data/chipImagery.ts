@@ -483,14 +483,14 @@ export function buildCompoundingScreenMarkEditPrompt(): string {
   ].join(" ");
 }
 
-/** Edit the era opener so the composited Freedom seal reads more 3D — lighting only. */
+/** Edit the era opener so the composited Freedom seal reads more 3D — lighting + thickness. */
 export function buildEraPatchDepthEditPrompt(): string {
   return [
     "The first attached photograph is the locked master frame — do not reframe, crop, zoom, tilt, or change camera angle.",
     "Keep the exact neon night city, wet terrace, glass rail, skyline, depth of field, and composition identical.",
     "The white rounded-square Freedom seal already in the scene must stay in the same place and size.",
-    "The second attached image is the exact Freedom seal identity — white face, red diamond-S and circle-X print, clear fingerprint gel center. Keep every printed mark identical. Do not redraw, restyle, recolor, or invent new lettering. Ignore any watermark or black backdrop on the second image.",
-    "Lighting edit only on that seal: give it subtle physical thickness — soft bevel on the rounded edges, a thin cyan-magenta neon rim light catching the top and side edges, a soft contact shadow and faint wet-floor reflection under the seal so it floats just above the terrace. Keep the white face opaque white.",
+    "The second attached image is the exact Freedom seal identity reference. Restore the seal face from that second image exactly: opaque white rounded square, red diamond-S and circle-X print on the exact grid, and the clear embossed fingerprint gel in the center with every ridge, highlight, and shadow identical to the second image. Do not flatten, blur, simplify, or invent new ridge patterns. Do not redraw, restyle, recolor, or invent new lettering. Ignore any watermark or black backdrop on the second image.",
+    "Then add physical depth to that exact seal only: visible thickness / slight extrusion on the rounded edges, a soft bevel catching light, a thin cyan-magenta neon rim light on the top and side edges, plus a soft contact shadow and faint wet-floor reflection under the seal so it floats just above the terrace.",
     "Change nothing else in the photograph. No people, no extra products, no readable text.",
     OMNI_TEXT_BAN,
   ].join(" ");

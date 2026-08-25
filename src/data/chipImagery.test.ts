@@ -878,9 +878,10 @@ describe("plate retakes", () => {
     const prompt = buildEraPatchDepthEditPrompt();
     expect(prompt).toMatch(/locked master|do not reframe/i);
     expect(prompt).toMatch(/Freedom seal|fingerprint/i);
-    expect(prompt).toMatch(/do not redraw/i);
-    expect(prompt).toMatch(/bevel|rim light|contact shadow/i);
-    expect(prompt).toMatch(/white face|opaque white/i);
+    expect(prompt).toMatch(/ridge/i);
+    expect(prompt).toMatch(/do not redraw|Restore the seal face/i);
+    expect(prompt).toMatch(/bevel|rim light|contact shadow|thickness|extrusion/i);
+    expect(prompt).toMatch(/white|opaque white/i);
     expect(prompt).toContain(OMNI_TEXT_BAN);
   });
 

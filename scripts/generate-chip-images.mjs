@@ -27,6 +27,7 @@ import {
   readFileSync,
   writeFileSync,
 } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -423,15 +424,32 @@ async function main() {
       APP,
       "public/concepts/refs/packages/Patch_Freedom_NoPeel_RGB.png",
     );
-    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    const neonBg = join(NEON_CITY_OUT, "16x9", "sp-stack-00-era.png");
     if (!existsSync(patchPath)) throw new Error(`missing ${patchPath}`);
-    const backup = `${scenePath}.pre-depth`;
-    if (!existsSync(backup)) {
-      copyFileSync(scenePath, backup);
-      console.log(`backup: ${backup}`);
+    if (!existsSync(neonBg)) throw new Error(`missing ${neonBg}`);
+
+    // Always rebuild from the official NoPeel still first so fingerprint ridges
+    // are exact before the Gemini depth/lighting pass.
+    console.log("era-depth: recomposing from official NoPeel + neon city BG");
+    const compose = spawnSync(
+      "python3",
+      [join(APP, "scripts/compose-era-plate.py"), "--also-tron"],
+      { cwd: APP, encoding: "utf8" },
+    );
+    if (compose.status !== 0) {
+      throw new Error(
+        `compose-era-plate failed: ${compose.stderr || compose.stdout}`,
+      );
     }
+    console.log(compose.stdout.trim());
+
+    if (!existsSync(scenePath)) throw new Error(`missing ${scenePath}`);
+    const backup = `${scenePath}.pre-depth`;
+    copyFileSync(scenePath, backup);
+    console.log(`backup: ${backup}`);
+
     const prompt = buildEraPatchDepthEditPrompt();
-    console.log("era-depth: sp-stack-00-era.png (lighting only)");
+    console.log("era-depth: Gemini thickness + ridge restore on sp-stack-00-era.png");
     await withRetries(() =>
       generateImage({
         apiKey,
@@ -443,7 +461,6 @@ async function main() {
         recompose: true,
       }),
     );
-    // Keep tron in sync for PPTX tron variant.
     copyFileSync(scenePath, join(APP, "public/concepts/clean-tron/sp-stack-00-era.png"));
     console.log(`  wrote ${scenePath}`);
     return;
