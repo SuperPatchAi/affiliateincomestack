@@ -119,6 +119,21 @@ export function ExperienceScene({
                 ))}
               </HeadingTag>
             </div>
+          ) : slide.copyLayout === "headline-only" ? (
+            <div
+              className="scene-copy scene-copy--headline-only"
+              data-scene-copy
+              tabIndex={0}
+              aria-label={slide.headline}
+            >
+              <HeadingTag
+                className="scene-headline scene-headline--era"
+                data-anim="headline"
+                data-anim-layer="headline"
+              >
+                {slide.headline}
+              </HeadingTag>
+            </div>
           ) : (
             <div
               className="scene-copy"

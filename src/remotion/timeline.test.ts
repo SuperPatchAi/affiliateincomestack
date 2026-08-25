@@ -49,9 +49,9 @@ describe("remotion timeline", () => {
     );
   });
 
-  it("keeps the film on the 23-scene cut without the hero-caption scene", () => {
+  it("keeps the film on the 23-scene cut without the headline-only opener", () => {
     expect(FILM_SLIDES).toHaveLength(23);
-    expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00-super-stack");
+    expect(FILM_SLIDES.map((s) => s.id)).not.toContain("00-era");
     expect(FILM_SLIDES[0].id).toBe("01-title");
   });
 });

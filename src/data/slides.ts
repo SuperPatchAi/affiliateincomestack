@@ -167,8 +167,11 @@ export type Slide = {
   chips?: SequencedChip[];
   flywheelArc?: FlywheelArc;
   motionPreset: string;
-  /** Scene 01 renders a centered hero caption instead of the cinematic lower third. */
-  copyLayout?: "lower-third" | "hero-caption";
+  /**
+   * `hero-caption` — centered product caption (web).
+   * `headline-only` — single headline, no eyebrow/body (era opener).
+   */
+  copyLayout?: "lower-third" | "hero-caption" | "headline-only";
   requiresDisclosure: boolean;
 };
 
@@ -243,15 +246,16 @@ export function assertHeroMedia(slide: Slide): void {
 }
 
 export function assertSlidesValid(slides: Slide[]): void {
-  if (slides.length !== 23) {
-    throw new Error(`Expected 23 slides, got ${slides.length}`);
+  if (slides.length !== 24) {
+    throw new Error(`Expected 24 slides, got ${slides.length}`);
   }
   for (const s of slides) {
     const heroCaption = s.copyLayout === "hero-caption";
+    const headlineOnly = s.copyLayout === "headline-only";
     if (!s.headline?.trim()) {
       throw new Error(`Slide ${s.id} missing headline`);
     }
-    if (!heroCaption) {
+    if (!heroCaption && !headlineOnly) {
       if (!s.eyebrow?.trim() || !s.body?.trim()) {
         throw new Error(`Slide ${s.id} missing copy fields`);
       }
@@ -294,8 +298,13 @@ export function assertSlidesValid(slides: Slide[]): void {
       }
     }
     const chips = s.chips ?? [];
-    if (chips.length > 0 && s.copyLayout === "hero-caption") {
-      throw new Error(`Slide ${s.id} is hero-caption and cannot carry chips`);
+    if (
+      chips.length > 0 &&
+      (s.copyLayout === "hero-caption" || s.copyLayout === "headline-only")
+    ) {
+      throw new Error(
+        `Slide ${s.id} is ${s.copyLayout} and cannot carry chips`,
+      );
     }
     if (chips.length > 6) {
       throw new Error(`Slide ${s.id} has ${chips.length} chips; at most 6 chips per scene`);
@@ -329,12 +338,12 @@ export type ExperienceChapter = {
   sceneEnd: number;
 };
 
-/** Chapter groupings after dropping the 3D logo opener — scenes 01–10, 11–19, 20–22, 23. */
+/** Chapter groupings — era opener + full stack, ten streams, momentum, action. */
 export const EXPERIENCE_CHAPTERS: ExperienceChapter[] = [
-  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 9 },
-  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 10, sceneEnd: 18 },
-  { id: "momentum", label: "Momentum", sceneStart: 19, sceneEnd: 21 },
-  { id: "action", label: "Action", sceneStart: 22, sceneEnd: 22 },
+  { id: "full-stack", label: "Full Stack", sceneStart: 0, sceneEnd: 10 },
+  { id: "ten-income-streams", label: "Ten Income Streams", sceneStart: 11, sceneEnd: 19 },
+  { id: "momentum", label: "Momentum", sceneStart: 20, sceneEnd: 22 },
+  { id: "action", label: "Action", sceneStart: 23, sceneEnd: 23 },
 ];
 
 export function chapterForSceneIndex(index: number): ExperienceChapter {
@@ -353,6 +362,19 @@ export function formatSceneCounter(index: number): string {
 }
 
 export const SLIDES: Slide[] = [
+  {
+    id: "00-era",
+    conceptSrc: "/concepts/clean/sp-stack-00-era.png",
+    accent: "cool",
+    eyebrow: "",
+    headline: "Join the SuperPatch Era.",
+    body: "",
+    copyLayout: "headline-only",
+    motionPreset: "ken-burns-glow",
+    requiresDisclosure: false,
+    presenterNotes:
+      "Opener only — headline over the locked Freedom peel void plate. Do not invent claims; advance into the full Income Stack title.",
+  },
   {
     id: "01-title",
     conceptSrc: "/concepts/clean/sp-stack-01-title.png",
@@ -945,7 +967,8 @@ export const SLIDES: Slide[] = [
   },
 ];
 
-/** Remotion film scenes — the 3D hero-caption opener is web-only. */
-export const FILM_SLIDES: Slide[] = SLIDES.filter(
-  (s) => (s.copyLayout ?? "lower-third") !== "hero-caption",
-);
+/** Remotion film scenes — hero-caption / headline-only openers are web-only. */
+export const FILM_SLIDES: Slide[] = SLIDES.filter((s) => {
+  const layout = s.copyLayout ?? "lower-third";
+  return layout !== "hero-caption" && layout !== "headline-only";
+});

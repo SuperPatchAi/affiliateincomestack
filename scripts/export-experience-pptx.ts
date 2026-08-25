@@ -105,38 +105,43 @@ function addChrome(
 function addCopy(slide: PptxGenJS.Slide, pptx: PptxGenJS, spec: PptxSlideSpec) {
   const left = 0.85;
   const copyW = 7.2;
-  let y = 4.55;
+  let y = spec.headlineOnly ? 4.75 : 4.55;
 
-  slide.addShape(pptx.shapes.RECTANGLE, {
-    x: left,
-    y: y + 0.1,
-    w: 0.28,
-    h: 0.035,
-    fill: { color: COLORS.red },
-    line: { color: COLORS.red, width: 0 },
-  });
+  if (!spec.headlineOnly) {
+    slide.addShape(pptx.shapes.RECTANGLE, {
+      x: left,
+      y: y + 0.1,
+      w: 0.28,
+      h: 0.035,
+      fill: { color: COLORS.red },
+      line: { color: COLORS.red, width: 0 },
+    });
 
-  slide.addText(spec.eyebrowDisplay, {
-    x: left + 0.4,
-    y,
-    w: copyW - 0.4,
-    h: 0.28,
-    fontFace: "Montserrat",
-    fontSize: 11,
-    bold: true,
-    color: COLORS.white,
-    margin: 0,
-  });
-  y += 0.32;
+    slide.addText(spec.eyebrowDisplay, {
+      x: left + 0.4,
+      y,
+      w: copyW - 0.4,
+      h: 0.28,
+      fontFace: "Montserrat",
+      fontSize: 11,
+      bold: true,
+      color: COLORS.white,
+      margin: 0,
+    });
+    y += 0.32;
+  }
 
-  const headlineH = Math.min(1.55, 0.42 + spec.headlineDisplay.length * 0.012);
+  const headlineH = Math.min(
+    spec.headlineOnly ? 2.1 : 1.55,
+    0.42 + spec.headlineDisplay.length * 0.012,
+  );
   slide.addText(spec.headlineDisplay, {
     x: left,
     y,
     w: copyW,
     h: headlineH,
     fontFace: "Montserrat",
-    fontSize: 40,
+    fontSize: spec.headlineOnly ? 48 : 40,
     bold: true,
     color: COLORS.white,
     margin: 0,
@@ -152,18 +157,20 @@ function addCopy(slide: PptxGenJS.Slide, pptx: PptxGenJS, spec: PptxSlideSpec) {
   });
   y += headlineH + 0.08;
 
-  slide.addText(spec.body, {
-    x: left,
-    y,
-    w: Math.min(copyW, 7.0),
-    h: 1.35,
-    fontFace: "Montserrat",
-    fontSize: 14,
-    color: COLORS.muted,
-    margin: 0,
-    valign: "top",
-  });
-  y += 1.2;
+  if (!spec.headlineOnly) {
+    slide.addText(spec.body, {
+      x: left,
+      y,
+      w: Math.min(copyW, 7.0),
+      h: 1.35,
+      fontFace: "Montserrat",
+      fontSize: 14,
+      color: COLORS.muted,
+      margin: 0,
+      valign: "top",
+    });
+    y += 1.2;
+  }
 
   if (spec.showStreamIndex && spec.streamLabels?.length) {
     const rows = spec.streamLabels.map((label, i) => ({

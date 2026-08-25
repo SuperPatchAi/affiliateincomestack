@@ -40,7 +40,9 @@ describe("pptx export model", () => {
 
   it("uses on-screen body when present, otherwise body", () => {
     const withOnScreen = SLIDES.find((s) => s.onScreenBody?.trim());
-    const without = SLIDES.find((s) => !s.onScreenBody?.trim());
+    const without = SLIDES.find(
+      (s) => !s.onScreenBody?.trim() && s.copyLayout !== "headline-only",
+    );
     expect(without).toBeDefined();
     const specs = buildPptxSlideSpecs(SLIDES);
     if (withOnScreen) {
@@ -87,8 +89,15 @@ describe("pptx export model", () => {
 
   it("uppercases headline for display while keeping source headline", () => {
     const first = buildPptxSlideSpecs(SLIDES)[0]!;
+    expect(first.slideId).toBe("00-era");
+    expect(first.headlineOnly).toBe(true);
     expect(first.headlineDisplay).toBe(first.headline.toUpperCase());
-    expect(first.eyebrowDisplay).toBe(first.eyebrow.toUpperCase());
+    expect(first.eyebrowDisplay).toBe("");
+    expect(first.body).toBe("");
+
+    const title = buildPptxSlideSpecs(SLIDES).find((s) => s.slideId === "01-title")!;
+    expect(title.headlineDisplay).toBe(title.headline.toUpperCase());
+    expect(title.eyebrowDisplay).toBe(title.eyebrow.toUpperCase());
   });
 
   it("exports the same SUPERPATCH wordmark family the web chrome uses", () => {

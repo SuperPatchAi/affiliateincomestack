@@ -16,9 +16,10 @@ import {
 } from "./slides";
 
 describe("SLIDES", () => {
-  it("has 23 slides with copy fields", () => {
-    expect(SLIDES).toHaveLength(23);
+  it("has 24 slides with copy fields", () => {
+    expect(SLIDES).toHaveLength(24);
     expect(SLIDES.map((s) => s.id)).toEqual([
+      "00-era",
       "01-title",
       "02-world",
       "03-four-stacks",
@@ -45,7 +46,9 @@ describe("SLIDES", () => {
     ]);
     for (const s of SLIDES) {
       expect(s.headline.length).toBeGreaterThan(0);
-      if (s.copyLayout === "hero-caption") continue;
+      if (s.copyLayout === "hero-caption" || s.copyLayout === "headline-only") {
+        continue;
+      }
       expect(s.eyebrow.length).toBeGreaterThan(0);
       const filmCopy = s.onScreenBody?.trim() ? s.onScreenBody : s.body;
       expect(wordCount(filmCopy)).toBeGreaterThanOrEqual(30);
@@ -53,23 +56,31 @@ describe("SLIDES", () => {
     }
   });
 
-  it("opens on the complete-opportunity title scene", () => {
-    const first = SLIDES[0];
-    expect(first.id).toBe("01-title");
-    expect(first.copyLayout).toBeUndefined();
-    expect(first.headline).toBe(
+  it("opens on the SuperPatch Era opener, then the complete-opportunity title", () => {
+    const era = SLIDES[0];
+    expect(era.id).toBe("00-era");
+    expect(era.copyLayout).toBe("headline-only");
+    expect(era.headline).toBe("Join the SuperPatch Era.");
+    expect(era.eyebrow).toBe("");
+    expect(era.body).toBe("");
+    expect(era.requiresDisclosure).toBe(false);
+
+    const title = SLIDES[1];
+    expect(title.id).toBe("01-title");
+    expect(title.copyLayout).toBeUndefined();
+    expect(title.headline).toBe(
       "More Than an Affiliate Program. A Complete Opportunity.",
     );
-    expect(first.eyebrow).toBe("The Super Patch Income Stack™");
-    expect(first.requiresDisclosure).toBe(false);
+    expect(title.eyebrow).toBe("The Super Patch Income Stack™");
+    expect(title.requiresDisclosure).toBe(false);
   });
 
-  it("keeps the trademark on the opening title scene", () => {
-    expect(SLIDES[0].id).toBe("01-title");
-    expect(SLIDES[0].eyebrow).toBe("The Super Patch Income Stack™");
+  it("keeps the trademark on the Income Stack title scene", () => {
+    expect(SLIDES[1].id).toBe("01-title");
+    expect(SLIDES[1].eyebrow).toBe("The Super Patch Income Stack™");
   });
 
-  it("exempts hero-caption slides from lower-third copy validation", () => {
+  it("exempts hero-caption and headline-only slides from lower-third copy validation", () => {
     expect(() => assertSlidesValid(SLIDES)).not.toThrow();
   });
 
@@ -240,7 +251,7 @@ describe("assertSlidesValid chip rules", () => {
     requiresDisclosure: false,
   };
   const stack = (overrides: Partial<Slide>): Slide[] =>
-    Array.from({ length: 23 }, (_, i) =>
+    Array.from({ length: 24 }, (_, i) =>
       i === 1 ? { ...validSlide, ...overrides, id: `s${i}` } : { ...validSlide, id: `s${i}` },
     );
 
@@ -285,6 +296,19 @@ describe("assertSlidesValid chip rules", () => {
         }),
       ),
     ).toThrow(/hero-caption/);
+  });
+
+  it("rejects chips on headline-only scenes", () => {
+    expect(() =>
+      assertSlidesValid(
+        stack({
+          copyLayout: "headline-only",
+          eyebrow: "",
+          body: "",
+          chips: [{ label: "CHIP", sub: "A supporting line of copy." }],
+        }),
+      ),
+    ).toThrow(/headline-only/);
   });
 });
 
@@ -550,6 +574,7 @@ describe("plate annotations", () => {
 
   it("uses animated hero loops on Omni scenes and omits hero on still-only beats", () => {
     const stillOnly = new Set([
+      "00-era",
       "02-world",
       "03b-name-stacks",
       "05b-science",

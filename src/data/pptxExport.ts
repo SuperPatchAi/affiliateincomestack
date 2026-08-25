@@ -24,6 +24,8 @@ export type PptxSlideSpec = {
   headline: string;
   headlineDisplay: string;
   body: string;
+  /** Skip eyebrow + body blocks (era opener). */
+  headlineOnly?: boolean;
   disclosure?: string;
   ctaPrimary?: string;
   ctaSecondary?: string;
@@ -65,20 +67,24 @@ export function buildPptxSlideSpecs(
   variant: PptxPlateVariant = "photoreal",
 ): PptxSlideSpec[] {
   return slides.map((slide, index) => {
-    const body = slide.onScreenBody?.trim()
-      ? slide.onScreenBody.trim()
-      : slide.body;
+    const headlineOnly = slide.copyLayout === "headline-only";
+    const body = headlineOnly
+      ? ""
+      : slide.onScreenBody?.trim()
+        ? slide.onScreenBody.trim()
+        : slide.body;
     const showStreamIndex = isStreamIndexSlide(slide.id);
     const streamSlide = isIncomeStreamSlide(slide.id);
     return {
       slideId: slide.id,
       index,
       backgroundPublicPath: resolvePptxBackgroundPath(slide.conceptSrc, variant),
-      eyebrow: slide.eyebrow,
-      eyebrowDisplay: slide.eyebrow.toUpperCase(),
+      eyebrow: headlineOnly ? "" : slide.eyebrow,
+      eyebrowDisplay: headlineOnly ? "" : slide.eyebrow.toUpperCase(),
       headline: slide.headline,
       headlineDisplay: slide.headline.toUpperCase(),
       body,
+      headlineOnly: headlineOnly || undefined,
       disclosure: slide.disclosure,
       ctaPrimary: slide.ctaPrimary,
       ctaSecondary: slide.ctaSecondary,

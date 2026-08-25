@@ -590,6 +590,17 @@
   pointer-events: auto;
 }
 
+/* Era opener: single headline on quiet left — no eyebrow/body stack. */
+.scene-copy--headline-only {
+  gap: 0;
+  width: min(720px, calc(100vw - clamp(76px, 17vw, 250px)));
+}
+
+.scene-headline--era {
+  max-width: 14ch;
+  font-size: clamp(2.85rem, 5.8vw, 7.1rem);
+}
+
 /* Scene 01 hero caption: centered under the patch, above the receding floor.
    Not the left lower third — do not reuse .scene-copy offsets. */
 .scene-copy-hero {
