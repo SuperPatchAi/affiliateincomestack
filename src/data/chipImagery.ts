@@ -1723,6 +1723,17 @@ export const NEON_CITY_EXISTING_FITS: Readonly<Record<string, string>> = {
  */
 export const NEON_CITY_PLATE_RETAKES: PlateRetakeSpec[] = [
   {
+    plateFile: "sp-stack-00-era.png",
+    slideId: "00-era",
+    accent: "cyan and magenta neon on wet night glass with quieter darker left",
+    style: NEON_CITY_STYLE_ANCHOR,
+    composeFromPhotoreal: false,
+    subject:
+      "A rain-slicked neon night-city photograph with no product and no people: wet reflective plaza or terrace looking into a cyan-magenta metropolis, soft bokeh towers, deep clean blacks. Completely empty center-right midground — leave a large open dark reflective zone for a later translucent product overlay. Quiet darker left third for later type. Architecture and light only — no patches, no stickers, no packages, no figures, no faces, no readable text.",
+    motion:
+      "Distant neon traffic trails drift. Wet reflections shimmer. Slow almost-still push-in.",
+  },
+  {
     plateFile: "sp-stack-01-title.png",
     slideId: "01-title",
     accent: "cyan and magenta neon on wet glass and night skin",

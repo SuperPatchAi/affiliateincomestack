@@ -847,6 +847,17 @@
       "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-neon-city/16x9/sp-stack-05c-market.png",
       "aspect": "16:9",
       "generatedAt": "2026-08-24T18:27:05.736Z"
+    },
+    "neon-city:16x9/sp-stack-00-era.png": {
+      "prompt": "Cinematic photorealistic night-city photograph: a rain-slicked metropolis after dark, alive with vivid mixed neon color — cyan, magenta, amber, and violet — glowing from windows, abstract signage shapes, and traffic light trails, with wet asphalt and glass mirroring every glow. Shot like a premium Apple x Nike commercial on anamorphic lenses: shallow depth of field, deep clean blacks, cinematic contrast. Keep the hero subject centered with quieter, darker edges reserved for later interface overlays. Every sign, screen, and billboard reads as pure abstract glowing shape or soft bokeh — no readable characters anywhere in the scene. Lived-in adult skin in open shade: visible pores, laugh lines, fine wrinkles where age calls for them, slight uneven tone, a stray blemish or freckle. Faces look photographed, not retouched. Not plastic, not airbrushed, not a beauty filter, not porcelain CGI. Compose a fresh rain-slicked neon night-city photograph — cyan, magenta, amber, and violet glows, wet reflections, deep clean blacks. Do not include mountains, alpine ridges, snow fields, or wilderness terrain. Accent lighting: cyan and magenta neon on wet night glass with quieter darker left. A rain-slicked neon night-city photograph with no product and no people: wet reflective plaza or terrace looking into a cyan-magenta metropolis, soft bokeh towers, deep clean blacks. Completely empty center-right midground — leave a large open dark reflective zone for a later translucent product overlay. Quiet darker left third for later type. Architecture and light only — no patches, no stickers, no packages, no figures, no faces, no readable text. Absolutely no on-screen text, letters, numbers, captions, logos, watermarks, UI chrome, or typography of any kind. Do not form letter-like shapes from grids, light trails, or geometry — including N, И, mirrored N, Z, or any alphabet glyph. Pure cinematic motion graphics only. Soft ambient cinematic audio bed only — no dialogue, no voiceover, no speech.",
+      "refs": [
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-neon-city/16x9/sp-stack-01-title.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-neon-city/16x9/sp-stack-02-world.png",
+        "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-neon-city/16x9/sp-stack-07-development.png"
+      ],
+      "out": "/Users/cbsuperpatch/Desktop/ClaudeSkills/.worktrees/affiliate-income-stack-main/public/concepts/clean-neon-city/16x9/sp-stack-00-era.png",
+      "aspect": "16:9",
+      "generatedAt": "2026-08-25T17:29:28.307Z"
     }
   }
 }
