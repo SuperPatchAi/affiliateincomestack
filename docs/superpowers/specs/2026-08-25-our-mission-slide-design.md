@@ -1,7 +1,7 @@
 # Our Mission Slide — Design
 
 **Date:** 2026-08-25  
-**Status:** Wired  
+**Status:** Locked (operator approved plate)  
 **Deck:** SuperPatch Income Stack experience + PPTX
 
 ## Goal
@@ -28,11 +28,11 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 
 ## Plate — Concept B (Constellation of lives)
 
-- Dark void-adjacent night: warm amber + cyan-magenta **photographic bokeh** (soft out-of-focus orbs / path-light blooms) suggesting people at scale; connection via clustered depth, not mesh lines
-- Quiet darker **left** third for the headline
-- No faces / hero figures / products / packages; not terrace, not street-level sidewalk; ban wireframe / node-edge / constellation chart lines (avoids UI read)
+- One continuous night photograph: photographic bokeh orbs rising from the **same** neon city (not a void plate pasted beside a street plate)
+- Left third quieter/darker within that same scene for the headline — same horizon and color, no vertical seam
+- No faces / products; ban mesh/UI lines; ban split-screen / diptych / collage
 - Live path: `public/concepts/clean/sp-stack-00b-mission.png`
-- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true` (no `neonVoidStage` — city rim must remain)
+- Gen: `composeFromPhotoreal: false` + `skipNeonStyleLock: true`
 
 ## Experience + PPTX
 
@@ -46,4 +46,4 @@ Add a **new slide** after the Income Stack title with hero text **Our Mission.**
 - [x] Opens as scene 3 (after era + title)
 - [x] Headline on-screen: Our Mission.
 - [x] Constellation-over-city plate; quiet left; empty of people/product/UI
-- [x] PPTX regenerated with 25 slides
+- [x] Operator locked current plate (photographic bokeh field over continuous neon city)
